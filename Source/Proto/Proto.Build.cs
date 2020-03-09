@@ -8,7 +8,7 @@ public class Proto : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "OnlineSubsystem", "OnlineSubsystemUtils" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "OnlineSubsystem", "Http", "Json", "JsonUtilities", "OnlineSubsystemUtils" });
 
 		DynamicallyLoadedModuleNames.Add("OnlineSubsystemNull");
 
