@@ -20,4 +20,7 @@ void APcon_Login::BeginPlay()
 	Super::BeginPlay();
 
 	WG_Login_Ref = CreateWidget<UWG_Login>(this,WG_Login_Class);
+	WG_Login_Ref->AddToViewport(0);
+
+	bShowMouseCursor = true;
 }
