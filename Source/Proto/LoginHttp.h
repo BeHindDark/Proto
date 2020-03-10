@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Proto.h"
 #include "GameFramework/Actor.h"
-#include "Runtime/Online/HTTP/Public/Http.h"
+#include "Online/HTTP/Public/Http.h"
 #include "LoginHttp.generated.h"
 
 UCLASS()
