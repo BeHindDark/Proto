@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Proto.h"
 #include "GameFramework/GameModeBase.h"
 #include "GM_Main.generated.h"
 
@@ -14,4 +14,5 @@ class PROTO_API AGM_Main : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+	AGM_Main();
 };

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Proto.h"
 #include "GameFramework/Pawn.h"
 #include "Pawn_Showcase.generated.h"
 
@@ -26,4 +26,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+public:
+	UPROPERTY(VisibleAnywhere, Category=Root)
+	USceneComponent* DefaultSceneRoot;
+
+	UPROPERTY(VisibleAnywhere, Category=Camera)
+	UCameraComponent* Camera;
 };

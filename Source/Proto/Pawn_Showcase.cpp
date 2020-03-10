@@ -7,8 +7,13 @@
 APawn_Showcase::APawn_Showcase()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
+	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+
+	RootComponent = DefaultSceneRoot;
+	Camera->SetupAttachment(DefaultSceneRoot);
 }
 
 // Called when the game starts or when spawned
