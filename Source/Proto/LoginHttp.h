@@ -18,6 +18,12 @@ public:
 
 	FHttpModule* Http;
 
+	// http로 url로 요청 Get으로 userId, userPw로 전달해주는 함수 
+	UFUNCTION(BlueprintCallable, Category = "LoginHttp")
+	void SendAccountCreationRequest(const FString& userId, const FString& userPw);
+
+	// http Get 요청 직후 호출되는 콜백함수
+	void OnAccountCreationResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
