@@ -16,17 +16,22 @@ ALoginHttp::ALoginHttp()
 
 void ALoginHttp::SendAccountCreationRequest(const FString& userId, const FString& userPw)
 {
-	// Http를 생성 요청
+/*
+	동작 순서
+	1. HttpRequest(요청) 생성한다
+	2. 요청 방식은 "Get" or "Post" 방식으로 설정한다
+	3. 요청 URL은 인자값으로 받은 URL을 사용하도록 설정한다
+	4. *중요, 요청 후 프레임마다 받은 바이트의 크기를 리턴해준다	
+	해당 OnAccountCreationResponse 함수를 연결시켜준다
+	5. 요청이 완료됬을 때 호출할 함수를 연결해준다
+	6. 요청을 보내준다
+*/
 	TSharedRef<IHttpRequest> Request = Http->CreateRequest();
-	// http로 요청을 시작한다. 
-	Request->OnProcessRequestComplete().BindUObject(this, &ALoginHttp::OnAccountCreationResponse);
-	// http로 userId, userPw 데이터를 url를 이용하여 데이터를 보내준다
-	Request->SetURL(FString::Printf(TEXT("http://192.168.116.135::80/d.php?userId=%s&userPw=%s"), *userId, *userPw));
-	// Get으로 요청을 해준다
 	Request->SetVerb("Get");
+	Request->SetURL(FString::Printf(TEXT("http://192.168.116.135::80/d.php?userId=%s&userPw=%s"), *userId, *userPw));
+	Request->OnProcessRequestComplete().BindUObject(this, &ALoginHttp::OnAccountCreationResponse);
 	Request->SetHeader(TEXT("User-Agent"), "x-UnrealEngin-Agent");
 	Request->SetHeader("Content-Type", TEXT("application/json"));
-	// 요청 처리를 시작하기 위해 호출
 	Request->ProcessRequest();
 }
 
@@ -34,7 +39,7 @@ void ALoginHttp::OnAccountCreationResponse(FHttpRequestPtr Request, FHttpRespons
 {
 	TSharedPtr<FJsonObject> JsonObject;
 
-	//TSharedRef<<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+	TSharedPtr<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 	/*
 	if (FJsonSerializer::Deserialize(Reader, JsonObject))
 	{
@@ -42,6 +47,7 @@ void ALoginHttp::OnAccountCreationResponse(FHttpRequestPtr Request, FHttpRespons
 		FString Username = JsonObject->GetStringField("Username");
 	}
 	*/
+	
 }
 
 // Called when the game starts or when spawned
