@@ -13,5 +13,10 @@ UCLASS()
 class PROTO_API UWG_Login : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+
+protected:
+
+	UFUNCTION(BlurprintCallable)
+	void IDCommitted();
 };

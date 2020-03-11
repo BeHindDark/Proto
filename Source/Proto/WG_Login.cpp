@@ -3,3 +3,7 @@
 
 #include "WG_Login.h"
 
+
+void UWG_Login::IDCommitted() {
+
+}
