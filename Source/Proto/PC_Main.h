@@ -13,5 +13,14 @@ UCLASS()
 class PROTO_API APC_Main : public APlayerController
 {
 	GENERATED_BODY()
-	
+
+	APC_Main();
+
+protected:
+	virtual void BeginPlay() override;
+	UPROPERTY()
+	TSubclassOf<class UWG_Main> WG_Main_Class;
+
+	UPROPERTY()
+	class UWG_Main* WG_Main;
 };
