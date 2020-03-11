@@ -4,17 +4,17 @@
 
 #include "Proto.h"
 #include "GameFramework/PlayerController.h"
-#include "Pcon_Login.generated.h"
+#include "PC_Login.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROTO_API APcon_Login : public APlayerController
+class PROTO_API APC_Login : public APlayerController
 {
 	GENERATED_BODY()
-	
-	APcon_Login();
+
+	APC_Login();
 protected:
 	virtual void BeginPlay() override;
 

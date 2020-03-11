@@ -4,7 +4,7 @@
 
 #include "Proto.h"
 #include "Engine/GameInstance.h"
-#include "GameInstance_Proto.generated.h"
+#include "GI_Proto.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCreateSessionReportDelegate, bool);
 
@@ -15,15 +15,15 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnJoinSessionReportDelegate, bool);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDestroySessionReportDelegate, bool);
 
 /**
- * 
+ *
  */
 UCLASS()
-class PROTO_API UGameInstance_Proto : public UGameInstance
+class PROTO_API UGI_Proto : public UGameInstance
 {
 	GENERATED_BODY()
-	
+
 public:
-	UGameInstance_Proto(const FObjectInitializer& ObjectInitializer);
+	UGI_Proto(const FObjectInitializer& ObjectInitializer);
 
 	/**
 	$$각종 게임 정보 저장에 필요한 변수들.
@@ -77,9 +77,9 @@ public:
 	/** 세션 참가 준비완료시 호출되는 델리게이트 Delegate for joining a session */
 	FOnJoinSessionCompleteDelegate OnJoinSessionCompleteDelegate;
 
-	/** Handle to registered delegate for joining a session */ 
+	/** Handle to registered delegate for joining a session */
 	FDelegateHandle OnJoinSessionCompleteDelegateHandle;
-	
+
 
 	//Delegate and handle for Destroy Session
 	/** 세션 종료 완료시 호출되는 델리게이트 Delegate for destroying a session */
@@ -106,7 +106,7 @@ public:
 	*	@Param		MaxNumPlayers	최대 참가가능한 플레이어 수/Number of Maximum allowed players on this "Session" (Server)
 	*	@Memo		UserID를 구하는 법은 : ULocalPlayer* const Player = GetFirstGamePlayer()에서 Player->GetPreferredUniqueNetID();이다.
 	*/
-	bool HostSession(TSharedPtr<const FUniqueNetId> UserId,FName SessionName,bool bIsLAN,bool bIsPresence,int32 MaxNumPlayers);
+	bool HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers);
 
 	/**
 	*	Session생성 요청이 완료되었을 때 실행되는 델리게이트함수/Function fired when a session create request has completed
@@ -114,7 +114,7 @@ public:
 	*	@param SessionName		해당하는 세션 이름/the name of the session this callback is for
 	*	@param bWasSuccessful true if the async action completed without error, false if there was an error
 	*/
-	virtual void OnCreateSessionComplete(FName SessionName,bool bWasSuccessful);
+	virtual void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
 
 	/**
 	*	Session시작 요청이 완료되었을 때 실행되는 델리게이트함수/Function fired when a session start request has completed
@@ -122,7 +122,7 @@ public:
 	*	@param SessionName the name of the session this callback is for
 	*	@param bWasSuccessful true if the async action completed without error, false if there was an error
 	*/
-	void OnStartOnlineGameComplete(FName SessionName,bool bWasSuccessful);
+	void OnStartOnlineGameComplete(FName SessionName, bool bWasSuccessful);
 
 	/**
 	*	세션 검색/Find an online session
@@ -131,7 +131,7 @@ public:
 	*	@param bIsLAN		LAN게임을 검색할지 여부/are we searching LAN matches
 	*	@param bIsPresence	are we searching presence sessions
 	*/
-	void FindSessions(TSharedPtr<const FUniqueNetId> UserId,bool bIsLAN,bool bIsPresence);
+	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
 
 	/**
 	*	세션 검색이 끝났을 때 호출되는 델리게이트함수/Delegate fired when a session search query has completed
@@ -148,7 +148,7 @@ public:
 	*
 	*	@return bool		성공여부/true if successful, false otherwise
 	*/
-	bool JoinSession(TSharedPtr<const FUniqueNetId> UserId,FName SessionName,const FOnlineSessionSearchResult& SearchResult);
+	bool JoinSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult);
 
 	/**
 	*	세션 참가요청이 완료되었을 때 실행되는 델리게이트함수/Delegate fired when a session join request has completed
@@ -156,7 +156,7 @@ public:
 	*	@param SessionName the name of the session this callback is for
 	*	@param bWasSuccessful true if the async action completed without error, false if there was an error
 	*/
-	void OnJoinSessionComplete(FName SessionName,EOnJoinSessionCompleteResult::Type Result);
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 	/**
 	*	현재 참가중인 세션에서 나갑니다.
@@ -170,5 +170,5 @@ public:
 	*	@param SessionName the name of the session this callback is for
 	*	@param bWasSuccessful true if the async action completed without error, false if there was an error
 	*/
-	virtual void OnDestroySessionComplete(FName SessionName,bool bWasSuccessful);
+	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 };

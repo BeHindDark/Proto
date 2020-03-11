@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Pawn_Showcase.h"
+#include "Pn_Showcase.h"
 
 // Sets default values
-APawn_Showcase::APawn_Showcase()
+APn_Showcase::APn_Showcase()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
@@ -14,24 +14,25 @@ APawn_Showcase::APawn_Showcase()
 
 	RootComponent = DefaultSceneRoot;
 	Camera->SetupAttachment(DefaultSceneRoot);
+
 }
 
 // Called when the game starts or when spawned
-void APawn_Showcase::BeginPlay()
+void APn_Showcase::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void APawn_Showcase::Tick(float DeltaTime)
+void APn_Showcase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
 // Called to bind functionality to input
-void APawn_Showcase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void APn_Showcase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 

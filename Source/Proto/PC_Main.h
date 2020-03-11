@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Proto.h"
 #include "GameFramework/PlayerController.h"
-#include "Pcon_Main.generated.h"
+#include "PC_Main.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROTO_API APcon_Main : public APlayerController
+class PROTO_API APC_Main : public APlayerController
 {
 	GENERATED_BODY()
 	

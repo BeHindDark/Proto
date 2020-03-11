@@ -2,11 +2,11 @@
 
 
 #include "GM_Main.h"
-#include "Pawn_Showcase.h"
-#include "Pcon_Main.h"
+#include "Pn_Showcase.h"
+#include "PC_Main.h"
 
 AGM_Main::AGM_Main()
 {
-	DefaultPawnClass = APawn_Showcase::StaticClass();
-	PlayerControllerClass = APcon_Main::StaticClass();
+	DefaultPawnClass = APn_Showcase::StaticClass();
+	PlayerControllerClass = APC_Main::StaticClass();
 }

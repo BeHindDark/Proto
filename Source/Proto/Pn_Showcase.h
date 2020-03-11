@@ -4,16 +4,16 @@
 
 #include "Proto.h"
 #include "GameFramework/Pawn.h"
-#include "Pawn_Showcase.generated.h"
+#include "Pn_Showcase.generated.h"
 
 UCLASS()
-class PROTO_API APawn_Showcase : public APawn
+class PROTO_API APn_Showcase : public APawn
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
-	APawn_Showcase();
+	APn_Showcase();
 
 protected:
 	// Called when the game starts or when spawned
@@ -27,9 +27,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
-	UPROPERTY(VisibleAnywhere, Category=Root)
+	UPROPERTY(VisibleAnywhere, Category = Root)
 	USceneComponent* DefaultSceneRoot;
 
-	UPROPERTY(VisibleAnywhere, Category=Camera)
+	UPROPERTY(VisibleAnywhere, Category = Camera)
 	UCameraComponent* Camera;
 };
