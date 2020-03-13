@@ -13,5 +13,27 @@ UCLASS()
 class PROTO_API UWG_Login : public UUserWidget
 {
 	GENERATED_BODY()
+
+
+protected:
+
+	virtual void NativeConstruct() override;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* LoginButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* IDInput;
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* PWInput;
 	
+	UFUNCTION()
+	void IDCommitted();
+
+	UFUNCTION()
+	void PassWordCommitted();
+
+	UFUNCTION()
+	void OnLoginClicked();
 };
