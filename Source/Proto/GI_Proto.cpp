@@ -17,6 +17,13 @@ UGI_Proto::UGI_Proto(const FObjectInitializer& ObjectInitializer) {
 }
 
 bool UGI_Proto::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers) {
+
+	// Creating a local player where we can get the UserID from
+	//ULocalPlayer* const Player = GetFirstGamePlayer();
+
+	// Call our custom HostSession function. GameSessionName is a GameInstance variable
+	//HostSession(Player->GetPreferredUniqueNetId(),GameSessionName,true,true,4);
+
 	//return bool
 	bool bSuccess = false;
 
@@ -44,9 +51,10 @@ bool UGI_Proto::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName Session
 			SessionSettings->bAllowJoinViaPresenceFriendsOnly = false;
 
 			//커스텀 세팅 추가
+			SessionSettings->Settings.Add(FName("SessionFrontName"),FOnlineSessionSetting(FString(TEXT("Session Name to show to the users")),EOnlineDataAdvertisementType::ViaOnlineService));
 			SessionSettings->Settings.Add(FName("bIsPrivate"), FOnlineSessionSetting(false, EOnlineDataAdvertisementType::ViaOnlineService));
-			SessionSettings->Settings.Add(FName("HostUserID"), FOnlineSessionSetting(FString(TEXT("userid")), EOnlineDataAdvertisementType::ViaOnlineService));
-			SessionSettings->Settings.Add(FName("SessionDescription"), FOnlineSessionSetting(FString(TEXT("sessiondescription")), EOnlineDataAdvertisementType::ViaOnlineService));
+			SessionSettings->Settings.Add(FName("HostUserID"), FOnlineSessionSetting(FString(TEXT("Session Host's UserID")), EOnlineDataAdvertisementType::ViaOnlineService));
+			SessionSettings->Settings.Add(FName("SessionDescription"), FOnlineSessionSetting(FString(TEXT("SessionDescription written by Host")), EOnlineDataAdvertisementType::ViaOnlineService));
 
 			//거꾸로 세션 세팅을 받아갈때는 아래와 같이 합니다.
 			//bool val;
@@ -93,6 +101,7 @@ void UGI_Proto::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful) 
 
 				// Our StartSessionComplete delegate should get called after this
 				Sessions->StartSession(SessionName);
+				
 			}
 		}
 	}

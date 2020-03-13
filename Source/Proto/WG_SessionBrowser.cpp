@@ -3,6 +3,7 @@
 
 #include "WG_SessionBrowser.h"
 #include "Components/CanvasPanel.h"
+#include "Components/Button.h"
 
 
 void UWG_SessionBrowser::NativeConstruct()
@@ -12,4 +13,5 @@ void UWG_SessionBrowser::NativeConstruct()
 	//WG_SessionList = CreateWidget<UUserWidget>(this, WG_SessionList_Class);
 
 	//BackgroundCanvasPanel->AddChildToCanvas(WG_SessionList);
+	
 }

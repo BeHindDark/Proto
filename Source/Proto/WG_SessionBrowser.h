@@ -19,6 +19,6 @@ protected:
 
 public:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	class WG_SessionList* WG_SessionList;
+	class UWG_SessionList* WG_SessionList;
 	
 };
