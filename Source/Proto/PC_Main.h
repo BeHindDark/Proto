@@ -18,6 +18,7 @@ class PROTO_API APC_Main : public APlayerController
 
 protected:
 	virtual void BeginPlay() override;
+
 	UPROPERTY()
 	TSubclassOf<class UWG_Main> WG_Main_Class;
 
