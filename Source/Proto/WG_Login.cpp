@@ -12,10 +12,10 @@ void UWG_Login::NativeConstruct() {
 	LoginButton->OnClicked.AddDynamic(this, &UWG_Login::OnLoginClicked);
 	
 	IDInput = Cast<UEditableTextBox>(GetWidgetFromName(TEXT("IDInput")));
-	if (IDInput != nullptr) {
+	/*if (IDInput != nullptr) {
 		IDInput->OnTextCommitted.RemoveDynamic(this, UWG_Login::IDCommitted);
 		IDInput->OnTextCommitted.AddDynamic(this, &UWG_Login::IDCommitted);
-	}
+	}*/
 
 }
 
