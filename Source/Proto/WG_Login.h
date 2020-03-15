@@ -19,6 +19,8 @@ protected:
 
 	virtual void NativeConstruct() override;
 
+protected:
+
 	UPROPERTY(meta = (BindWidget))
 	class UButton* LoginButton;
 
@@ -28,6 +30,8 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* PWInput;
 	
+private:
+
 	UFUNCTION()
 	void IDCommitted();
 
