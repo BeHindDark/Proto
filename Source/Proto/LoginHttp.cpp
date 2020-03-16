@@ -29,7 +29,7 @@ void ALoginHttp::SendAccountCreationRequest(const FString& userId, const FString
 
 	TSharedRef<IHttpRequest> Request = Http->CreateRequest();
 	Request->SetVerb("Get");
-	Request->SetURL(FString::Printf(TEXT("http://192.168.161.142:8080/join.php?userId=%s&userPw=%s&userName=%s"), *userId, *userPw, *userName));
+	Request->SetURL(FString::Printf(TEXT("http://192.168.116.142:8080/join.php?userId=%s&userPw=%s&userName=%s"), *userId, *userPw, *userName));
 	Request->OnProcessRequestComplete().BindUObject(this, &ALoginHttp::OnAccountCreationResponse);
 	Request->SetHeader(TEXT("User-Agent"), "x-UnrealEngin-Agent");
 	Request->SetHeader("Content-Type", TEXT("application/json"));
@@ -64,7 +64,7 @@ void ALoginHttp::SendLoginRequest(const FString& userId, const FString& userPw)
 
 	TSharedRef<IHttpRequest> Request = Http->CreateRequest();
 	Request->SetVerb("Get");
-	Request->SetURL(FString::Printf(TEXT("http://192.168.161.142:8080/login.php?userId=%s&userPw=%s&userName=%s"), *userId, *userPw));
+	Request->SetURL(FString::Printf(TEXT("http://192.168.116.142:8080/login.php?userId=%s&userPw=%s&userName=%s"), *userId, *userPw));
 	Request->OnProcessRequestComplete().BindUObject(this, &ALoginHttp::OnLoginResponse);
 	Request->SetHeader(TEXT("User-Agent"), "x-UnrealEngin-Agent");
 	Request->SetHeader("Content-Type", TEXT("application/json"));
