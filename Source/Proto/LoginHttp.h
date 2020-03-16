@@ -11,8 +11,8 @@ UCLASS()
 class PROTO_API ALoginHttp : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ALoginHttp();
 
@@ -20,15 +20,20 @@ public:
 
 	// http로 url로 요청 Get으로 userId, userPw로 전달해주는 함수 
 	UFUNCTION(BlueprintCallable, Category = "LoginHttp")
-	void SendAccountCreationRequest(const FString& userId, const FString& userPw);
+	void SendAccountCreationRequest(const FString& userId, const FString& userPw, const FString& userName);
 
 	// http Get 요청 직후 호출되는 콜백함수
 	void OnAccountCreationResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
+	UFUNCTION(BlueprintCallable, Category = "LoginHttp")
+	void SendLoginRequest(const FString& userId, const FString& userPw);
+	void OnLoginResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
