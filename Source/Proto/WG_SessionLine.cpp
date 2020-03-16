@@ -2,6 +2,8 @@
 
 
 #include "WG_SessionLine.h"
+#include "WG_SessionList.h"
+#include "WG_SessionBrowser.h"
 #include "Components/Border.h"
 #include "Components/TextBlock.h"
 
@@ -20,9 +22,11 @@ void UWG_SessionLine::NativeConstruct()
 		PlayerSeatText->SetText(FText::FromString(TEXT("Player Seat")));
 		MaxPlayerText->SetText(FText::FromString(TEXT("")));
 		PingText->SetText(FText::FromString(TEXT("Ping")));
+		CurrentBoxColor = TitleBoxColor;
 	}
 	else
 	{
+		CurrentBoxColor = NormalBoxColor;
 		PlayerSeatText->SetText(FText::FromString(TEXT("/")));
 	}
 }
@@ -65,8 +69,11 @@ FReply UWG_SessionLine::NativeOnMouseButtonDown(const FGeometry & InGeometry,con
 
 	//if(!SessionData.IsValid()) return FReply::Unhandled();
 
+	//다른 선택된 위젯을 해제합니다.
+	SessionList_Ref->ClearSelection();
+
 	//여기서 위젯의 색상이 변경됩니다.
-	SetSelect(true);
+	SetSelect(true);	
 
 	//여기서 SessionBrowser의 함수를 호출합니다.
 	
@@ -85,6 +92,7 @@ void UWG_SessionLine::SetSelect(bool Selected)
 	bIsSelected = Selected;
 	if(bIsSelected)
 	{
+		CurrentBoxColor = TitleBoxColor;
 		BackgroundBorder->SetContentColorAndOpacity(SelectedContentColor);
 		if(IsHovered())
 		{
@@ -97,7 +105,8 @@ void UWG_SessionLine::SetSelect(bool Selected)
 	}
 	else
 	{
-		BackgroundBorder->SetContentColorAndOpacity(SelectedContentColor);
+		CurrentBoxColor = NormalBoxColor;
+		BackgroundBorder->SetContentColorAndOpacity(NormalContentColor);
 		if(IsHovered())
 		{
 			BackgroundBorder->SetBrushColor(HoveredBackgroundColor);
@@ -187,4 +196,10 @@ bool UWG_SessionLine::UpdateSessionData(FOnlineSessionSearchResult NewSession)
 
 		return false;
 	}
+}
+
+void UWG_SessionLine::SetUpperClass(UWG_SessionList * SessionList,UWG_SessionBrowser * SessionBrowser)
+{
+	SessionList_Ref = SessionList;
+	SessionBrowser_Ref = SessionBrowser;
 }

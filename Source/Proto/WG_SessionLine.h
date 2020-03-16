@@ -76,12 +76,28 @@ protected:
 	FLinearColor HoveredBackgroundColor = FLinearColor(0.8f, 1.0f, 1.0f, 1.0f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI|Color")
-	FLinearColor SelectedBackgroundColor = FLinearColor(1.0f, 1.0f, 1.0f, 0.6f);
+	FLinearColor SelectedBackgroundColor = FLinearColor(0.8f, 1.0f, 1.0f, 0.8f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI|Color")
 	FLinearColor SelectedContentColor = FLinearColor(0.6f, 0.6f, 0.6f, 1.0f);
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "UI|Color")
+	FLinearColor TitleBoxColor = FLinearColor(0.08f,0.35f,0.35f,1.0f);
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "UI|Color")
+	FLinearColor NormalBoxColor = FLinearColor(0.04f,0.18f,0.18f,0.8f);
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category = "UI|Color")
+	FLinearColor CurrentBoxColor = FLinearColor(0.04f,0.18f,0.18f,0.8f);
+
+
+	/** 상위 위젯인 SessionBrowser에 대한 레퍼런스
+	*/
 	class UWG_SessionBrowser* SessionBrowser_Ref;
+
+	/** 상위 위젯인 SessionList에 대한 레퍼런스
+	*/
+	class UWG_SessionList* SessionList_Ref;
 
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
 	class UBorder* BackgroundBorder;
@@ -114,4 +130,6 @@ public:
 	*	@return	bool		주어진 세션정보가 valid하여 업데이트를 성공했으면 true invalid하면 false
 	*/
 	bool UpdateSessionData(FOnlineSessionSearchResult NewSession);
+
+	void SetUpperClass(class UWG_SessionList* SessionList,class UWG_SessionBrowser* SessionBrowser);
 };

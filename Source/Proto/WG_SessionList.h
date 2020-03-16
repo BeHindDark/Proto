@@ -24,4 +24,7 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,meta=(BindWidget))
 	class UWG_SessionLine* TitleLine;
+
+public:
+	void ClearSelection();
 };

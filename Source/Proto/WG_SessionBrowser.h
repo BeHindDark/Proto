@@ -14,11 +14,17 @@ class PROTO_API UWG_SessionBrowser : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	UWG_SessionBrowser(const FObjectInitializer& ObjectInitializer);
+
 protected:
 	virtual void NativeConstruct() override;
 
 public:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UWG_SessionList* WG_SessionList;
-	
+
+protected:
+	TSubclassOf<class UWG_SessionLine> WG_SessionLine_Class;
+
 };
