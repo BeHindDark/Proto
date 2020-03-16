@@ -29,15 +29,19 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* PWInput;
+
+
 	
 private:
 
 	UFUNCTION()
-	void IDCommitted();
+	void IDCommitted(const FText& InText, ETextCommit::Type InCommitType);
 
 	UFUNCTION()
-	void PassWordCommitted();
+	void PassWordCommitted(const FText& InText, ETextCommit::Type InCommitType);
 
 	UFUNCTION()
 	void OnLoginClicked();
+
+	void OnLoginSession();
 };

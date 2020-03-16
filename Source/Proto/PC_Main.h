@@ -24,4 +24,5 @@ protected:
 
 	UPROPERTY()
 	class UWG_Main* WG_Main;
+
 };
