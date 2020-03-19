@@ -14,4 +14,17 @@ class PROTO_API UWG_Main : public UUserWidget
 {
 	GENERATED_BODY()
 
+protected:
+    virtual void NativeConstruct() override;
+
+private:
+    UPROPERTY(meta = (BindWidget))
+    class UButton* SessionBrowserButton;
+
+    UPROPERTY(meta = (BindWidget))
+    class UButton* AmoryButton;
+
+    void SessionBrowserButtonClicked();
+
+    void AmoryButtonClicked();
 };

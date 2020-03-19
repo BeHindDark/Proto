@@ -19,3 +19,7 @@ void APC_Login::BeginPlay() {
 
 	bShowMouseCursor = true;
 }
+
+void APC_Login::OnLogin(FText ID, FText PW) {
+
+}

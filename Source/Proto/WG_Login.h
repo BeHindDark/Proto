@@ -7,7 +7,7 @@
 #include "WG_Login.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class PROTO_API UWG_Login : public UUserWidget
@@ -25,13 +25,23 @@ protected:
 	class UButton* LoginButton;
 
 	UPROPERTY(meta = (BindWidget))
+	class UButton* CreateAccountButton;
+
+	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* IDInput;
 
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* PWInput;
 
+	UPROPERTY(meta = (BindWidget))
+	class UCheckBox* SaveIDCheckBox;
 
-	
+	UPROPERTY(meta = (BindWidget))
+	class UCheckBox* UseServerDataCheckBox;
+
+	UPROPERTY(meta = (BindWidget))
+	class UCheckBox* UseLocalDataCheckBox;
+
 private:
 
 	UFUNCTION()
@@ -44,4 +54,8 @@ private:
 	void OnLoginClicked();
 
 	void OnLoginSession();
+
+	void OnServerDataCheckBoxClicked(bool Checked);
+
+	void OnLocalDataCheckBoxClicked(bool Checked);
 };

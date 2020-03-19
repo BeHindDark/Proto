@@ -22,4 +22,7 @@ protected:
 
 private:
 	class UWG_Login* WG_Login_Ref;
+
+public:
+	void OnLogin(FText ID, FText PW);
 };
