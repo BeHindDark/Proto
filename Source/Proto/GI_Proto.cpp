@@ -15,8 +15,13 @@ UGI_Proto::UGI_Proto(const FObjectInitializer& ObjectInitializer) {
 	OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Proto::OnJoinSessionComplete);
 	OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Proto::OnDestroySessionComplete);
 }
+void UGI_Proto::CreateOnlineSession(FString SessionFrontName,FString HostName,FString SessionDescription,int32 MaxPlayerNum)
+{
+	ULocalPlayer* const Player = GetFirstGamePlayer();
+	HostSession(Player->GetPreferredUniqueNetId().GetUniqueNetId(), GameSessionName, false, true, MaxPlayerNum, SessionFrontName, HostName, SessionDescription);
+}
 
-bool UGI_Proto::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers) {
+bool UGI_Proto::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers, FString SessionFrontName, FString HostName, FString SessionDescription) {
 
 	// Creating a local player where we can get the UserID from
 	//ULocalPlayer* const Player = GetFirstGamePlayer();

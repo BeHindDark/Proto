@@ -96,6 +96,10 @@ public:
 
 	FOnDestroySessionReportDelegate OnDestroySessionReport;
 
+public:
+	UFUNCTION(BlueprintCallable,Category="Network")
+	void CreateOnlineSession(FString SessionFrontName,FString HostName,FString SessionDescription,int32 MaxPlayerNum);
+
 	/**
 	*	Session을 만들어 Host가 되기 위한 함수/Function to host a game!
 	*
@@ -106,7 +110,7 @@ public:
 	*	@Param		MaxNumPlayers	최대 참가가능한 플레이어 수/Number of Maximum allowed players on this "Session" (Server)
 	*	@Memo		UserID를 구하는 법은 : ULocalPlayer* const Player = GetFirstGamePlayer()에서 Player->GetPreferredUniqueNetID();이다.
 	*/
-	bool HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers);
+	bool HostSession(TSharedPtr<const FUniqueNetId> UserId,FName SessionName,bool bIsLAN,bool bIsPresence,int32 MaxNumPlayers,FString SessionFrontName,FString HostUserID,FString SessionDescription);
 
 	/**
 	*	Session생성 요청이 완료되었을 때 실행되는 델리게이트함수/Function fired when a session create request has completed
