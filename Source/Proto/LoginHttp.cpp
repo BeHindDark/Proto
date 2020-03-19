@@ -83,10 +83,8 @@ void ALoginHttp::OnLoginResponse(FHttpRequestPtr Request, FHttpResponsePtr Respo
 	if (FJsonSerializer::Deserialize(Reader, JsonObject))
 	{
 		GEngine->AddOnScreenDebugMessage(10, 10, FColor::Blue, TEXT("Ok"));
-		//bool bAccountCreatedSuccessfully = JsonObject->GetBoolField("AccountSuccessfullyCreated");
-		FString userId = JsonObject->GetStringField("userId");
-
-
+		bool bAccountCreatedSuccessfully = JsonObject->GetBoolField("LoginWasSuccessful");
+		FString userId = JsonObject->GetStringField("ID");
 	}
 	
 }
