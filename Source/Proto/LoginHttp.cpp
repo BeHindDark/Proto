@@ -29,7 +29,7 @@ void ALoginHttp::SendAccountCreationRequest(const FString& userId, const FString
 
 	TSharedRef<IHttpRequest> Request = Http->CreateRequest();
 	Request->SetVerb("Get");
-	Request->SetURL(FString::Printf(TEXT("http://192.168.116.142:8080/join.php?userId=%s&userPw=%s&userName=%s"), *userId, *userPw, *userName));
+	Request->SetURL(FString::Printf(TEXT("http://192.168.116.144:8080/join.php?userId=%s&userPw=%s&userName=%s"), *userId, *userPw, *userName));
 	Request->OnProcessRequestComplete().BindUObject(this, &ALoginHttp::OnAccountCreationResponse);
 	Request->SetHeader(TEXT("User-Agent"), "x-UnrealEngin-Agent");
 	Request->SetHeader("Content-Type", TEXT("application/json"));
@@ -64,7 +64,7 @@ void ALoginHttp::SendLoginRequest(const FString& userId, const FString& userPw)
 
 	TSharedRef<IHttpRequest> Request = Http->CreateRequest();
 	Request->SetVerb("Get");
-	Request->SetURL(FString::Printf(TEXT("http://192.168.116.142:8080/login.php?userId=%s&userPw=%s&userName=%s"), *userId, *userPw));
+	Request->SetURL(FString::Printf(TEXT("http://192.168.116.144:8080/login.php?userId=%s&userPw=%s"), *userId, *userPw));
 	Request->OnProcessRequestComplete().BindUObject(this, &ALoginHttp::OnLoginResponse);
 	Request->SetHeader(TEXT("User-Agent"), "x-UnrealEngin-Agent");
 	Request->SetHeader("Content-Type", TEXT("application/json"));
@@ -75,6 +75,20 @@ void ALoginHttp::OnLoginResponse(FHttpRequestPtr Request, FHttpResponsePtr Respo
 {
 	//웹서버로부터 응답된 내용을 화면에 디버그 문자열로 출력해본다
 	GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Green, Response->GetContentAsString());
+	TSharedPtr<FJsonObject> JsonObject;
+
+	//Create a reader pointer to read the json data
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+
+	if (FJsonSerializer::Deserialize(Reader, JsonObject))
+	{
+		GEngine->AddOnScreenDebugMessage(10, 10, FColor::Blue, TEXT("Ok"));
+		//bool bAccountCreatedSuccessfully = JsonObject->GetBoolField("AccountSuccessfullyCreated");
+		FString userId = JsonObject->GetStringField("userId");
+
+
+	}
+	
 }
 
 // Called when the game starts or when spawned
