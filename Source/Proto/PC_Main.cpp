@@ -6,7 +6,7 @@
 
 APC_Main::APC_Main()
 {
-	static ConstructorHelpers::FClassFinder<UWG_Main> WG_MAIN_C(TEXT("/Game/Blueprints/Widget/WG_Main.WG_Main_C"));
+	static ConstructorHelpers::FClassFinder<UWG_Main> WG_MAIN_C(TEXT("/Game/Blueprints/Widget/UMG_Main.UMG_Main_C"));
 	if (WG_MAIN_C.Succeeded())
 	{
 		WG_Main_Class = WG_MAIN_C.Class;

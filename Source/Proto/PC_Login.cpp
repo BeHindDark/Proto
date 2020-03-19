@@ -5,7 +5,7 @@
 #include "WG_Login.h"
 
 APC_Login::APC_Login() {
-	static ConstructorHelpers::FClassFinder<UWG_Login> WG_Login_C(TEXT("/Game/Blueprints/Widget/WG_Login.WG_Login_C"));
+	static ConstructorHelpers::FClassFinder<UWG_Login> WG_Login_C(TEXT("/Game/Blueprints/Widget/UMG_Login.UMG_Login_C"));
 	if (WG_Login_C.Succeeded()) {
 		WG_Login_Class = WG_Login_C.Class;
 	}
