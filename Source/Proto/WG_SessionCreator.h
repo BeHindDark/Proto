@@ -36,7 +36,7 @@ public:
 protected:
 	TSubclassOf<UUserWidget> LoadingScreen_Class;
 
-	UUserWidget* LoadingScreen;
+	TWeakObjectPtr<UUserWidget> LoadingScreen;
 
 private:
 	class UWG_SessionBrowser* WG_SessionBrowser_Ref;

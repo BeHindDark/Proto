@@ -28,9 +28,5 @@ void UWG_SessionBrowser::NativeConstruct()
 		SessionNewLine->SetUpperClass(WG_SessionList, this);
 	}
 	
-
-	//WG_SessionList = CreateWidget<UUserWidget>(this, WG_SessionList_Class);
-
-	//BackgroundCanvasPanel->AddChildToCanvas(WG_SessionList);
 	
 }

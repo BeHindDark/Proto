@@ -27,4 +27,6 @@ public:
 protected:
 	TSubclassOf<class UWG_SessionLine> WG_SessionLine_Class;
 
+	TSubclassOf<class UWG_SessionCreator> WG_SessionCreator_Class;
+
 };

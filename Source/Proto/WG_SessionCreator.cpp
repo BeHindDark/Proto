@@ -5,6 +5,7 @@
 #include "WG_SessionInfo.h"
 #include "WG_SessionBrowser.h"
 #include "GI_Proto.h"
+#include "PC_Main.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
 #include "Components/MultiLineEditableText.h"
@@ -44,25 +45,16 @@ void UWG_SessionCreator::OnGetCreateSessionReport(bool bWasSuccessful)
 		return;
 	}
 
+	APC_Main* PC_Main = Cast<APC_Main>(GetOwningPlayer());
+	if(!IsValid(PC_Main))
+	{
+		CHECK_LOG(!IsValid(PC_Main));
+		return;
+	}
+
 	ProtoGI->OnCreateSessionReport.Clear();
 
-	if(!bWasSuccessful)
-	{
-		//error
-		//이부분은 PlayerController로 옮겨야 한다.
-		if(IsValid(LoadingScreen))
-		{
-			LoadingScreen->RemoveFromParent();
-			LoadingScreen = nullptr;
-		}
-
-	}
-	else
-	{
-		UGameplayStatics::OpenLevel(GetWorld(),FName("ThirdPersonExampleMap"),true,"listen");
-	}
-
-
+	PC_Main->OnGetCreateSessionReport(bWasSuccessful);
 }
 
 void UWG_SessionCreator::OnCreateSessionClicked()
@@ -81,8 +73,13 @@ void UWG_SessionCreator::OnCreateSessionClicked()
 								 WG_SessionInfo->DescriptionMLEditableText->GetText().ToString(),
 								 4);
 	//아래의 로딩스크린 부르는 부분은 Player Controller로 옮길 예정
-	LoadingScreen = CreateWidget<UUserWidget>(GetOwningPlayer(),LoadingScreen_Class);
-	LoadingScreen->AddToViewport(10);
+
+	APC_Main* PC_Main = Cast<APC_Main>(GetOwningPlayer());
+	if(IsValid(PC_Main))
+	{
+		PC_Main->ShowLoadingScreenWG(10);
+		LoadingScreen = TWeakObjectPtr<UUserWidget>(PC_Main->WG_LoadingScreen);
+	}
 }
 
 void UWG_SessionCreator::OnClearClicked()
@@ -92,15 +89,10 @@ void UWG_SessionCreator::OnClearClicked()
 
 void UWG_SessionCreator::OnBacktoBrowserClicked()
 {
-	if(WG_SessionBrowser_Ref==nullptr)
+	APC_Main* PC_Main = Cast<APC_Main>(GetOwningPlayer());
+	if(IsValid(PC_Main))
 	{
-		//error
-		CHECK_LOG(WG_SessionBrowser_Ref==nullptr);
-	}
-	else
-	{
-		WG_SessionBrowser_Ref->SetVisibility(ESlateVisibility::Visible);
+		PC_Main->ShowMainWG();
 		RemoveFromParent();
 	}
-
 }

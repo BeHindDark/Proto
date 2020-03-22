@@ -17,14 +17,17 @@ class PROTO_API UWG_Main : public UUserWidget
 protected:
     virtual void NativeConstruct() override;
 
-private:
-    UPROPERTY(meta = (BindWidget))
+public:
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
     class UButton* SessionBrowserButton;
 
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
     class UButton* AmoryButton;
 
+protected:
+    UFUNCTION()
     void SessionBrowserButtonClicked();
 
+    UFUNCTION()
     void AmoryButtonClicked();
 };
