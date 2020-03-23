@@ -4,6 +4,7 @@
 #include "WG_SessionLine.h"
 #include "WG_SessionList.h"
 #include "WG_SessionBrowser.h"
+#include "WG_SessionInfo.h"
 #include "Components/Border.h"
 #include "Components/TextBlock.h"
 
@@ -67,10 +68,12 @@ FReply UWG_SessionLine::NativeOnMouseButtonDown(const FGeometry & InGeometry,con
 
 	if(bIsTitle) return FReply::Unhandled();
 
-	//if(!SessionData.IsValid()) return FReply::Unhandled();
+	if(!SessionData.IsValid()) return FReply::Unhandled();
+
+	if(!SessionBrowser_Ref.IsValid()) return FReply::Unhandled();
 
 	//다른 선택된 위젯을 해제합니다.
-	SessionList_Ref->ClearSelection();
+	SessionBrowser_Ref->WG_SessionList->ClearSelection();
 
 	//여기서 위젯의 색상이 변경됩니다.
 	SetSelect(true);	
@@ -165,8 +168,7 @@ bool UWG_SessionLine::UpdateSessionData(FOnlineSessionSearchResult NewSession)
 		}
 		
 		// CurrentPlayer/MaxPlayer 설정
-		if((SessionData.Session.NumOpenPublicConnections >= 0)&&
-			(SessionData.Session.SessionSettings.NumPublicConnections > SessionData.Session.NumOpenPublicConnections))
+		if(SessionData.Session.SessionSettings.NumPublicConnections > 0)
 		{
 			CurrentPlayerText->SetText(FText::FromString(FString::FromInt(SessionData.Session.SessionSettings.NumPublicConnections - SessionData.Session.NumOpenPublicConnections)));
 			MaxPlayerText->SetText(FText::FromString(FString::FromInt(SessionData.Session.SessionSettings.NumPublicConnections)));
@@ -198,8 +200,12 @@ bool UWG_SessionLine::UpdateSessionData(FOnlineSessionSearchResult NewSession)
 	}
 }
 
-void UWG_SessionLine::SetUpperClass(UWG_SessionList * SessionList,UWG_SessionBrowser * SessionBrowser)
+FOnlineSessionSearchResult UWG_SessionLine::GetSessionData()
 {
-	SessionList_Ref = SessionList;
-	SessionBrowser_Ref = SessionBrowser;
+	return SessionData;
+}
+
+void UWG_SessionLine::ConnectBrowser(UWG_SessionBrowser * SessionBrowser)
+{
+	SessionBrowser_Ref = TWeakObjectPtr<UWG_SessionBrowser>(SessionBrowser);
 }

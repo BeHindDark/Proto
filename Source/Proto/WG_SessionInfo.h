@@ -29,6 +29,8 @@ public:
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
 	class USizeBox* ScrollSize;
 
+	FOnlineSessionSearchResult SessionData;
+
 protected:
 	UPROPERTY(EditInstanceOnly,Category = UI,meta=(AllowPrivateAccess = true))
 	/**	이 SessionInfo 위젯이 편집용인지의 여부
@@ -48,4 +50,6 @@ public:
 	/**	모든 EditableTextBox 및 MultiLineEditableText를 비운다.
 	*/
 	void ClearText();
+
+	void UpdateSessionData(FOnlineSessionSearchResult NewSessionData);
 };

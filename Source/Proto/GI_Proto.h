@@ -97,8 +97,33 @@ public:
 	FOnDestroySessionReportDelegate OnDestroySessionReport;
 
 public:
-	UFUNCTION(BlueprintCallable,Category="Network")
+	UFUNCTION(BlueprintCallable, Category = "Network|Session")
+	/**	새로운 세션을 만들고 Lobby맵으로 이동합니다.
+	*	세션 생성 결과를 받으려면 OnCreateSessionReport에 함수를 AddUObject로 바인드 해주세요.
+	*	@param	SessionFrontName	사용자 및 UI에 보여질 세션의 이름입니다.
+	*	@param	HostName			세션을 만든 Host의 이름입니다.
+	*	@param	SessionDescription	Host가 작성한 세션에 대한 설명입니다.
+	*	@param	MaxPlayerNum		public하게 참가 가능한 유저 수 입니다.
+	*/
 	void CreateOnlineSession(FString SessionFrontName,FString HostName,FString SessionDescription,int32 MaxPlayerNum);
+
+	UFUNCTION(BlueprintCallable, Category = "Network|Session")
+	/**	존재하는 세션들을 검색하여 SessionSearch에 저장합니다.
+	*	세션 탐색 완료를 보고받으려면 OnFindSessionReport에 함수를 AddUObject로 바인드 해주세요.
+	*/
+	void FindOnlineSession();
+
+	/**	주어진 세션에 참가합니다.
+	*	세션 참가 완료를 보고받으려면 OnJoinSessionReport에 함수를 AddUObject로 바인드 해주세요.
+	*	@param	SearchResult	단일 세션을 가리키는 검색결과입니다.
+	*/
+	void JoinOnlineSession(const FOnlineSessionSearchResult& SearchResult);
+
+	UFUNCTION(BlueprintCallable, Category = "Network|Session")
+	/**	현재 참가중인 세션에서 나갑니다. Host라면 세션을 파괴합니다.
+	*	세션 파괴 완료를 보고받으려면 OnDestroySessionReport에 함수를 AddUObject로 바인드 해주세요.
+	*/
+	void DestroySessionAndLeaveGame();
 
 	/**
 	*	Session을 만들어 Host가 되기 위한 함수/Function to host a game!

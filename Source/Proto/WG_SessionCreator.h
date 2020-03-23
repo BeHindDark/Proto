@@ -34,8 +34,6 @@ public:
 	class UButton* BacktoBrowserButton;
 
 protected:
-	TSubclassOf<UUserWidget> LoadingScreen_Class;
-
 	TWeakObjectPtr<UUserWidget> LoadingScreen;
 
 private:

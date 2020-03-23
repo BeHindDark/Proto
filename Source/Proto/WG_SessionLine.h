@@ -93,11 +93,8 @@ protected:
 
 	/** 상위 위젯인 SessionBrowser에 대한 레퍼런스
 	*/
-	class UWG_SessionBrowser* SessionBrowser_Ref;
+	TWeakObjectPtr<class UWG_SessionBrowser> SessionBrowser_Ref;
 
-	/** 상위 위젯인 SessionList에 대한 레퍼런스
-	*/
-	class UWG_SessionList* SessionList_Ref;
 
 	UPROPERTY(BlueprintReadWrite, meta=(BindWidget))
 	class UBorder* BackgroundBorder;
@@ -131,5 +128,7 @@ public:
 	*/
 	bool UpdateSessionData(FOnlineSessionSearchResult NewSession);
 
-	void SetUpperClass(class UWG_SessionList* SessionList,class UWG_SessionBrowser* SessionBrowser);
+	FOnlineSessionSearchResult GetSessionData();
+
+	void ConnectBrowser(class UWG_SessionBrowser* SessionBrowser);
 };

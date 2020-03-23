@@ -6,6 +6,7 @@
 #include "WG_SessionBrowser.h"
 #include "WG_SessionCreator.h"
 #include "Blueprint/UserWidget.h"
+#include "GI_Proto.h"
 
 APC_Main::APC_Main()
 {
@@ -17,6 +18,11 @@ void APC_Main::BeginPlay()
 	ShowMainWG(1);
 	FInputModeUIOnly UIMode;
 	SetInputMode(UIMode);
+
+	UGI_Proto* GI_Proto = Cast<UGI_Proto>(GetGameInstance());
+
+	GI_Proto->DestroySessionAndLeaveGame();
+
 }
 
 void APC_Main::ShowMainWG(int Zorder)
@@ -36,8 +42,11 @@ void APC_Main::ShowMainWG(int Zorder)
 		WG_Main = nullptr;
 		WG_Main = CreateWidget<UWG_Main>(this, WG_Main_Class);
 	}
-
-	WG_Main->AddToViewport(Zorder);
+	if(!WG_Main->IsInViewport())
+	{
+		WG_Main->AddToViewport(Zorder);
+	}
+	
 	
 	bShowMouseCursor = true;
 }
@@ -60,7 +69,12 @@ void APC_Main::ShowSessionBrowserWG(int Zorder)
 		WG_SessionBrowser = CreateWidget<UWG_SessionBrowser>(this,WG_SessionBrowser_Class);
 	}
 
-	WG_SessionBrowser->AddToViewport(Zorder);
+
+	if(!WG_SessionBrowser->IsInViewport())
+	{
+		WG_SessionBrowser->AddToViewport(Zorder);
+	}
+	
 	
 	bShowMouseCursor = true;
 }
@@ -83,7 +97,10 @@ void APC_Main::ShowSessionCreatorWG(int Zorder)
 		WG_SessionCreator = CreateWidget<UWG_SessionCreator>(this,WG_SessionCreator_Class);
 	}
 
-	WG_SessionCreator->AddToViewport(Zorder);
+	if(!WG_SessionCreator->IsInViewport())
+	{
+		WG_SessionCreator->AddToViewport(Zorder);
+	}
 
 	bShowMouseCursor = true;
 }
@@ -115,10 +132,33 @@ void APC_Main::OnGetCreateSessionReport(bool bWasSuccessful)
 {
 	if(bWasSuccessful)
 	{
+		
+		if(IsValid(WG_SessionCreator))
+		{
+			WG_SessionCreator->RemoveFromParent();
+		}
+
+		if(IsValid(WG_SessionBrowser))
+		{
+			WG_SessionBrowser->RemoveFromParent();
+		}
+
+		if(IsValid(WG_Main))
+		{
+			WG_Main->RemoveFromParent();
+		}
+
+		if(IsValid(WG_LoadingScreen))
+		{
+			WG_LoadingScreen->RemoveFromParent();
+		}
+
 		UGameplayStatics::OpenLevel(GetWorld(),FName("ThirdPersonExampleMap"),true,"listen");
 	}
 	else
 	{
+		UE_LOG(Proto,Warning,TEXT("%s / %s : Fail to Create Session"),*LINE_INFO,*GetNameSafe(this));
+
 		if(IsValid(WG_LoadingScreen))
 		{
 			WG_LoadingScreen->RemoveFromParent();

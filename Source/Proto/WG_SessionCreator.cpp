@@ -12,10 +12,7 @@
 
 UWG_SessionCreator::UWG_SessionCreator(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
-	static ConstructorHelpers::FClassFinder<UUserWidget> UMG_LoadingScreen_C(TEXT("/Game/Blueprints/Widget/UMG_LoadingScreen.UMG_LoadingScreen_C"));
-	if(UMG_LoadingScreen_C.Succeeded()) {
-		LoadingScreen_Class = UMG_LoadingScreen_C.Class;
-	}
+
 }
 
 void UWG_SessionCreator::NativeConstruct()
@@ -72,8 +69,7 @@ void UWG_SessionCreator::OnCreateSessionClicked()
 								 WG_SessionInfo->HostNameTextBox->GetText().ToString(),
 								 WG_SessionInfo->DescriptionMLEditableText->GetText().ToString(),
 								 4);
-	//아래의 로딩스크린 부르는 부분은 Player Controller로 옮길 예정
-
+	
 	APC_Main* PC_Main = Cast<APC_Main>(GetOwningPlayer());
 	if(IsValid(PC_Main))
 	{
@@ -92,7 +88,11 @@ void UWG_SessionCreator::OnBacktoBrowserClicked()
 	APC_Main* PC_Main = Cast<APC_Main>(GetOwningPlayer());
 	if(IsValid(PC_Main))
 	{
-		PC_Main->ShowMainWG();
+		PC_Main->ShowSessionBrowserWG(2);
 		RemoveFromParent();
+	}
+	else
+	{
+		CHECK_LOG(IsValid(PC_Main));
 	}
 }

@@ -1,14 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "GI_Proto.h"
 
 UGI_Proto::UGI_Proto(const FObjectInitializer& ObjectInitializer) {
-	// ÃÊ±âÈ­
+	// ì´ˆê¸°í™”
 
 	SessionLobyName = TEXT("SessionLobyMap");
 
-	/** ¼¼¼Ç¿¡ °ü·ÃµÈ ÇÔ¼ö¿Í µ¨¸®°ÔÀÌÆ®¸¦ ¹ÙÀÎµùÇÑ´Ù. */
+	/** ì„¸ì…˜ì— ê´€ë ¨ëœ í•¨ìˆ˜ì™€ ë¸ë¦¬ê²Œì´íŠ¸ë¥¼ ë°”ì¸ë”©í•œë‹¤. */
 	OnCreateSessionCompleteDelegate = FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Proto::OnCreateSessionComplete);
 	OnStartSessionCompleteDelegate = FOnStartSessionCompleteDelegate::CreateUObject(this, &UGI_Proto::OnStartOnlineGameComplete);
 	OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &UGI_Proto::OnFindSessionsComplete);
@@ -18,7 +18,38 @@ UGI_Proto::UGI_Proto(const FObjectInitializer& ObjectInitializer) {
 void UGI_Proto::CreateOnlineSession(FString SessionFrontName,FString HostName,FString SessionDescription,int32 MaxPlayerNum)
 {
 	ULocalPlayer* const Player = GetFirstGamePlayer();
+	
 	HostSession(Player->GetPreferredUniqueNetId().GetUniqueNetId(), GameSessionName, false, true, MaxPlayerNum, SessionFrontName, HostName, SessionDescription);
+}
+
+void UGI_Proto::FindOnlineSession()
+{
+	ULocalPlayer* const Player = GetFirstGamePlayer();
+
+	FindSessions(Player->GetPreferredUniqueNetId().GetUniqueNetId(), false, true);
+}
+
+void UGI_Proto::JoinOnlineSession(const FOnlineSessionSearchResult & SearchResult)
+{
+	ULocalPlayer* const Player = GetFirstGamePlayer();
+
+	JoinSession(Player->GetPreferredUniqueNetId().GetUniqueNetId(), GameSessionName, SearchResult);
+}
+
+void UGI_Proto::DestroySessionAndLeaveGame()
+{
+	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+	if(OnlineSub)
+	{
+		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+
+		if(Sessions.IsValid())
+		{
+			Sessions->AddOnDestroySessionCompleteDelegate_Handle(OnDestroySessionCompleteDelegate);
+
+			Sessions->DestroySession(GameSessionName);
+		}
+	}
 }
 
 bool UGI_Proto::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers, FString SessionFrontName, FString HostName, FString SessionDescription) {
@@ -32,12 +63,12 @@ bool UGI_Proto::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName Session
 	//return bool
 	bool bSuccess = false;
 
-	// Online Subsystem ºÒ·¯¿À±â
+	// Online Subsystem ë¶ˆëŸ¬ì˜¤ê¸°
 	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
 
 	if (OnlineSub)
 	{
-		// ¼¼¼Ç ÀÎÅÍÆäÀÌ½º °¡Á®¿À±â Get the Session Interface, so we can call the "CreateSession" function on it
+		// ì„¸ì…˜ ì¸í„°í˜ì´ìŠ¤ ê°€ì ¸ì˜¤ê¸° Get the Session Interface, so we can call the "CreateSession" function on it
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 
 		if (Sessions.IsValid() && UserId.IsValid())
@@ -55,19 +86,19 @@ bool UGI_Proto::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName Session
 			SessionSettings->bAllowJoinViaPresence = true;
 			SessionSettings->bAllowJoinViaPresenceFriendsOnly = false;
 
-			//Ä¿½ºÅÒ ¼¼ÆÃ Ãß°¡
-			SessionSettings->Settings.Add(FName("SessionFrontName"),FOnlineSessionSetting(FString(TEXT("Session Name to show to the users")),EOnlineDataAdvertisementType::ViaOnlineService));
+			//ì»¤ìŠ¤í…€ ì„¸íŒ… ì¶”ê°€
+			SessionSettings->Settings.Add(FName("SessionFrontName"),FOnlineSessionSetting(SessionFrontName, EOnlineDataAdvertisementType::ViaOnlineService));
 			SessionSettings->Settings.Add(FName("bIsPrivate"), FOnlineSessionSetting(false, EOnlineDataAdvertisementType::ViaOnlineService));
-			SessionSettings->Settings.Add(FName("HostUserID"), FOnlineSessionSetting(FString(TEXT("Session Host's UserID")), EOnlineDataAdvertisementType::ViaOnlineService));
-			SessionSettings->Settings.Add(FName("SessionDescription"), FOnlineSessionSetting(FString(TEXT("SessionDescription written by Host")), EOnlineDataAdvertisementType::ViaOnlineService));
+			SessionSettings->Settings.Add(FName("HostUserID"), FOnlineSessionSetting(HostName, EOnlineDataAdvertisementType::ViaOnlineService));
+			SessionSettings->Settings.Add(FName("SessionDescription"), FOnlineSessionSetting(SessionDescription, EOnlineDataAdvertisementType::ViaOnlineService));
 
-			//°Å²Ù·Î ¼¼¼Ç ¼¼ÆÃÀ» ¹Ş¾Æ°¥¶§´Â ¾Æ·¡¿Í °°ÀÌ ÇÕ´Ï´Ù.
+			//ê±°ê¾¸ë¡œ ì„¸ì…˜ ì„¸íŒ…ì„ ë°›ì•„ê°ˆë•ŒëŠ” ì•„ë˜ì™€ ê°™ì´ í•©ë‹ˆë‹¤.
 			//bool val;
 			//SessionSettings->Settings[FName("bIsPrivate")].Data.GetValue(val);
-			//¸Ê ÀÌ¸§
+			//ë§µ ì´ë¦„
 			SessionSettings->Set(SETTING_MAPNAME, SessionLobyName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 
-			//°ÔÀÓ ¸ğµå ÀÌ¸§
+			//ê²Œì„ ëª¨ë“œ ì´ë¦„
 			SessionSettings->Set(SETTING_GAMEMODE, FString(TEXT("Default GameMode")), EOnlineDataAdvertisementType::ViaOnlineService);
 
 			// Set the delegate to the Handle of the SessionInterface
@@ -79,7 +110,7 @@ bool UGI_Proto::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName Session
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("No OnlineSubsytem found!"));
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("No OnlineSubsystem found!"));
 	}
 
 	return bSuccess;
@@ -97,7 +128,7 @@ void UGI_Proto::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful) 
 
 		if (Sessions.IsValid())
 		{
-			// ÇÚµéÀ» ÅëÇØ µ¨¸®°ÔÀÌÆ® ÇØÁ¦ Clear the SessionComplete delegate handle, since we finished this call
+			// í•¸ë“¤ì„ í†µí•´ ë¸ë¦¬ê²Œì´íŠ¸ í•´ì œ Clear the SessionComplete delegate handle, since we finished this call
 			Sessions->ClearOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegateHandle);
 			if (bWasSuccessful)
 			{
@@ -106,11 +137,15 @@ void UGI_Proto::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful) 
 
 				// Our StartSessionComplete delegate should get called after this
 				Sessions->StartSession(SessionName);
-				
+
+				return;
 			}
 		}
 	}
-	//½ÇÆĞÇÑ °æ¿ì´Â HostSessionÇÔ¼ö°¡ ÀÌ¹Ì false¸¦ returnÇßÀ» °ÍÀÌ´Ï ±×ÂÊ¿¡¼­ Ã³¸®ÇÑ´Ù.
+
+	OnCreateSessionReport.Broadcast(bWasSuccessful);
+
+	//ì‹¤íŒ¨í•œ ê²½ìš°ëŠ” HostSessioní•¨ìˆ˜ê°€ ì´ë¯¸ falseë¥¼ returní–ˆì„ ê²ƒì´ë‹ˆ ê·¸ìª½ì—ì„œ ì²˜ë¦¬í•œë‹¤.
 }
 
 void UGI_Proto::OnStartOnlineGameComplete(FName SessionName, bool bWasSuccessful) {
@@ -124,13 +159,13 @@ void UGI_Proto::OnStartOnlineGameComplete(FName SessionName, bool bWasSuccessful
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
-			// ÇÚµéÀ» ÅëÇØ µ¨¸®°ÔÀÌÆ® ÇØÁ¦ Clear the delegate, since we are done with this call
+			// í•¸ë“¤ì„ í†µí•´ ë¸ë¦¬ê²Œì´íŠ¸ í•´ì œ Clear the delegate, since we are done with this call
 			Sessions->ClearOnStartSessionCompleteDelegate_Handle(OnStartSessionCompleteDelegateHandle);
 		}
 	}
 
-	//ÀûÀıÇÏ GM, Pcon, WG¿¡ ¿Ï·á °á°ú¸¦ º¸°íÇÑ´Ù.
-	//¼º°ø½Ã ÀûÀıÇÑ ·¹º§À» ¿­°í, ½ÇÆĞ ½Ã¿£ ½ÇÆĞÀ§Á¬À» ¶ç¿î´Ù.
+	//ì ì ˆí•˜ GM, Pcon, WGì— ì™„ë£Œ ê²°ê³¼ë¥¼ ë³´ê³ í•œë‹¤.
+	//ì„±ê³µì‹œ ì ì ˆí•œ ë ˆë²¨ì„ ì—´ê³ , ì‹¤íŒ¨ ì‹œì—” ì‹¤íŒ¨ìœ„ì ¯ì„ ë„ìš´ë‹¤.
 	OnCreateSessionReport.Broadcast(bWasSuccessful);
 
 	// If the start was successful, we can open a NewMap if we want. Make sure to use "listen" as a parameter!
@@ -159,8 +194,8 @@ void UGI_Proto::FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN,
 			SessionSearch = MakeShareable(new FOnlineSessionSearch());
 
 			SessionSearch->bIsLanQuery = bIsLAN;
-			SessionSearch->MaxSearchResults = 20;
-			SessionSearch->PingBucketSize = 50;
+			SessionSearch->MaxSearchResults = 100;
+			SessionSearch->PingBucketSize = 250;
 
 			// We only want to set this Query Setting if "bIsPresence" is true
 			if (bIsPresence)
@@ -201,9 +236,9 @@ void UGI_Proto::OnFindSessionsComplete(bool bWasSuccessful) {
 			// Just debugging the Number of Search results. Can be displayed in UMG or something later on
 			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Num Search Results: %d"), SessionSearch->SearchResults.Num()));
 
-			// ¿©±â¼­ ReportDelegate¸¦ broadcastÇÏ¿© À§Á¬µî¿¡°Ô °Ë»öÀÌ ¿Ï·áµÇ¾úÀ½À» ¾Ë¸®°í ÀûÀıÇÑ logicÀ» ½ÇÇàÇÏ°Ô ÇÕ´Ï´Ù.
-			// °Ë»ö ¿Ï·áµÈ ¼¼¼ÇµéÀº GIÀÇ SessionSearch->SearchResults ¹è¿­¿¡ ÀúÀåµË´Ï´Ù.
-			// ¼º°ø½Ã¿£ À§Á¬¿¡ ¼¼¼Ç ¸ñ·ÏÀ» ¶ç¿ì°í, ½ÇÆĞ½Ã¿£ ¿¡·¯À§Á¬À» ¶ç¿ó´Ï´Ù.
+			// ì—¬ê¸°ì„œ ReportDelegateë¥¼ broadcastí•˜ì—¬ ìœ„ì ¯ë“±ì—ê²Œ ê²€ìƒ‰ì´ ì™„ë£Œë˜ì—ˆìŒì„ ì•Œë¦¬ê³  ì ì ˆí•œ logicì„ ì‹¤í–‰í•˜ê²Œ í•©ë‹ˆë‹¤.
+			// ê²€ìƒ‰ ì™„ë£Œëœ ì„¸ì…˜ë“¤ì€ GIì˜ SessionSearch->SearchResults ë°°ì—´ì— ì €ì¥ë©ë‹ˆë‹¤.
+			// ì„±ê³µì‹œì—” ìœ„ì ¯ì— ì„¸ì…˜ ëª©ë¡ì„ ë„ìš°ê³ , ì‹¤íŒ¨ì‹œì—” ì—ëŸ¬ìœ„ì ¯ì„ ë„ì›ë‹ˆë‹¤.
 			OnFindSessionReport.Broadcast(bWasSuccessful);
 
 			// If we have found at least 1 session, we just going to debug them. You could add them to a list of UMG Widgets, like it is done in the BP version!
@@ -238,7 +273,7 @@ bool UGI_Proto::JoinSession(TSharedPtr<const FUniqueNetId> UserId, FName Session
 
 		if (Sessions.IsValid() && UserId.IsValid())
 		{
-			// µ¨¸®°ÔÀÌÆ® ÇÚµé Àç¼³Á¤ Set the Handle again
+			// ë¸ë¦¬ê²Œì´íŠ¸ í•¸ë“¤ ì¬ì„¤ì • Set the Handle again
 			OnJoinSessionCompleteDelegateHandle = Sessions->AddOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteDelegate);
 
 			// Call the "JoinSession" Function with the passed "SearchResult". The "SessionSearch->SearchResults" can be used to get such a
@@ -263,7 +298,7 @@ void UGI_Proto::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteR
 
 		if (Sessions.IsValid())
 		{
-			// ÇÚµé ÇØÁ¦ Clear the Delegate again
+			// í•¸ë“¤ í•´ì œ Clear the Delegate again
 			Sessions->ClearOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteDelegateHandle);
 
 
@@ -278,11 +313,11 @@ void UGI_Proto::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteR
 
 			if (PlayerController && Sessions->GetResolvedConnectString(SessionName, TravelURL))
 			{
-				//ÀÌ ¾Æ·§ºÎºĞ¿¡¼­ ½ÇÁ¦·Î Client TravelÀÌ ÀÏ¾î³³´Ï´Ù.
-				//ÀÌ ºÎºĞ¿¡¼­ ReportDelegate¸¦ È£ÃâÇÏ°í
-				//ÇØ´ç µ¨¸®°ÔÀÌÆ®´Â ¼º°ø¿©ºÎ¸¦ parameter·Î Àü´ŞÇØ¾ß ÇÕ´Ï´Ù.
-				//¼º°ø¿©ºÎ°¡ true¸é ¼­¹öÅ½»ö±â À§Á¬À» Á¦°ÅÇØÁÖ°í
-				//failÀÌ¸é ·Îµù½ºÅ©¸°À» ´İ°í, ¼­¹öÅ½»ö±â À§Á¬À» ´Ù½Ã º¸¿©ÁÖ¸ç, ¿¡·¯À§Á¬À» ¶ç¿öÁİ´Ï´Ù.
+				//ì´ ì•„ë«ë¶€ë¶„ì—ì„œ ì‹¤ì œë¡œ Client Travelì´ ì¼ì–´ë‚©ë‹ˆë‹¤.
+				//ì´ ë¶€ë¶„ì—ì„œ ReportDelegateë¥¼ í˜¸ì¶œí•˜ê³ 
+				//í•´ë‹¹ ë¸ë¦¬ê²Œì´íŠ¸ëŠ” ì„±ê³µì—¬ë¶€ë¥¼ parameterë¡œ ì „ë‹¬í•´ì•¼ í•©ë‹ˆë‹¤.
+				//ì„±ê³µì—¬ë¶€ê°€ trueë©´ ì„œë²„íƒìƒ‰ê¸° ìœ„ì ¯ì„ ì œê±°í•´ì£¼ê³ 
+				//failì´ë©´ ë¡œë”©ìŠ¤í¬ë¦°ì„ ë‹«ê³ , ì„œë²„íƒìƒ‰ê¸° ìœ„ì ¯ì„ ë‹¤ì‹œ ë³´ì—¬ì£¼ë©°, ì—ëŸ¬ìœ„ì ¯ì„ ë„ì›Œì¤ë‹ˆë‹¤.
 				OnJoinSessionReport.Broadcast(true);
 
 
@@ -309,7 +344,7 @@ void UGI_Proto::LeaveCurrentSession()
 		{
 			Sessions->AddOnDestroySessionCompleteDelegate_Handle(OnDestroySessionCompleteDelegate);
 
-			//GameSessionNameÀº GameInstanceÀÇ º¯¼öÀÔ´Ï´Ù.
+			//GameSessionNameì€ GameInstanceì˜ ë³€ìˆ˜ì…ë‹ˆë‹¤.
 			Sessions->DestroySession(GameSessionName);
 		}
 	}
