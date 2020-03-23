@@ -24,10 +24,17 @@ public:
     UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
     class UButton* AmoryButton;
 
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UTextBlock* UserIDText;
+
 protected:
     UFUNCTION()
     void SessionBrowserButtonClicked();
 
     UFUNCTION()
     void AmoryButtonClicked();
+
+    UFUNCTION()
+    void UserUpdate();
+
 };

@@ -4,6 +4,7 @@
 #include "LoginHttp.h"
 #include "Json/Public/Serialization/JsonReader.h"
 #include "Json/Public/Serialization/JsonSerializer.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 // Sets default values
 ALoginHttp::ALoginHttp()
@@ -64,7 +65,7 @@ void ALoginHttp::SendLoginRequest(const FString& userId, const FString& userPw)
 
 	TSharedRef<IHttpRequest> Request = Http->CreateRequest();
 	Request->SetVerb("Get");
-	Request->SetURL(FString::Printf(TEXT("http://192.168.116.144:8080/login.php?userId=%s&userPw=%s"), *userId, *userPw));
+	Request->SetURL(FString::Printf(TEXT("http://192.168.116.147:8080/login.php?userId=%s&userPw=%s"), *userId, *userPw));
 	Request->OnProcessRequestComplete().BindUObject(this, &ALoginHttp::OnLoginResponse);
 	Request->SetHeader(TEXT("User-Agent"), "x-UnrealEngin-Agent");
 	Request->SetHeader("Content-Type", TEXT("application/json"));
@@ -75,18 +76,35 @@ void ALoginHttp::OnLoginResponse(FHttpRequestPtr Request, FHttpResponsePtr Respo
 {
 	//웹서버로부터 응답된 내용을 화면에 디버그 문자열로 출력해본다
 	GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Green, Response->GetContentAsString());
+
+	//json 직렬화 데이터를 보관할 포인터 생성
 	TSharedPtr<FJsonObject> JsonObject;
 
-	//Create a reader pointer to read the json data
+	//json 데이터를 읽을 판독기 포인터 생성
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 
+	//독서자에게 주어진 json 데이터와 deserialize할 실제 객체 최적화
 	if (FJsonSerializer::Deserialize(Reader, JsonObject))
 	{
-		GEngine->AddOnScreenDebugMessage(10, 10, FColor::Blue, TEXT("Ok"));
-		bool bAccountCreatedSuccessfully = JsonObject->GetBoolField("LoginWasSuccessful");
-		FString userId = JsonObject->GetStringField("ID");
+		bool bLoginWasSuccessful = JsonObject->GetBoolField("LoginWasSuccessful");
+		ref_userId = JsonObject->GetStringField("ID");
+
+		// 로그인 성공하면 
+		if (bLoginWasSuccessful)
+		{
+			GEngine->AddOnScreenDebugMessage(10, 10, FColor::Green, TEXT("Login true"));
+			// MainMap으로 이동한다
+			UGameplayStatics::OpenLevel(this, "MainMap");
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(10, 10, FColor::Green, TEXT("Login false"));
+		}
 	}
-	
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Login false"));
+	}
 }
 
 // Called when the game starts or when spawned
