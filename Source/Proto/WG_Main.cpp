@@ -4,11 +4,17 @@
 #include "WG_Main.h"
 #include "Components/Button.h"
 #include "PC_Main.h"
+#include "LoginHttp.h"
+#include "Components/TextBlock.h"
 
 void UWG_Main::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	UserIDText = Cast<UTextBlock>(GetWidgetFromName(TEXT("UserIDText")));
+	if (nullptr == UserIDText) return;
+
+	UserIDText->SetText(FText::FromString("test1"));
 	SessionBrowserButton->OnClicked.AddDynamic(this, &UWG_Main::SessionBrowserButtonClicked);
 	AmoryButton->OnClicked.AddDynamic(this, &UWG_Main::AmoryButtonClicked);
 }
@@ -34,4 +40,11 @@ void UWG_Main::SessionBrowserButtonClicked()
 void UWG_Main::AmoryButtonClicked()
 {
 
+}
+
+void UWG_Main::UserUpdate()
+{
+	//FActorSpawnParameters spawnparams;
+	//spawnparams.Owner = this;
+	//ALoginHttp* Login_Http = GetWorld()->SpawnActor<ALoginHttp>(FVector::ZeroVector, FRotator::ZeroRotator, spawnparams);
 }

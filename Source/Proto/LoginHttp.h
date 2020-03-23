@@ -17,6 +17,7 @@ public:
 	ALoginHttp();
 
 	FHttpModule* Http;
+	FString ref_userId;
 
 	// http로 url로 요청 Get으로 userId, userPw로 전달해주는 함수 
 	UFUNCTION(BlueprintCallable, Category = "LoginHttp")
