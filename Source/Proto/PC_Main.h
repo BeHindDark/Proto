@@ -59,6 +59,10 @@ public:
 	*/
 	void OnGetCreateSessionReport(bool bWasSuccessful);
 
+	void TryJoinOnlineSession(const FOnlineSessionSearchResult& SearchResult);
+
+	void OnGetJoinSessionReport(bool bWasSuccessful, FString TravleURL);
+
 protected:
 
 	void InitializeWidget();

@@ -33,7 +33,10 @@ void UGI_Proto::JoinOnlineSession(const FOnlineSessionSearchResult & SearchResul
 {
 	ULocalPlayer* const Player = GetFirstGamePlayer();
 
-	JoinSession(Player->GetPreferredUniqueNetId().GetUniqueNetId(), GameSessionName, SearchResult);
+	if(!JoinSession(Player->GetPreferredUniqueNetId().GetUniqueNetId(),GameSessionName,SearchResult))
+	{
+		OnJoinSessionReport.Broadcast(false, "");
+	}
 }
 
 void UGI_Proto::DestroySessionAndLeaveGame()
@@ -73,7 +76,7 @@ bool UGI_Proto::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName Session
 
 		if (Sessions.IsValid() && UserId.IsValid())
 		{
-
+			
 			SessionSettings = MakeShareable(new FOnlineSessionSettings());
 
 			SessionSettings->bIsLANMatch = bIsLAN;
@@ -311,23 +314,19 @@ void UGI_Proto::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteR
 			// Every OnlineSubsystem uses different TravelURLs
 			FString TravelURL;
 
-			if (PlayerController && Sessions->GetResolvedConnectString(SessionName, TravelURL))
+			if (Sessions->GetResolvedConnectString(SessionName, TravelURL))
 			{
 				//이 아랫부분에서 실제로 Client Travel이 일어납니다.
 				//이 부분에서 ReportDelegate를 호출하고
 				//해당 델리게이트는 성공여부를 parameter로 전달해야 합니다.
 				//성공여부가 true면 서버탐색기 위젯을 제거해주고
 				//fail이면 로딩스크린을 닫고, 서버탐색기 위젯을 다시 보여주며, 에러위젯을 띄워줍니다.
-				OnJoinSessionReport.Broadcast(true);
+				OnJoinSessionReport.Broadcast(true, TravelURL);
 
-
-				// Finally call the ClienTravel. If you want, you could print the TravelURL to see
-				// how it really looks like
-				PlayerController->ClientTravel(TravelURL, ETravelType::TRAVEL_Absolute);
 			}
 			else
 			{
-				OnJoinSessionReport.Broadcast(false);
+				OnJoinSessionReport.Broadcast(false, FString(""));
 			}
 		}
 	}

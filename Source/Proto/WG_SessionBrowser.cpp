@@ -25,10 +25,11 @@ void UWG_SessionBrowser::NativeConstruct()
 	Super::NativeConstruct();
 	
 	JoinButton->OnClicked.AddDynamic(this, &UWG_SessionBrowser::OnJoinButtonClicked);
-	RefreshAllButton->OnClicked.AddDynamic(this,&UWG_SessionBrowser::OnRefreshAllButtonClicked);
-	QuickRefreshButton->OnClicked.AddDynamic(this,&UWG_SessionBrowser::OnQuickRefreshButtonClicked);
+	RefreshAllButton->OnClicked.AddDynamic(this,&UWG_SessionBrowser::OnRefreshAllButtonClicked);	
 	SessionCreatorButton->OnClicked.AddDynamic(this,&UWG_SessionBrowser::OnSessionCreatorButtonClicked);
 	BacktoMainButton->OnClicked.AddDynamic(this,&UWG_SessionBrowser::OnBacktoMainButtonClicked);
+
+	QuickRefreshButton->OnClicked.AddDynamic(this,&UWG_SessionBrowser::OnQuickRefreshButtonClicked);
 
 	//CallFindSession();
 }
@@ -68,6 +69,15 @@ void UWG_SessionBrowser::OnGetFindSessionReport(bool bWasSuccessful)
 
 void UWG_SessionBrowser::OnJoinButtonClicked()
 {
+	APC_Main* PC_Main = Cast<APC_Main>(GetOwningPlayer());
+	if(!IsValid(PC_Main))
+	{
+		CHECK_LOG(!IsValid(PC_Main));
+		return;
+	}
+
+	PC_Main->TryJoinOnlineSession(WG_SessionInfo->SessionData);
+
 }
 
 void UWG_SessionBrowser::OnRefreshAllButtonClicked()
@@ -78,15 +88,85 @@ void UWG_SessionBrowser::OnRefreshAllButtonClicked()
 
 void UWG_SessionBrowser::OnQuickRefreshButtonClicked()
 {
+
 	for(UWidget* LineWidget :WG_SessionList->SessionScrollBox->GetAllChildren())
 	{
 		UWG_SessionLine* SessionLine = Cast<UWG_SessionLine>(LineWidget);
+
 		if(IsValid(SessionLine))
 		{
 			FOnlineSessionSearchResult SessionData = SessionLine->GetSessionData();
-			SessionLine->UpdateSessionData(SessionData);
+			if(SessionData.IsValid())
+			{
+				SessionLine->UpdateSessionData(SessionData);
+			}
+			else
+			{
+				SessionLine->RemoveFromParent();
+			}
+		}
+		else
+		{
+			UE_LOG(Proto,Warning,TEXT("%s / %s : Invalid SessionLine"),*LINE_INFO,*GetNameSafe(this));
 		}
 	}
+	/*
+	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
+
+	if(OnlineSub)
+	{
+		// 세션 인터페이스 가져오기 Get the Session Interface, so we can call the "CreateSession" function on it
+		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+
+		if(Sessions.IsValid())
+		{
+			ULocalPlayer* const Player = GetOwningLocalPlayer();
+
+			TSharedPtr<const FUniqueNetId> UserID = Player->GetPreferredUniqueNetId().GetUniqueNetId();
+
+			for(UWidget* LineWidget :WG_SessionList->SessionScrollBox->GetAllChildren())
+			{
+				UWG_SessionLine* SessionLine = Cast<UWG_SessionLine>(LineWidget);
+				
+				if(IsValid(SessionLine))
+				{
+					FOnlineSessionSearchResult SessionData = SessionLine->GetSessionData();
+										
+					FOnSingleSessionResultCompleteDelegate ResultDelegate;
+					ResultDelegate.BindLambda([SessionLine](int32 LocalUserNum,bool bWasSuccessful,const FOnlineSessionSearchResult& NewData)
+											  {
+												  if(NewData.IsSessionInfoValid())
+												  {
+													  UE_LOG(Proto,Warning,TEXT("%s / Lambda : UpdateSessionData"),*LINE_INFO);
+													  SessionLine->UpdateSessionData(NewData);
+												  }
+												  else
+												  {
+													  UE_LOG(Proto,Warning,TEXT("%s / Lambda : InvalidSessionData"),*LINE_INFO);
+													  SessionLine->RemoveFromParent();
+												  }
+											  });
+
+					Sessions->FindSessionById(*UserID.Get(),SessionData.Session.SessionInfo->GetSessionId(),*SessionData.Session.OwningUserId.Get(),ResultDelegate);
+
+					UE_LOG(Proto,Warning,TEXT("%s / %s : Success?"),*LINE_INFO,*GetNameSafe(this));
+				}
+				else
+				{
+					UE_LOG(Proto,Warning,TEXT("%s / %s : Invalid SessionLine"),*LINE_INFO,*GetNameSafe(this));
+				}
+			}
+		}
+		else
+		{
+			CHECK_LOG(Sessions.IsValid());
+		}
+	}
+	else
+	{
+		CHECK_LOG(OnlineSub);
+	}
+	]*/
 }
 
 void UWG_SessionBrowser::OnSessionCreatorButtonClicked()
@@ -98,8 +178,13 @@ void UWG_SessionBrowser::OnSessionCreatorButtonClicked()
 		return;
 	}
 
+	functionbrake = true;
+
 	SetVisibility(ESlateVisibility::Hidden);
 	PC_Main->ShowSessionCreatorWG(3);
+		
+	BrakeTimer.BindLambda([this]{functionbrake = false;});
+	GetWorld()->GetTimerManager().SetTimer(BrakeTimerHandle,BrakeTimer,1.0f,false);
 
 }
 
@@ -111,6 +196,8 @@ void UWG_SessionBrowser::OnBacktoMainButtonClicked()
 		CHECK_LOG(!IsValid(PC_Main));
 		return;
 	}
+
+	functionbrake = true;
 
 	PC_Main->ShowMainWG(1);
 	RemoveFromParent();

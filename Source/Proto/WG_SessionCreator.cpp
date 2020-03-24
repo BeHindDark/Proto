@@ -66,7 +66,7 @@ void UWG_SessionCreator::OnCreateSessionClicked()
 	ProtoGI->OnCreateSessionReport.AddUObject(this,&UWG_SessionCreator::OnGetCreateSessionReport);
 
 	ProtoGI->CreateOnlineSession(WG_SessionInfo->SessionNameTextBox->GetText().ToString(),
-								 WG_SessionInfo->HostNameTextBox->GetText().ToString(),
+								 WG_SessionInfo->HostUserIDTextBox->GetText().ToString(),
 								 WG_SessionInfo->DescriptionMLEditableText->GetText().ToString(),
 								 4);
 	

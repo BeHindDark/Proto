@@ -10,7 +10,11 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnCreateSessionReportDelegate, bool);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnFindSessionReportDelegate, bool);
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnJoinSessionReportDelegate, bool);
+/**	세션 참가시도가 끝나고 ClientTravel을 하기 전 호출되는 델리게이트
+*	@param	bool	bWasSuccessful	세션 참가 성공 여부
+*	@param	FString	TravelURL		참가할 세션의 URL
+*/
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnJoinSessionReportDelegate, bool, FString);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDestroySessionReportDelegate, bool);
 
