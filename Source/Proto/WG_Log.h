@@ -19,7 +19,7 @@ protected:
 
 protected:
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
-	class TextBlock* ErrorTypeText;
+	class UTextBlock* ErrorTypeText;
 
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
 	class UMultiLineEditableText* ErrorMessageMLEditableText;
