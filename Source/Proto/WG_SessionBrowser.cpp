@@ -28,7 +28,6 @@ void UWG_SessionBrowser::NativeConstruct()
 	RefreshAllButton->OnClicked.AddDynamic(this,&UWG_SessionBrowser::OnRefreshAllButtonClicked);	
 	SessionCreatorButton->OnClicked.AddDynamic(this,&UWG_SessionBrowser::OnSessionCreatorButtonClicked);
 	BacktoMainButton->OnClicked.AddDynamic(this,&UWG_SessionBrowser::OnBacktoMainButtonClicked);
-
 	QuickRefreshButton->OnClicked.AddDynamic(this,&UWG_SessionBrowser::OnQuickRefreshButtonClicked);
 
 	//CallFindSession();
@@ -88,7 +87,16 @@ void UWG_SessionBrowser::OnRefreshAllButtonClicked()
 
 void UWG_SessionBrowser::OnQuickRefreshButtonClicked()
 {
+	APC_Main* PC_Main = Cast<APC_Main>(GetOwningPlayer());
+	if(!IsValid(PC_Main))
+	{
+		CHECK_LOG(!IsValid(PC_Main));
+		return;
+	}
 
+	PC_Main->ShowLogWG("Notification", "This feature is not available for now.");
+
+	/*
 	for(UWidget* LineWidget :WG_SessionList->SessionScrollBox->GetAllChildren())
 	{
 		UWG_SessionLine* SessionLine = Cast<UWG_SessionLine>(LineWidget);
@@ -110,6 +118,7 @@ void UWG_SessionBrowser::OnQuickRefreshButtonClicked()
 			UE_LOG(Proto,Warning,TEXT("%s / %s : Invalid SessionLine"),*LINE_INFO,*GetNameSafe(this));
 		}
 	}
+	*/
 	/*
 	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
 

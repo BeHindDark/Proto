@@ -30,6 +30,7 @@ public:
 
 	class UUserWidget* WG_LoadingScreen;
 
+	class UWG_Log* WG_Log;
 
 protected:
 
@@ -41,6 +42,8 @@ protected:
 
 	TSubclassOf<class UUserWidget> WG_LoadingScreen_Class;
 
+	TSubclassOf<class UWG_Log> WG_Log_Class;
+
 public:
 
 	void ShowMainWG(int Zorder = 0);
@@ -49,7 +52,9 @@ public:
 
 	void ShowSessionCreatorWG(int Zorder = 0);
 
-	void ShowLoadingScreenWG(int Zorder = 0);
+	void ShowLoadingScreenWG(int Zorder = 5);
+
+	void ShowLogWG(FString TypeText, FString LogText, int Zorder = 10);
 
 	/**	세션 생성이 성공, 또는 실패했을 때 실행됩니다.
 	*	@param	bWasSuccessful	세션 생성 성공여부입니다.

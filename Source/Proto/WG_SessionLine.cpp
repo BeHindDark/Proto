@@ -8,6 +8,7 @@
 #include "Components/Border.h"
 #include "Components/TextBlock.h"
 #include "PC_Main.h"
+#include "WG_Log.h"
 
 void UWG_SessionLine::NativeConstruct()
 {
@@ -97,7 +98,7 @@ FReply UWG_SessionLine::NativeOnMouseButtonDoubleClick(const FGeometry & InGeome
 	}
 	
 	PC_Main->TryJoinOnlineSession(SessionData);
-	
+
 	return FReply::Unhandled();
 }
 

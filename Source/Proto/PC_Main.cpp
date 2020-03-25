@@ -5,6 +5,7 @@
 #include "WG_Main.h"
 #include "WG_SessionBrowser.h"
 #include "WG_SessionCreator.h"
+#include "WG_Log.h"
 #include "Blueprint/UserWidget.h"
 #include "GI_Proto.h"
 
@@ -128,6 +129,31 @@ void APC_Main::ShowLoadingScreenWG(int Zorder)
 	bShowMouseCursor = false;
 }
 
+void APC_Main::ShowLogWG(FString TypeText,FString LogText,int Zorder)
+{
+	if(!IsLocalPlayerController())
+	{
+		CHECK_LOG(!IsLocalPlayerController());
+		return;
+	}
+
+	if(IsValid(WG_Log))
+	{
+		WG_Log->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		WG_Log = nullptr;
+		WG_Log = CreateWidget<UWG_Log>(this,WG_Log_Class);
+	}
+
+	WG_Log->InitializeLog(TypeText, LogText, EInputMode::UIOnly);
+
+	WG_Log->AddToViewport(Zorder);
+
+	bShowMouseCursor = true;
+}
+
 void APC_Main::OnGetCreateSessionReport(bool bWasSuccessful)
 {
 	if(bWasSuccessful)
@@ -242,5 +268,12 @@ void APC_Main::InitializeWidget()
 	{
 		WG_LoadingScreen_Class = WG_LoadingScreen_C.Class;
 	}
+	
+	static ConstructorHelpers::FClassFinder<UWG_Log> WG_Log_C(TEXT("/Game/Blueprints/Widget/UMG_Log.UMG_Log_C"));
+	if(WG_Log_C.Succeeded())
+	{
+		WG_Log_Class = WG_Log_C.Class;
+	}
+	
 }
 
