@@ -7,6 +7,8 @@
 #include "WG_SessionInfo.h"
 #include "Components/Border.h"
 #include "Components/TextBlock.h"
+#include "PC_Main.h"
+#include "WG_Log.h"
 
 void UWG_SessionLine::NativeConstruct()
 {
@@ -79,6 +81,7 @@ FReply UWG_SessionLine::NativeOnMouseButtonDown(const FGeometry & InGeometry,con
 	SetSelect(true);	
 
 	//여기서 SessionBrowser의 함수를 호출합니다.
+	SessionBrowser_Ref->WG_SessionInfo->UpdateSessionData(SessionData);
 	
 	return FReply::Unhandled();
 }
@@ -86,7 +89,16 @@ FReply UWG_SessionLine::NativeOnMouseButtonDown(const FGeometry & InGeometry,con
 FReply UWG_SessionLine::NativeOnMouseButtonDoubleClick(const FGeometry & InGeometry,const FPointerEvent & InMouseEvent)
 {
 	Super::NativeOnMouseButtonDoubleClick(InGeometry, InMouseEvent);
+
+	APC_Main* PC_Main = Cast<APC_Main>(GetOwningPlayer());
+	if(!IsValid(PC_Main))
+	{
+		CHECK_LOG(!IsValid(PC_Main));
+		return FReply::Unhandled();
+	}
 	
+	PC_Main->TryJoinOnlineSession(SessionData);
+
 	return FReply::Unhandled();
 }
 
@@ -117,7 +129,7 @@ void UWG_SessionLine::SetSelect(bool Selected)
 		else
 		{
 			BackgroundBorder->SetBrushColor(NormalBackgroundColor);
-		}		
+		}
 	}
 }
 

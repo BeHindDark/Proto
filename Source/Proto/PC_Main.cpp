@@ -5,6 +5,7 @@
 #include "WG_Main.h"
 #include "WG_SessionBrowser.h"
 #include "WG_SessionCreator.h"
+#include "WG_Log.h"
 #include "Blueprint/UserWidget.h"
 #include "GI_Proto.h"
 
@@ -128,6 +129,31 @@ void APC_Main::ShowLoadingScreenWG(int Zorder)
 	bShowMouseCursor = false;
 }
 
+void APC_Main::ShowLogWG(FString TypeText,FString LogText,int Zorder)
+{
+	if(!IsLocalPlayerController())
+	{
+		CHECK_LOG(!IsLocalPlayerController());
+		return;
+	}
+
+	if(IsValid(WG_Log))
+	{
+		WG_Log->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		WG_Log = nullptr;
+		WG_Log = CreateWidget<UWG_Log>(this,WG_Log_Class);
+	}
+
+	WG_Log->InitializeLog(TypeText, LogText, EInputMode::UIOnly);
+
+	WG_Log->AddToViewport(Zorder);
+
+	bShowMouseCursor = true;
+}
+
 void APC_Main::OnGetCreateSessionReport(bool bWasSuccessful)
 {
 	if(bWasSuccessful)
@@ -148,16 +174,59 @@ void APC_Main::OnGetCreateSessionReport(bool bWasSuccessful)
 			WG_Main->RemoveFromParent();
 		}
 
-		if(IsValid(WG_LoadingScreen))
-		{
-			WG_LoadingScreen->RemoveFromParent();
-		}
 
 		UGameplayStatics::OpenLevel(GetWorld(),FName("ThirdPersonExampleMap"),true,"listen");
 	}
 	else
 	{
 		UE_LOG(Proto,Warning,TEXT("%s / %s : Fail to Create Session"),*LINE_INFO,*GetNameSafe(this));
+
+		if(IsValid(WG_LoadingScreen))
+		{
+			WG_LoadingScreen->RemoveFromParent();
+		}
+	}
+}
+
+void APC_Main::TryJoinOnlineSession(const FOnlineSessionSearchResult& SearchResult)
+{
+	UGI_Proto* GI_Proto = Cast<UGI_Proto>(GetGameInstance());
+	if(!IsValid(GI_Proto))
+	{
+		CHECK_LOG(!IsValid(GI_Proto));
+		return;
+	}
+	GI_Proto->OnJoinSessionReport.AddUObject(this, &APC_Main::OnGetJoinSessionReport);
+
+	ShowLoadingScreenWG(5);
+
+	GI_Proto->JoinOnlineSession(SearchResult);
+}
+
+void APC_Main::OnGetJoinSessionReport(bool bWasSuccessful,FString TravleURL)
+{
+	if(bWasSuccessful)
+	{
+		if(IsValid(WG_SessionCreator))
+		{
+			WG_SessionCreator->RemoveFromParent();
+		}
+
+		if(IsValid(WG_SessionBrowser))
+		{
+			WG_SessionBrowser->RemoveFromParent();
+		}
+
+		if(IsValid(WG_Main))
+		{
+			WG_Main->RemoveFromParent();
+		}
+
+		ClientTravel(TravleURL, ETravelType::TRAVEL_Absolute);
+	}
+	else
+	{
+		UE_LOG(Proto,Warning,TEXT("%s / %s : Fail to Join Session"),*LINE_INFO,*GetNameSafe(this));
 
 		if(IsValid(WG_LoadingScreen))
 		{
@@ -199,5 +268,12 @@ void APC_Main::InitializeWidget()
 	{
 		WG_LoadingScreen_Class = WG_LoadingScreen_C.Class;
 	}
+	
+	static ConstructorHelpers::FClassFinder<UWG_Log> WG_Log_C(TEXT("/Game/Blueprints/Widget/UMG_Log.UMG_Log_C"));
+	if(WG_Log_C.Succeeded())
+	{
+		WG_Log_Class = WG_Log_C.Class;
+	}
+	
 }
 

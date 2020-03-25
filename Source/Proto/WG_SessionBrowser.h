@@ -40,6 +40,7 @@ public:
 	class UButton* RefreshAllButton;
 
 	/**	현재 WG_SessionList에 있는 SessionLine들의 정보를 업데이트 합니다.
+	*	만약을 위해 남겨둔 예비 변수입니다.
 	*/
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* QuickRefreshButton;
@@ -57,6 +58,14 @@ public:
 protected:
 	TSubclassOf<class UWG_SessionLine> WG_SessionLine_Class;
 
+private:
+
+	bool functionbrake = false;
+
+	FTimerDelegate BrakeTimer;
+
+	FTimerHandle BrakeTimerHandle;
+
 public:
 
 	void OnGetFindSessionReport(bool bWasSuccessful);
@@ -69,6 +78,11 @@ protected:
 	void OnRefreshAllButtonClicked();
 
 	UFUNCTION()
+	/**	QuickRefresh 버튼이 눌렸을 때 SessionLine들을 업데이트 하는 함수입니다.
+	*	현재 언리얼 엔진이 FindSessionById를 틀만만들어두고 채워두지 않은 상황이라
+	*	oculus 세션일 떄 외에는 사용이 불가능합니다.
+	*	후일 언리얼이 기능을 채워넣었을 떄를 대비하여 일단 남겨둡니다.
+	*/
 	void OnQuickRefreshButtonClicked();
 
 	UFUNCTION()

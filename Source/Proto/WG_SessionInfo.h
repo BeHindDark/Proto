@@ -16,12 +16,13 @@ class PROTO_API UWG_SessionInfo : public UUserWidget
 	
 protected:
 	virtual void NativeConstruct() override;
+
 public:
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
 	class UEditableTextBox* SessionNameTextBox;
 
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
-	class UEditableTextBox* HostNameTextBox;
+	class UEditableTextBox* HostUserIDTextBox;
 
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
 	class UMultiLineEditableText* DescriptionMLEditableText;
@@ -51,5 +52,5 @@ public:
 	*/
 	void ClearText();
 
-	void UpdateSessionData(FOnlineSessionSearchResult NewSessionData);
+	bool UpdateSessionData(const FOnlineSessionSearchResult& NewSessionData);
 };
