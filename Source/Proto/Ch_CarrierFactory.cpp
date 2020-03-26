@@ -31,7 +31,7 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	CockpitArrow->SetupAttachment(LegMesh);
 
 	//지금 이거 적용 안됨. 구글링중
-	//CockpitMesh->SetupAttachment(LegMesh);
+	CockpitMesh->SetupAttachment(CockpitArrow);
 	LeftWeaponArrow->SetupAttachment(CockpitMesh);
 	RightWeaponArrow->SetupAttachment(CockpitMesh);
 
