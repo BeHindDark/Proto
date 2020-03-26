@@ -12,32 +12,52 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	FName CockpitSocket(TEXT("Mount_Top"));
+	if (GetMesh()->DoesSocketExist(CockpitSocket)) {
+		//애로우를 이용해서 간접적으로 붙이지말고 그냥 소켓에 직접적으로 붙이기
+		//CockpitArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("CockpitArrow"));
+		CockpitMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CockpitMesh"));
+		CockpitMesh->SetupAttachment(GetMesh(), CockpitSocket);
+
+		FName LWeaponSocket(TEXT("Mount_Weapon_L"));
+		if (CockpitMesh->DoesSocketExist(LWeaponSocket)) {
+			//LeftWeaponArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("LWeaponArrow"));
+			WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LWeaponMesh"));
+			WeaponMesh->SetupAttachment(CockpitMesh, LWeaponSocket);
+		}
+
+		FName RWeaponSocket(TEXT("Mount_Weapon_R"));
+		if (CockpitMesh->DoesSocketExist(RWeaponSocket)) {
+			WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RWeaponMesh"));
+			WeaponMesh->SetupAttachment(CockpitMesh, RWeaponSocket);
+		}
+	}
+	/*FName LShoulderSocket(TEXT("Mount_HalfShoulder_L"));
+	if (CockpitMesh->DoesSocketExist(LShoulderSocket)) {
+
+	}
+	FName RShoulderSocket(TEXT("Mount_HalfShoulder_R"));
+	if (CockpitMesh->DoesSocketExist(RShoulderSocket)) {
+
+	}*/
+
+	//RightWeaponArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("RWeaponArrow"));
+	//LeftShoulderArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("LShoulderArrow"));
+	//RightShoulderArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("RShoulderArrow"));
+	//ArrowArrayIndex = { CockpitArrow, LeftWeaponArrow, RightWeaponArrow, LeftShoulderArrow, RightShoulderArrow };
+
 	
-	CockpitArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("CockpitArrow"));
-	LeftWeaponArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("LWeaponArrow"));
-	RightWeaponArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("RWeaponArrow"));
-	LeftShoulderArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("LShoulderArrow"));
-	RightShoulderArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("RShoulderArrow"));
-	ArrowArrayIndex = { CockpitArrow, LeftWeaponArrow, RightWeaponArrow, LeftShoulderArrow, RightShoulderArrow };
 
-	Root = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Root"));
-	LegMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LegMesh"));
-	CockpitMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CockpitMesh"));
-	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
+	//CockpitArrow->SetupAttachment(GetMesh());
 
-	RootComponent = Root;
+	//LeftWeaponArrow->SetupAttachment(CockpitMesh);
+	//RightWeaponArrow->SetupAttachment(CockpitMesh);
+	//LeftShoulderArrow->SetupAttachment(CockpitMesh);
+	//RightShoulderArrow->SetupAttachment(CockpitMesh);
 
-	LegMesh->SetupAttachment(Root);
-	CockpitArrow->SetupAttachment(LegMesh);
-
-	//지금 이거 적용 안됨. 구글링중
-	//CockpitMesh->SetupAttachment(LegMesh);
-	LeftWeaponArrow->SetupAttachment(CockpitMesh);
-	RightWeaponArrow->SetupAttachment(CockpitMesh);
-
-	//지금 이거 적용 안됨. 구글링중
-	//CockpitMesh->SetupAttachment(LegMesh);
-	WeaponMesh->SetupAttachment(CockpitMesh);
+	//CockpitMesh->SetupAttachment(GetMesh());
+	//WeaponMesh->SetupAttachment(CockpitMesh);
 
 }
 

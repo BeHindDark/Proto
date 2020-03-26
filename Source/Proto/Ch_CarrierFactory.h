@@ -26,35 +26,27 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Array")
 	TArray<UArrowComponent*> ArrowArrayIndex;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
-	UArrowComponent* CockpitArrow = nullptr;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
+	//UArrowComponent* CockpitArrow = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
-	UArrowComponent* LeftWeaponArrow = nullptr;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
+	//UArrowComponent* LeftWeaponArrow = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
-	UArrowComponent* RightWeaponArrow = nullptr;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
+	//UArrowComponent* RightWeaponArrow = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
-	UArrowComponent* LeftShoulderArrow = nullptr;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
+	//UArrowComponent* LeftShoulderArrow = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
-	UArrowComponent* RightShoulderArrow;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	USkeletalMeshComponent* LegMesh;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
+	//UArrowComponent* RightShoulderArrow;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* CockpitMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* WeaponMesh;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Collision")
-	UCapsuleComponent* Root;
-
-
-
+	
 
 
 public:	
