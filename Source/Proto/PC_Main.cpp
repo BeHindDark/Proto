@@ -268,7 +268,7 @@ void APC_Main::InitializeWidget()
 	{
 		WG_LoadingScreen_Class = WG_LoadingScreen_C.Class;
 	}
-	
+
 	static ConstructorHelpers::FClassFinder<UWG_Log> WG_Log_C(TEXT("/Game/Blueprints/Widget/UMG_Log.UMG_Log_C"));
 	if(WG_Log_C.Succeeded())
 	{
