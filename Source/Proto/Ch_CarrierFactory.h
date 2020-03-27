@@ -26,28 +26,43 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Array")
 	TArray<UArrowComponent*> ArrowArrayIndex;
 	
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
-	//UArrowComponent* CockpitArrow = nullptr;
-
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
-	//UArrowComponent* LeftWeaponArrow = nullptr;
-
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
-	//UArrowComponent* RightWeaponArrow = nullptr;
-
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
-	//UArrowComponent* LeftShoulderArrow = nullptr;
-
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
-	//UArrowComponent* RightShoulderArrow;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
+	UArrowComponent* CockpitArrow;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
+	UStaticMeshComponent* ShoulderMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* CockpitMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* WeaponMesh;
+	UStaticMeshComponent* LShoulderMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
+	UStaticMeshComponent* RShoulderMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
+	UStaticMeshComponent* LWeaponMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
+	UStaticMeshComponent* RWeaponMesh;
 	
 
+private:
+
+	void AttachShoulder(FName SocketName);
+
+	void AttachLShoulder(FName SocketName);
+
+	void AttachRShoulder(FName SocketName);
+
+	void AttachCockpit(FName SocketName);
+
+	void AttachLWeapon(FName SocketName);
+
+	void AttachRWeapon(FName SocketName);
+
+	void AttachMesh(FName SocketName, UStaticMeshComponent* MotherMeshName, UStaticMeshComponent* AttachMeshName, FName ComponentName);
 
 public:	
 	// Called every frame
