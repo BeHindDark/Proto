@@ -14,6 +14,7 @@ void UWG_Login::NativeConstruct() {
 	IDInput->OnTextCommitted.AddDynamic(this, &UWG_Login::IDCommitted);
 	PWInput->OnTextCommitted.AddDynamic(this, &UWG_Login::PassWordCommitted);
 	LoginButton->OnClicked.AddDynamic(this, &UWG_Login::OnLoginClicked);
+	CreateAccountButton->OnClicked.AddDynamic(this, &UWG_Login::OnCreateAccount);
 	UseServerDataCheckBox->OnCheckStateChanged.AddDynamic(this, &UWG_Login::OnServerDataCheckBoxClicked);
 	UseLocalDataCheckBox->OnCheckStateChanged.AddDynamic(this, &UWG_Login::OnLocalDataCheckBoxClicked);
 }
@@ -32,6 +33,11 @@ void UWG_Login::PassWordCommitted(const FText& InText, ETextCommit::Type InCommi
 
 void UWG_Login::OnLoginClicked() {
 	UWG_Login::OnLoginSession();
+}
+
+void UWG_Login::OnCreateAccount()
+{
+	UE_LOG(LogTemp, Error, TEXT("회원가입 버튼 클릭"));
 }
 
 void UWG_Login::OnLoginSession() {
