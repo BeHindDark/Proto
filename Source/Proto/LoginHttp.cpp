@@ -43,7 +43,6 @@ void ALoginHttp::OnAccountCreationResponse(FHttpRequestPtr Request, FHttpRespons
 	//웹서버로부터 응답된 내용을 화면에 디버그 문자열로 출력해본다
 	GEngine->AddOnScreenDebugMessage(1, 10.0f, FColor::Green, Response->GetContentAsString());
 
-	/*
 	TSharedPtr<FJsonObject> JsonObject;
 
 	//Create a reader pointer to read the json data
@@ -51,12 +50,8 @@ void ALoginHttp::OnAccountCreationResponse(FHttpRequestPtr Request, FHttpRespons
 
 	if (FJsonSerializer::Deserialize(Reader, JsonObject))
 	{
-		bool bAccountCreatedSuccessfully = JsonObject->GetBoolField("AccountSuccessfullyCreated");
-		FString userId = JsonObject->GetStringField("userId");
-
-		//GEngine->AddOnScreenDebugMessage(1, 30.0f, FColor::Blue, FString::Printf(TEXT("%s"), userId));
+	
 	}
-	*/
 }
 
 void ALoginHttp::SendLoginRequest(const FString& userId, const FString& userPw)
@@ -111,8 +106,6 @@ void ALoginHttp::OnLoginResponse(FHttpRequestPtr Request, FHttpResponsePtr Respo
 void ALoginHttp::BeginPlay()
 {
 	Super::BeginPlay();
-
-
 }
 
 // Called every frame

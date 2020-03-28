@@ -4,17 +4,16 @@
 
 #include "Proto.h"
 #include "Blueprint/UserWidget.h"
-#include "WG_Login.generated.h"
+#include "WG_Join.generated.h"
 
 /**
- *
+ * 
  */
 UCLASS()
-class PROTO_API UWG_Login : public UUserWidget
+class PROTO_API UWG_Join : public UUserWidget
 {
 	GENERATED_BODY()
-
-
+	
 protected:
 
 	virtual void NativeConstruct() override;
@@ -22,25 +21,19 @@ protected:
 protected:
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* LoginButton;
+		class UButton* JoinButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* CreateAccountButton;
+		class UButton* BackButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* IDInput;
+		class UEditableTextBox* IDInput;
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* PWInput;
+		class UEditableTextBox* PWInput;
 
 	UPROPERTY(meta = (BindWidget))
-	class UCheckBox* SaveIDCheckBox;
-
-	UPROPERTY(meta = (BindWidget))
-	class UCheckBox* UseServerDataCheckBox;
-
-	UPROPERTY(meta = (BindWidget))
-	class UCheckBox* UseLocalDataCheckBox;
+		class UEditableTextBox* PW2Input;
 
 private:
 
@@ -49,15 +42,10 @@ private:
 
 	UFUNCTION()
 	void PassWordCommitted(const FText& InText, ETextCommit::Type InCommitType);
+	void PassWord2Committed(const FText& InText, ETextCommit::Type InCommitType);
 
 	UFUNCTION()
-	void OnLoginClicked();
+	void OnJoinClicked();
 
-	void OnCreateAccount();
-
-	void OnLoginSession();
-
-	void OnServerDataCheckBoxClicked(bool Checked);
-
-	void OnLocalDataCheckBoxClicked(bool Checked);
+	void OnJoinSession();
 };
