@@ -16,7 +16,7 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	FName ShoulderSocket(TEXT("Mount_Top"));
 	FName CockpitSocket(TEXT("Mount_Cockpit"));
 	FName LShoulderSocket(TEXT("Mount_HalfShoulder_L"));
-	FName RSoulderSocket(TEXT("Mount_HalfShoulder_R"));
+	FName RShoulderSocket(TEXT("Mount_HalfShoulder_R"));
 	FName LWeaponSocket(TEXT("Mount_Weapon_L"));
 	FName RWeaponSocket(TEXT("Mount_Weapon_R"));
 
@@ -33,9 +33,21 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 		CockpitMesh = CreateDefaultSubobject<UStaticMeshComponent>(ShoulderComponentName);
 		CockpitMesh->SetupAttachment(GetMesh(), ShoulderSocket);
 	}
+
 	//어떻게 객체화해봤는데 정상적으로 되....겠죠?
 	if (CockpitMesh) {
 		AttachMesh(CockpitSocket, ShoulderMesh, CockpitMesh, CockpitComponentName);
+	}
+
+	if (LShoulderMesh) {
+		AttachMesh(LShoulderSocket, CockpitMesh, LShoulderMesh, LShoulderComponentName);
+		AttachMesh(RShoulderSocket, CockpitMesh, RShoulderMesh, RShoulderComponentName);
+		AttachMesh(LWeaponSocket, LShoulderMesh, LWeaponMesh, LWeaponComponentName);
+		AttachMesh(RWeaponSocket, RShoulderMesh, RWeaponMesh, RWeaponComponentName);
+	}
+	else if (LWeaponMesh) {
+		AttachMesh(LWeaponSocket, CockpitMesh, LWeaponMesh, LWeaponComponentName);
+		AttachMesh(RWeaponSocket, CockpitMesh, RWeaponMesh, RWeaponComponentName);
 	}
 }
 

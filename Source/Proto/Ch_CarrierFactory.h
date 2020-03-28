@@ -26,42 +26,26 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Array")
 	TArray<UArrowComponent*> ArrowArrayIndex;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Arrow")
-	UArrowComponent* CockpitArrow;
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* ShoulderMesh;
+	UStaticMeshComponent* ShoulderMesh = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* CockpitMesh;
+	UStaticMeshComponent* CockpitMesh = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* LShoulderMesh;
+	UStaticMeshComponent* LShoulderMesh = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* RShoulderMesh;
+	UStaticMeshComponent* RShoulderMesh = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* LWeaponMesh;
+	UStaticMeshComponent* LWeaponMesh = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* RWeaponMesh;
+	UStaticMeshComponent* RWeaponMesh = nullptr;
 	
 
 private:
-
-	void AttachShoulder(FName SocketName);
-
-	void AttachLShoulder(FName SocketName);
-
-	void AttachRShoulder(FName SocketName);
-
-	void AttachCockpit(FName SocketName);
-
-	void AttachLWeapon(FName SocketName);
-
-	void AttachRWeapon(FName SocketName);
-
 	void AttachMesh(FName SocketName, UStaticMeshComponent* MotherMeshName, UStaticMeshComponent* AttachMeshName, FName ComponentName);
 
 public:	
