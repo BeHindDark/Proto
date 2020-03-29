@@ -38,7 +38,7 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	if (CockpitMesh) {
 		AttachMesh(CockpitSocket, ShoulderMesh, CockpitMesh, CockpitComponentName);
 	}
-
+	//하프숄더 사용감안한 로직
 	if (LShoulderMesh) {
 		AttachMesh(LShoulderSocket, CockpitMesh, LShoulderMesh, LShoulderComponentName);
 		AttachMesh(RShoulderSocket, CockpitMesh, RShoulderMesh, RShoulderComponentName);
