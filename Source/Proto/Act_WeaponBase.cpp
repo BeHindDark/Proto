@@ -17,7 +17,7 @@ AAct_WeaponBase::AAct_WeaponBase()
 	SetReplicatingMovement(true);
 
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
-	SingleMuzzleArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzleArrow"));
+	//SingleMuzzleArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzleArrow"));
 
 	RootComponent = DefaultSceneRoot;
 }
@@ -40,11 +40,12 @@ void AAct_WeaponBase::BeginPlay()
 void AAct_WeaponBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	/*
 	if(GetLocalRole()>=ROLE_Authority)
 	{
 		TurnTowardDirectAim(DeltaTime);
 	}
+	*/
 
 }
 
@@ -73,6 +74,15 @@ void AAct_WeaponBase::ConnectWeaponControlSystem(UWeaponControlSystem * NewWeapo
 	SocketArrow_Ref = NewWeaponControlSystem->WeaponDataArray[NewWeaponIndex].SocketArrow_Ref;
 
 	WeaponIndex = NewWeaponIndex;
+
+	PitchRotationLimit = NewWeaponControlSystem->WeaponDataArray[NewWeaponIndex].PitchRotationLimit;
+
+	YawRotationLimit = NewWeaponControlSystem->WeaponDataArray[NewWeaponIndex].PitchRotationLimit;
+}
+
+void AAct_WeaponBase::SetSingleMuzzleArrow(UArrowComponent * MuzzleArrow)
+{
+	SingleMuzzleArrow = MuzzleArrow;
 }
 
 void AAct_WeaponBase::TurnTowardDirectAim(float DeltaTime)

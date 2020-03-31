@@ -60,21 +60,22 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapon")
 	TWeakObjectPtr<class UArrowComponent> SocketArrow_Ref;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "WeaponControlSystem")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapon|WeaponControlSystem")
 	TWeakObjectPtr<class UWeaponControlSystem> WeaponControlSystem_Ref;
 
-private:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess =  true))
 	bool bLocked;
 
 public:
-	UFUNCTION()
 	virtual void ServerOnFireOrder();
 
-	UFUNCTION()
 	virtual void ServerOnCeaseFireOrder();
 
 	void ConnectWeaponControlSystem(class UWeaponControlSystem* NewWeaponControlSystem, int NewWeaponIndex);
+
+	UFUNCTION(BlueprintCallable, Category = "Custom|Weapon")
+	virtual void SetSingleMuzzleArrow(class UArrowComponent* MuzzleArrow);
+
 
 protected:
 	virtual void TurnTowardDirectAim(float DeltaTime);
