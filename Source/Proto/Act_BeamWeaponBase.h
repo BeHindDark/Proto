@@ -2,18 +2,21 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "BaseWeapon.generated.h"
+#include "Proto.h"
+#include "Act_WeaponBase.h"
+#include "Act_BeamWeaponBase.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class PROTO_API ABaseWeapon : public AActor
+class PROTO_API AAct_BeamWeaponBase : public AAct_WeaponBase
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ABaseWeapon();
+	AAct_BeamWeaponBase();
 
 protected:
 	// Called when the game starts or when spawned
@@ -22,5 +25,4 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
 };
