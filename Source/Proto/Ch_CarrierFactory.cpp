@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "WeaponControlSystem.h"
 #include "Engine/SkeletalMeshSocket.h"
 
 // Sets default values
@@ -62,4 +63,12 @@ void ACh_CarrierFactory::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+FVector ACh_CarrierFactory::CameraAimLocation(UCameraComponent* CurrentCamera) {
+	WCS->
+}
+
+FVector ACh_CarrierFactory::GetCameraAimLocation() {
+	CameraAimLocation(Camera);
 }

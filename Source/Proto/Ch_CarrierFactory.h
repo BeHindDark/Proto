@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "Ch_CarrierFactory.generated.h"
 
@@ -50,6 +52,8 @@ protected:
 private:
 	//void AttachMesh(FName SocketName, UStaticMeshComponent* MotherMeshName, UStaticMeshComponent* AttachMeshName, FName ComponentName);
 
+	FVector CameraAimLocation(UCameraComponent* CurrentCamera);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -59,4 +63,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponControlSystem")
 	class UWeaponControlSystem* WCS;
+
+	USpringArmComponent* SpringArm;
+
+	UCameraComponent* Camera;
+
+	FVector GetCameraAimLocation();
 };
