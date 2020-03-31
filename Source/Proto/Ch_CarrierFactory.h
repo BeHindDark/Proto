@@ -54,6 +54,27 @@ private:
 
 	FVector CameraAimLocation(UCameraComponent* CurrentCamera);
 
+	void Turn(float NewAxisValue);
+
+	void LookUp(float NewAxisValue);
+
+	void MoveForward(float NewAxisValue);
+
+	void MoveRight(float NewAxisValue);
+
+	void TurnBody(float NewAxisValue);
+
+	float CameraPitchMovement;
+
+	float CameraPitchSpeed;
+
+	float CameraYawMovement;
+
+	float CameraYawSpeed;
+
+	float MoveInput = 0.0f;
+
+	float BodyYawSpeed = 0.3;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
