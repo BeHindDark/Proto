@@ -21,6 +21,7 @@ protected:
 
 	//TArray<WeaponIndexArray> WeaponControllIndex;
 
+
 	TArray<TArray<int32>> WeaponArray;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Array")
@@ -43,10 +44,11 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* RWeaponMesh = nullptr;
+
 	
 
 private:
-	void AttachMesh(FName SocketName, UStaticMeshComponent* MotherMeshName, UStaticMeshComponent* AttachMeshName, FName ComponentName);
+	//void AttachMesh(FName SocketName, UStaticMeshComponent* MotherMeshName, UStaticMeshComponent* AttachMeshName, FName ComponentName);
 
 public:	
 	// Called every frame
@@ -55,4 +57,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponControlSystem")
+	class UWeaponControlSystem* WCS;
 };

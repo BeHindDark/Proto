@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Engine/SkeletalMeshSocket.h"
 
 // Sets default values
 ACh_CarrierFactory::ACh_CarrierFactory()
@@ -13,41 +14,32 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	FName ShoulderSocket(TEXT("Mount_Top"));
+	FName TopSocket(TEXT("Mount_Top"));
 	FName CockpitSocket(TEXT("Mount_Cockpit"));
 	FName LShoulderSocket(TEXT("Mount_HalfShoulder_L"));
 	FName RShoulderSocket(TEXT("Mount_HalfShoulder_R"));
 	FName LWeaponSocket(TEXT("Mount_Weapon_L"));
 	FName RWeaponSocket(TEXT("Mount_Weapon_R"));
+	FName WeaponSocket(TEXT("Mount_Weapon"));
 
-	FName ShoulderComponentName(TEXT("ShoulderMesh"));
+	FName TopComponentName(TEXT("ShoulderMesh"));
+	
+	const USkeletalMeshSocket* MainMeshSocket = GetMesh()->GetSocketByName(TopSocket);
+	/*
 	FName CockpitComponentName(TEXT("CockpitSocket"));
 	FName LShoulderComponentName(TEXT("LShoulderMesh"));
 	FName RShoulderComponentName(TEXT("RShoulderMesh"));
 	FName LWeaponComponentName(TEXT("LWeaponMesh"));
 	FName RWeaponComponentName(TEXT("RWeaponMesh"));
-
-	if (GetMesh()->DoesSocketExist(ShoulderSocket)) {
+	FName WeaponComponentName(TEXT("WeaponMesh"));
+	*/
+	
+	if (GetMesh()->DoesSocketExist(TopSocket)) {
 		//애로우를 이용해서 간접적으로 붙이지말고 그냥 소켓에 직접적으로 붙이기
 		//CockpitArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("CockpitArrow"));
-		CockpitMesh = CreateDefaultSubobject<UStaticMeshComponent>(ShoulderComponentName);
-		CockpitMesh->SetupAttachment(GetMesh(), ShoulderSocket);
-	}
-
-	//어떻게 객체화해봤는데 정상적으로 되....겠죠?
-	if (CockpitMesh) {
-		AttachMesh(CockpitSocket, ShoulderMesh, CockpitMesh, CockpitComponentName);
-	}
-	//하프숄더 사용감안한 로직
-	if (LShoulderMesh) {
-		AttachMesh(LShoulderSocket, CockpitMesh, LShoulderMesh, LShoulderComponentName);
-		AttachMesh(RShoulderSocket, CockpitMesh, RShoulderMesh, RShoulderComponentName);
-		AttachMesh(LWeaponSocket, LShoulderMesh, LWeaponMesh, LWeaponComponentName);
-		AttachMesh(RWeaponSocket, RShoulderMesh, RWeaponMesh, RWeaponComponentName);
-	}
-	else if (LWeaponMesh) {
-		AttachMesh(LWeaponSocket, CockpitMesh, LWeaponMesh, LWeaponComponentName);
-		AttachMesh(RWeaponSocket, CockpitMesh, RWeaponMesh, RWeaponComponentName);
+		CockpitMesh = CreateDefaultSubobject<UStaticMeshComponent>(TopComponentName);
+		CockpitMesh->SetupAttachment(GetMesh(), TopSocket);
+		//WCS.TargetWorldLocation = GetCameraAimLocation();
 	}
 }
 
@@ -70,11 +62,4 @@ void ACh_CarrierFactory::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-}
-
-void ACh_CarrierFactory::AttachMesh(FName SocketName, UStaticMeshComponent* MotherMeshName, UStaticMeshComponent* AttachMeshName, FName ComponentName) {
-	if (MotherMeshName->DoesSocketExist(SocketName)) {
-		AttachMeshName = CreateDefaultSubobject<UStaticMeshComponent>(ComponentName);
-		AttachMeshName->SetupAttachment(MotherMeshName, SocketName);
-	}
 }
