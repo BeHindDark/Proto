@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "WeaponControlSystem.h"
 #include "Engine/SkeletalMeshSocket.h"
 
 // Sets default values
@@ -13,6 +14,9 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	CameraPitchSpeed = 60.0f;
+	CameraYawSpeed = 120.0f;
 
 	FName TopSocket(TEXT("Mount_Top"));
 	FName CockpitSocket(TEXT("Mount_Cockpit"));
@@ -55,6 +59,13 @@ void ACh_CarrierFactory::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (Camera != nullptr) {
+		Camera->AddRelativeRotation(FRotator(CameraPitchMovement * DeltaTime, 0.0f, 0.0f));
+	}
+	if (Camera != nullptr) {
+		Camera->AddRelativeRotation(FRotator(0.0f, CameraYawMovement * DeltaTime, 0.0f));
+	}
+
 }
 
 // Called to bind functionality to input
@@ -62,4 +73,102 @@ void ACh_CarrierFactory::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ACh_CarrierFactory::Turn);
+	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &ACh_CarrierFactory::LookUp);
+	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ACh_CarrierFactory::MoveForward);
+	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ACh_CarrierFactory::MoveRight);
+	PlayerInputComponent->BindAxis(TEXT("TurnBody"), this, &ACh_CarrierFactory::TurnBody);
+
+}
+
+FVector ACh_CarrierFactory::CameraAimLocation(UCameraComponent* CurrentCamera) {
+	FVector AimPoint = Camera->GetComponentLocation() + (Camera->GetForwardVector() * 10000.0f);
+	FCollisionQueryParams AimParams;
+	FHitResult AimResult;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	AimParams.AddIgnoredActors(ActorsToIgnore);
+	bool IsHit = GetWorld()->LineTraceSingleByChannel(AimResult, Camera->GetComponentLocation(), AimPoint, ECC_Visibility, AimParams);
+	if (IsHit) {
+		return AimResult.ImpactPoint;
+
+	}
+	else {
+		return AimPoint;
+	}
+	/*
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	for(AActor* Weapon:FireControlSystem->WeaponArray)
+	{
+		ActorsToIgnore.Add(Weapon);
+	}
+	FHitResult AimResult;
+	FVector AimStart;
+	FVector AimDirection;
+	//PlayerController->GetPlayerViewPoint(AimStart, AimRotation);
+	AimStart = CurrentCamera->GetComponentLocation();
+	AimDirection = CurrentCamera->GetForwardVector();
+	FVector AimEnd = AimStart + AimDirection * AimingRange;
+	FCollisionQueryParams AimParams;
+	AimParams.AddIgnoredActors(ActorsToIgnore);
+
+	//DrawDebugLine(GetWorld(),AimStart,AimEnd,FColor::Green,false,1,0,1);
+
+	bool IsHit = GetWorld()->LineTraceSingleByChannel(AimResult, AimStart, AimEnd, ECC_Visibility, AimParams);
+	if (IsHit)
+	{
+		if (AimResult.bBlockingHit)
+		{
+			return FVector(AimResult.ImpactPoint);
+		}
+		else
+		{
+			return AimEnd;
+		}
+	}
+	else
+	{
+		return AimEnd;
+	}
+	*/
+}
+
+FVector ACh_CarrierFactory::GetCameraAimLocation() {
+	return CameraAimLocation(Camera);
+}
+
+void ACh_CarrierFactory::Turn(float NewAxisValue) {
+	CameraYawMovement = CameraYawSpeed * NewAxisValue;
+}
+
+void ACh_CarrierFactory::LookUp(float NewAxisValue) {
+	CameraPitchMovement = CameraPitchSpeed * NewAxisValue;
+}
+
+void ACh_CarrierFactory::MoveForward(float NewAxisValue) {
+	MoveInput = NewAxisValue;
+	AddMovementInput(GetActorForwardVector(), NewAxisValue);
+}
+
+void ACh_CarrierFactory::MoveRight(float NewAxisValue) {
+	if (FMath::IsNearlyEqual(MoveInput, 0.0f, 0.01f))
+	{
+		AddMovementInput(GetActorRightVector(), NewAxisValue);
+	}
+	else
+	{
+		if (MoveInput > 0.0f)
+		{
+			AddControllerYawInput(NewAxisValue * BodyYawSpeed);
+		}
+		else
+		{
+			AddControllerYawInput(-NewAxisValue * BodyYawSpeed);
+		}
+	}
+}
+
+void ACh_CarrierFactory::TurnBody(float NewAxisValue) {
+	AddControllerYawInput(NewAxisValue * BodyYawSpeed);
 }
