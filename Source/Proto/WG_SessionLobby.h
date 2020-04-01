@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Proto.h"
 #include "Blueprint/UserWidget.h"
 #include "WG_SessionLobby.generated.h"
 
@@ -27,5 +27,16 @@ UCLASS()
 class PROTO_API UWG_SessionLobby : public UUserWidget
 {
 	GENERATED_BODY()
+
+protected:
+
+    virtual void NativeConstruct() override;
 	
+protected:
+    UPROPERTY(meta = (BindWidget))
+    class UButton* GameStartButton;
+
+private:
+    UFUNCTION()
+    void OnGameStartClicked();
 };
