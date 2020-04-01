@@ -19,6 +19,7 @@ AAct_WeaponBase::AAct_WeaponBase()
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 
 	RootComponent = DefaultSceneRoot;
+		
 }
 
 void AAct_WeaponBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

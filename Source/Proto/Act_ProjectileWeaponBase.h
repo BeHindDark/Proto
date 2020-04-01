@@ -36,6 +36,7 @@ public:
 protected:
 	UFUNCTION()
 	/**	주어진 타겟에 투사체를 명중시킬 수 있도록 포탑을 회전시키는 함수입니다.
+	*	LaunchSpeed, TargetLocation, 
 	*	매 틱마다 호출됩니다.
 	*/
 	void TurnTowardProjectileAim(float DeltaTime);
