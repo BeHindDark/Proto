@@ -36,10 +36,6 @@ void UWeaponControlSystem::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 bool UWeaponControlSystem::ActivateWeaponGroup(int WeaponGroupIndex)
 {
-	if(ROLE_Authority>GetOwner()->GetLocalRole())
-	{
-		return false;
-	}
 	if((WeaponGroupIndex>=0)&&(WeaponGroupArray.Num()>WeaponGroupIndex))
 	{
 		if(WeaponGroupArray[WeaponGroupIndex].Num()>0)
