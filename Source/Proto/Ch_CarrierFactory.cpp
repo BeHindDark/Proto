@@ -82,6 +82,10 @@ void ACh_CarrierFactory::Tick(float DeltaTime)
 		Camera->AddRelativeRotation(FRotator(0.0f, CameraYawMovement * DeltaTime, 0.0f));
 	}
 
+	if (bIsPlayerControlling) {
+		AimLocation = GetCameraAimLocation();
+	}
+
 }
 
 // Called to bind functionality to input
@@ -115,7 +119,6 @@ FVector ACh_CarrierFactory::CameraAimLocation(UCameraComponent* CurrentCamera) {
 		else {
 			return AimPoint;
 		}
-
 	}
 	else {
 		return AimPoint;
