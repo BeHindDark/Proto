@@ -14,7 +14,7 @@ void UWG_Login::NativeConstruct() {
 	IDInput->OnTextCommitted.AddDynamic(this, &UWG_Login::IDCommitted);
 	PWInput->OnTextCommitted.AddDynamic(this, &UWG_Login::PassWordCommitted);
 	LoginButton->OnClicked.AddDynamic(this, &UWG_Login::OnLoginClicked);
-	CreateAccountButton->OnClicked.AddDynamic(this, &UWG_Login::OnCreateAccount);
+	CreateAccountButton->OnClicked.AddDynamic(this, &UWG_Login::OnCreateAccountClicked);
 	UseServerDataCheckBox->OnCheckStateChanged.AddDynamic(this, &UWG_Login::OnServerDataCheckBoxClicked);
 	UseLocalDataCheckBox->OnCheckStateChanged.AddDynamic(this, &UWG_Login::OnLocalDataCheckBoxClicked);
 }
@@ -35,10 +35,23 @@ void UWG_Login::OnLoginClicked() {
 	UWG_Login::OnLoginSession();
 }
 
-void UWG_Login::OnCreateAccount()
+void UWG_Login::OnCreateAccountClicked()
 {
-	UE_LOG(LogTemp, Error, TEXT("회원가입 버튼 클릭"));
+	APC_Login* PC = Cast<APC_Login>(GetOwningPlayer());
+
+	if (!IsValid(PC))
+	{
+		CHECK_LOG(!IsValid(PC));
+	}
+	else
+	{
+		SetVisibility(ESlateVisibility::Hidden);
+		PC->ShowJoinWG(1);
+	}
+	
 }
+
+
 
 void UWG_Login::OnLoginSession() {
 	//PW있어야됨

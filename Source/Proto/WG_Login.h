@@ -53,11 +53,16 @@ private:
 	UFUNCTION()
 	void OnLoginClicked();
 
-	void OnCreateAccount();
+	UFUNCTION()
+	void OnCreateAccountClicked();
+
+	//void OnJoinSession();
 
 	void OnLoginSession();
 
+	UFUNCTION()
 	void OnServerDataCheckBoxClicked(bool Checked);
 
+	UFUNCTION()
 	void OnLocalDataCheckBoxClicked(bool Checked);
 };
