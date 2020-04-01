@@ -6,6 +6,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "WeaponControlSystem.h"
+#include "Engine/SkeletalMeshSocket.h"
 
 // Sets default values
 ACh_CarrierFactory::ACh_CarrierFactory()
@@ -13,41 +15,35 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	FName ShoulderSocket(TEXT("Mount_Top"));
+	CameraPitchSpeed = 60.0f;
+	CameraYawSpeed = 120.0f;
+
+	FName TopSocket(TEXT("Mount_Top"));
 	FName CockpitSocket(TEXT("Mount_Cockpit"));
 	FName LShoulderSocket(TEXT("Mount_HalfShoulder_L"));
 	FName RShoulderSocket(TEXT("Mount_HalfShoulder_R"));
 	FName LWeaponSocket(TEXT("Mount_Weapon_L"));
 	FName RWeaponSocket(TEXT("Mount_Weapon_R"));
+	FName WeaponSocket(TEXT("Mount_Weapon"));
 
-	FName ShoulderComponentName(TEXT("ShoulderMesh"));
+	FName TopComponentName(TEXT("ShoulderMesh"));
+	
+	const USkeletalMeshSocket* MainMeshSocket = GetMesh()->GetSocketByName(TopSocket);
+	/*
 	FName CockpitComponentName(TEXT("CockpitSocket"));
 	FName LShoulderComponentName(TEXT("LShoulderMesh"));
 	FName RShoulderComponentName(TEXT("RShoulderMesh"));
 	FName LWeaponComponentName(TEXT("LWeaponMesh"));
 	FName RWeaponComponentName(TEXT("RWeaponMesh"));
-
-	if (GetMesh()->DoesSocketExist(ShoulderSocket)) {
+	FName WeaponComponentName(TEXT("WeaponMesh"));
+	*/
+	
+	if (GetMesh()->DoesSocketExist(TopSocket)) {
 		//애로우를 이용해서 간접적으로 붙이지말고 그냥 소켓에 직접적으로 붙이기
 		//CockpitArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("CockpitArrow"));
-		CockpitMesh = CreateDefaultSubobject<UStaticMeshComponent>(ShoulderComponentName);
-		CockpitMesh->SetupAttachment(GetMesh(), ShoulderSocket);
-	}
-
-	//어떻게 객체화해봤는데 정상적으로 되....겠죠?
-	if (CockpitMesh) {
-		AttachMesh(CockpitSocket, ShoulderMesh, CockpitMesh, CockpitComponentName);
-	}
-	//하프숄더 사용감안한 로직
-	if (LShoulderMesh) {
-		AttachMesh(LShoulderSocket, CockpitMesh, LShoulderMesh, LShoulderComponentName);
-		AttachMesh(RShoulderSocket, CockpitMesh, RShoulderMesh, RShoulderComponentName);
-		AttachMesh(LWeaponSocket, LShoulderMesh, LWeaponMesh, LWeaponComponentName);
-		AttachMesh(RWeaponSocket, RShoulderMesh, RWeaponMesh, RWeaponComponentName);
-	}
-	else if (LWeaponMesh) {
-		AttachMesh(LWeaponSocket, CockpitMesh, LWeaponMesh, LWeaponComponentName);
-		AttachMesh(RWeaponSocket, CockpitMesh, RWeaponMesh, RWeaponComponentName);
+		CockpitMesh = CreateDefaultSubobject<UStaticMeshComponent>(TopComponentName);
+		CockpitMesh->SetupAttachment(GetMesh(), TopSocket);
+		//WCS.TargetWorldLocation = GetCameraAimLocation();
 	}
 }
 
@@ -63,6 +59,13 @@ void ACh_CarrierFactory::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (Camera != nullptr) {
+		Camera->AddRelativeRotation(FRotator(CameraPitchMovement * DeltaTime, 0.0f, 0.0f));
+	}
+	if (Camera != nullptr) {
+		Camera->AddRelativeRotation(FRotator(0.0f, CameraYawMovement * DeltaTime, 0.0f));
+	}
+
 }
 
 // Called to bind functionality to input
@@ -70,11 +73,102 @@ void ACh_CarrierFactory::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ACh_CarrierFactory::Turn);
+	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &ACh_CarrierFactory::LookUp);
+	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ACh_CarrierFactory::MoveForward);
+	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ACh_CarrierFactory::MoveRight);
+	PlayerInputComponent->BindAxis(TEXT("TurnBody"), this, &ACh_CarrierFactory::TurnBody);
+
 }
 
-void ACh_CarrierFactory::AttachMesh(FName SocketName, UStaticMeshComponent* MotherMeshName, UStaticMeshComponent* AttachMeshName, FName ComponentName) {
-	if (MotherMeshName->DoesSocketExist(SocketName)) {
-		AttachMeshName = CreateDefaultSubobject<UStaticMeshComponent>(ComponentName);
-		AttachMeshName->SetupAttachment(MotherMeshName, SocketName);
+FVector ACh_CarrierFactory::CameraAimLocation(UCameraComponent* CurrentCamera) {
+	FVector AimPoint = Camera->GetComponentLocation() + (Camera->GetForwardVector() * 10000.0f);
+	FCollisionQueryParams AimParams;
+	FHitResult AimResult;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	AimParams.AddIgnoredActors(ActorsToIgnore);
+	bool IsHit = GetWorld()->LineTraceSingleByChannel(AimResult, Camera->GetComponentLocation(), AimPoint, ECC_Visibility, AimParams);
+	if (IsHit) {
+		return AimResult.ImpactPoint;
+
 	}
+	else {
+		return AimPoint;
+	}
+	/*
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	for(AActor* Weapon:FireControlSystem->WeaponArray)
+	{
+		ActorsToIgnore.Add(Weapon);
+	}
+	FHitResult AimResult;
+	FVector AimStart;
+	FVector AimDirection;
+	//PlayerController->GetPlayerViewPoint(AimStart, AimRotation);
+	AimStart = CurrentCamera->GetComponentLocation();
+	AimDirection = CurrentCamera->GetForwardVector();
+	FVector AimEnd = AimStart + AimDirection * AimingRange;
+	FCollisionQueryParams AimParams;
+	AimParams.AddIgnoredActors(ActorsToIgnore);
+
+	//DrawDebugLine(GetWorld(),AimStart,AimEnd,FColor::Green,false,1,0,1);
+
+	bool IsHit = GetWorld()->LineTraceSingleByChannel(AimResult, AimStart, AimEnd, ECC_Visibility, AimParams);
+	if (IsHit)
+	{
+		if (AimResult.bBlockingHit)
+		{
+			return FVector(AimResult.ImpactPoint);
+		}
+		else
+		{
+			return AimEnd;
+		}
+	}
+	else
+	{
+		return AimEnd;
+	}
+	*/
+}
+
+FVector ACh_CarrierFactory::GetCameraAimLocation() {
+	return CameraAimLocation(Camera);
+}
+
+void ACh_CarrierFactory::Turn(float NewAxisValue) {
+	CameraYawMovement = CameraYawSpeed * NewAxisValue;
+}
+
+void ACh_CarrierFactory::LookUp(float NewAxisValue) {
+	CameraPitchMovement = CameraPitchSpeed * NewAxisValue;
+}
+
+void ACh_CarrierFactory::MoveForward(float NewAxisValue) {
+	MoveInput = NewAxisValue;
+	AddMovementInput(GetActorForwardVector(), NewAxisValue);
+}
+
+void ACh_CarrierFactory::MoveRight(float NewAxisValue) {
+	if (FMath::IsNearlyEqual(MoveInput, 0.0f, 0.01f))
+	{
+		AddMovementInput(GetActorRightVector(), NewAxisValue);
+	}
+	else
+	{
+		if (MoveInput > 0.0f)
+		{
+			AddControllerYawInput(NewAxisValue * BodyYawSpeed);
+		}
+		else
+		{
+			AddControllerYawInput(-NewAxisValue * BodyYawSpeed);
+		}
+	}
+}
+
+void ACh_CarrierFactory::TurnBody(float NewAxisValue) {
+	AddControllerYawInput(NewAxisValue * BodyYawSpeed);
 }
