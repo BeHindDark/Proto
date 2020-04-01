@@ -7,6 +7,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "WeaponControlSystem.h"
+#include "Act_WeaponBase.h"
 #include "Engine/SkeletalMeshSocket.h"
 
 // Sets default values
@@ -15,9 +16,24 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+
 	CameraPitchSpeed = 60.0f;
 	CameraYawSpeed = 120.0f;
+	
+	SpringArm->TargetArmLength = 800.0f;
+	SpringArm->SocketOffset = FVector(0.0f, 0.0f, 300.0f);
 
+	SpringArm->SetupAttachment(GetCapsuleComponent());
+	Camera->SetupAttachment(SpringArm);
+
+	SpringArm->bInheritPitch = false;
+	SpringArm->bInheritYaw = false;
+	SpringArm->bInheritRoll = false;
+	Camera->bUsePawnControlRotation = false;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 30.0f, 0.0f);
+	
 	FName TopSocket(TEXT("Mount_Top"));
 	FName CockpitSocket(TEXT("Mount_Cockpit"));
 	FName LShoulderSocket(TEXT("Mount_HalfShoulder_L"));
@@ -87,51 +103,23 @@ FVector ACh_CarrierFactory::CameraAimLocation(UCameraComponent* CurrentCamera) {
 	FHitResult AimResult;
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
+	for (FWeaponData WeaponData:WCS->WeaponDataArray) {
+		ActorsToIgnore.Add(WeaponData.Weapon);
+	}
 	AimParams.AddIgnoredActors(ActorsToIgnore);
 	bool IsHit = GetWorld()->LineTraceSingleByChannel(AimResult, Camera->GetComponentLocation(), AimPoint, ECC_Visibility, AimParams);
 	if (IsHit) {
-		return AimResult.ImpactPoint;
+		if (AimResult.bBlockingHit) {
+			return FVector(AimResult.ImpactPoint);
+		}
+		else {
+			return AimPoint;
+		}
 
 	}
 	else {
 		return AimPoint;
 	}
-	/*
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(this);
-	for(AActor* Weapon:FireControlSystem->WeaponArray)
-	{
-		ActorsToIgnore.Add(Weapon);
-	}
-	FHitResult AimResult;
-	FVector AimStart;
-	FVector AimDirection;
-	//PlayerController->GetPlayerViewPoint(AimStart, AimRotation);
-	AimStart = CurrentCamera->GetComponentLocation();
-	AimDirection = CurrentCamera->GetForwardVector();
-	FVector AimEnd = AimStart + AimDirection * AimingRange;
-	FCollisionQueryParams AimParams;
-	AimParams.AddIgnoredActors(ActorsToIgnore);
-
-	//DrawDebugLine(GetWorld(),AimStart,AimEnd,FColor::Green,false,1,0,1);
-
-	bool IsHit = GetWorld()->LineTraceSingleByChannel(AimResult, AimStart, AimEnd, ECC_Visibility, AimParams);
-	if (IsHit)
-	{
-		if (AimResult.bBlockingHit)
-		{
-			return FVector(AimResult.ImpactPoint);
-		}
-		else
-		{
-			return AimEnd;
-		}
-	}
-	else
-	{
-		return AimEnd;
-	}
-	*/
 }
 
 FVector ACh_CarrierFactory::GetCameraAimLocation() {
