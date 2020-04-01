@@ -54,6 +54,7 @@ void APC_Main::ShowMainWG(int Zorder)
 
 void APC_Main::ShowSessionBrowserWG(int Zorder)
 {
+	// IsLocalPlayerController() 로컬에서 제어되는 플레이어 컨트롤인지 여부를 반환하는 함수
 	if(!IsLocalPlayerController())
 	{
 		CHECK_LOG(!IsLocalPlayerController());
@@ -62,17 +63,21 @@ void APC_Main::ShowSessionBrowserWG(int Zorder)
 
 	if(IsValid(WG_SessionBrowser))
 	{
+		// 화면을 보여주는 함수
 		WG_SessionBrowser->SetVisibility(ESlateVisibility::Visible);
 	}
 	else
 	{
+		// 위젯이 널값
 		WG_SessionBrowser = nullptr;
+		// 위젯을 생성해줘라
 		WG_SessionBrowser = CreateWidget<UWG_SessionBrowser>(this,WG_SessionBrowser_Class);
 	}
 
 
 	if(!WG_SessionBrowser->IsInViewport())
 	{
+		// 화면이 생성이되면 뷰 포트로 열어줘라
 		WG_SessionBrowser->AddToViewport(Zorder);
 	}
 	

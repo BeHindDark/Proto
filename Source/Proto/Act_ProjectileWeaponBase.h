@@ -28,9 +28,16 @@ public:
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon|Projectile")
+	/**	발사체가 발사되는 속도입니다.
+	*	포탄을 스폰시킬때 이 값과 방향벡터를 곱해서 속도를 줘야 목표에 제대로 명중합니다.
+	*/
 	float LaunchSpeed = 20000.0f;
 
 protected:
 	UFUNCTION()
+	/**	주어진 타겟에 투사체를 명중시킬 수 있도록 포탑을 회전시키는 함수입니다.
+	*	LaunchSpeed, TargetLocation, 
+	*	매 틱마다 호출됩니다.
+	*/
 	void TurnTowardProjectileAim(float DeltaTime);
 };

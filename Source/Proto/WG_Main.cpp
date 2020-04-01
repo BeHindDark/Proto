@@ -30,6 +30,7 @@ void UWG_Main::SessionBrowserButtonClicked()
 	}
 	else
 	{
+		// 자기 자신을 숨기는 함수
 		SetVisibility(ESlateVisibility::Hidden);
 		PC_Main->ShowSessionBrowserWG(2);
 	}

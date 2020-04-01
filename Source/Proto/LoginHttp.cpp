@@ -14,7 +14,7 @@ ALoginHttp::ALoginHttp()
 }
 
 
-void ALoginHttp::SendAccountCreationRequest(const FString& userId, const FString& userPw, const FString& userName)
+void ALoginHttp::SendAccountCreationRequest(const FString& userId, const FString& userPw, const FString& userPW2)
 {
 	/*
 		동작 순서
@@ -26,11 +26,9 @@ void ALoginHttp::SendAccountCreationRequest(const FString& userId, const FString
 		5. 요청이 완료됬을 때 호출할 함수를 연결해준다
 		6. 요청을 보내준다
 	*/
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("userName : %s, Id : %s, Pw : %s"), *userName, *userId, *userPw));
-
 	TSharedRef<IHttpRequest> Request = Http->CreateRequest();
 	Request->SetVerb("Get");
-	Request->SetURL(FString::Printf(TEXT("http://192.168.116.144:8080/join.php?userId=%s&userPw=%s&userName=%s"), *userId, *userPw, *userName));
+	Request->SetURL(FString::Printf(TEXT("http://192.168.116.144:8080/join.php?userId=%s&userPw=%s&userName=%s"), *userId, *userPw, *userPW2));
 	Request->OnProcessRequestComplete().BindUObject(this, &ALoginHttp::OnAccountCreationResponse);
 	Request->SetHeader(TEXT("User-Agent"), "x-UnrealEngin-Agent");
 	Request->SetHeader("Content-Type", TEXT("application/json"));

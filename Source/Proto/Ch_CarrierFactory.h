@@ -75,6 +75,10 @@ private:
 	float MoveInput = 0.0f;
 
 	float BodyYawSpeed = 0.3;
+
+	bool bIsPlayerControlling;
+
+	FVector AimLocation;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
