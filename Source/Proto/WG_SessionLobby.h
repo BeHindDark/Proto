@@ -32,7 +32,13 @@ protected:
 
     virtual void NativeConstruct() override;
 	
-protected:
+public:
+    UPROPERTY(meta = (BindWidget))
+    class UWG_Chat* WG_Chat;
+
+    UPROPERTY(meta = (BindWidget))
+    class UWG_LobbyTeam* WG_LobbyTeam;
+
     UPROPERTY(meta = (BindWidget))
     class UButton* GameStartButton;
 
