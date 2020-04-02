@@ -14,7 +14,7 @@ class PROTO_API APC_Lobby : public APlayerController
 {
 	GENERATED_BODY()
 
-		APC_Lobby();
+	APC_Lobby();
 
 protected:
 
@@ -23,19 +23,10 @@ protected:
 	virtual void SetupInputComponent() override;
 
 public:
-	class UWG_Chat* WG_Chat;
-
-	class UWG_LobbyTeam* WG_LobbyTeam;
-
+	
 	class UWG_SessionLobby* WG_SessionLobby;
 
-	class UWG_ChatBox* WG_textBox;
-
 protected:
-
-	TSubclassOf<class UWG_Chat> WG_Chat_Class;
-
-	TSubclassOf<class UWG_LobbyTeam> WG_LobbyTeam_Class;
 
 	TSubclassOf<class UWG_SessionLobby> WG_SessionLobby_Class;
 
@@ -45,4 +36,27 @@ public:
 	void OnAllClicked();
 	void OnTeamClicked();
 	void OnSquadClicked();
+
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Chat/Messaging")
+	void AttemptToSendChatMessage(const FString& Message);
+
+	void SendChatMessage(const FString& Message);
+
+private:
+	/*
+	 * 최근, 악성 데이터/입력 감지를 위한 관문 역할을 위해 RPC 에 인증(validation) 함수를 추가하는 기능이 생겼습니다.
+	 * RPC 에 대한 인증 함수가 악성 파라미터를 감지한 경우,
+	 * 해당 RPC 를 호출한 클라이언트/서버 연결을 끊도록 시스템에 알린다는 개념입니다.
+	 _Implementation, _Validate 함수 옆에 꼭 붙여줘야된다
+	*/
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSendChatMessage(const FString& message);
+	void ServerSendChatMessage_Implementation(const FString& message);
+	bool ServerSendChatMessage_Validate(const FString& message);
+
+	UFUNCTION(Client, Reliable)
+	void ClientSendChatMessage(const FString& message);
+	void ClientSendChatMessage_Implementation(const FString& message);
 };

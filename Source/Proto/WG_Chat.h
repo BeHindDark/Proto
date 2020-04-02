@@ -14,11 +14,17 @@ class PROTO_API UWG_Chat : public UUserWidget
 {
 	GENERATED_BODY()
 	
-protected:
-	virtual void NativeConstruct() override;
+public:
+
+	UWG_Chat(const FObjectInitializer& ObjectInitializer);
 
 protected:
-	
+
+	virtual void NativeConstruct() override;
+
+	TSubclassOf<class UWG_TextBox> WG_TextBoxClass;
+
+public:
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* ChatEnty;
 
@@ -28,9 +34,14 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* ChatMode;
 
+	class UWG_TextBox* WG_TextBox;
+
 private:
 
 	UFUNCTION()
 	void ChattingCommitted(const FText& Input, ETextCommit::Type InCommitType);
+
+	UFUNCTION()
+	void AddChatLog(const FText& UserName, const FText& Message);
 
 };

@@ -47,3 +47,35 @@ void APC_Lobby::OnSquadClicked()
 {
 	GEngine->AddOnScreenDebugMessage(10, 10, FColor::Blue, TEXT("OnSquadClicked"));
 }
+
+
+void APC_Lobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
+void APC_Lobby::AttemptToSendChatMessage(const FString& Message)
+{
+	//if (Role < ROLE_Authority) ServerSendChatMessage(Message, ChatMode);
+}
+
+void APC_Lobby::ServerSendChatMessage_Implementation(const FString& message)
+{
+
+}
+
+bool APC_Lobby::ServerSendChatMessage_Validate(const FString& message)
+{
+	if (message.Len() < 255) return true;
+	else return false;
+}
+
+void APC_Lobby::ClientSendChatMessage_Implementation(const FString& message)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("동작확인"));
+}
+
+void APC_Lobby::SendChatMessage(const FString& Message)
+{
+	
+}
