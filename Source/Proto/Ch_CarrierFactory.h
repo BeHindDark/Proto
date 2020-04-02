@@ -17,36 +17,19 @@ public:
 	// Sets default values for this character's properties
 	ACh_CarrierFactory();
 
+	virtual void PossessedBy(AController* NewController) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	//TArray<WeaponIndexArray> WeaponControllIndex;
-
-
-	TArray<TArray<int32>> WeaponArray;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Array")
-	TArray<UArrowComponent*> ArrowArrayIndex;
-	
+		
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* ShoulderMesh = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* CockpitMesh = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* LShoulderMesh = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* RShoulderMesh = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* LWeaponMesh = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* RWeaponMesh = nullptr;
-
 	
 
 private:
@@ -76,9 +59,12 @@ private:
 
 	float BodyYawSpeed = 0.3;
 
-	bool bIsPlayerControlling;
+	bool bIsPlayerControlling = false;
 
 	FVector AimLocation;
+
+	APlayerController* PlayerController;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -89,8 +75,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponControlSystem")
 	class UWeaponControlSystem* WCS;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
 	USpringArmComponent* SpringArm;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* Camera;
 
 	FVector GetCameraAimLocation();
