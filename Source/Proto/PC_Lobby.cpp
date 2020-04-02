@@ -49,19 +49,26 @@ void APC_Lobby::OnSquadClicked()
 }
 
 
-void APC_Lobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+
+void APC_Lobby::ClientReceiveChatMessage_Implementation(const FString& message)
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
-void APC_Lobby::AttemptToSendChatMessage(const FString& Message)
+bool APC_Lobby::ClientReceiveChatMessage_Validate(const FString& message)
 {
-	//if (Role < ROLE_Authority) ServerSendChatMessage(Message, ChatMode);
+	return false;
 }
 
 void APC_Lobby::ServerSendChatMessage_Implementation(const FString& message)
 {
+	for (auto Iter = GetWorld()->GetPlayerControllerIterator(); Iter; ++Iter)
+	{
+		auto PC = Cast<APC_Lobby>(*Iter);
+		if (PC)
+		{
 
+		}
+	}
 }
 
 bool APC_Lobby::ServerSendChatMessage_Validate(const FString& message)
@@ -72,10 +79,14 @@ bool APC_Lobby::ServerSendChatMessage_Validate(const FString& message)
 
 void APC_Lobby::ClientSendChatMessage_Implementation(const FString& message)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("동작확인"));
+	if (nullptr == WG_SessionLobby)
+	{
+		return;
+	}
+
 }
 
-void APC_Lobby::SendChatMessage(const FString& Message)
+bool APC_Lobby::ClientSendChatMessage_Validate(const FString& message)
 {
-	
+	return true;
 }
