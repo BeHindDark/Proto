@@ -23,9 +23,9 @@ public:
 	FDownFireCheckDelegate DownFireCheck;
 private:
 	UFUNCTION()
-		void AnimNotify_UpFireCheck();
+	void AnimNotify_UpFireCheck();
 
 	UFUNCTION()
-		void AnimNotify_DownFireCheck();
+	void AnimNotify_DownFireCheck();
 
 };

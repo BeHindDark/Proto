@@ -19,11 +19,8 @@ void AAct_DB_ProjectileWeaponBase::BeginPlay()
 	Super::BeginPlay();
 	//블루프린트에 애님인스턴스 추가해야함!
 
-	UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
-	if(!IsValid(Anim)) {
-		CHECK_LOG(!IsValid(Anim));
-		return;
-	}
+	/*UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
+	
 	Anim->UpFireCheck.AddLambda([this]()->void {
 
 		if (ProjectileClass)
@@ -64,7 +61,7 @@ void AAct_DB_ProjectileWeaponBase::BeginPlay()
 		}
 
 
-		});
+		});*/
 }
 
 AAct_DB_ProjectileWeaponBase::AAct_DB_ProjectileWeaponBase()
@@ -83,7 +80,12 @@ void AAct_DB_ProjectileWeaponBase::GetArrowComponent(UArrowComponent* Arrow1, UA
 
 void AAct_DB_ProjectileWeaponBase::UpFire()
 {
+	
 	class UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
+	if (!IsValid(Anim)) {
+		CHECK_LOG(!IsValid(Anim));
+		return;
+	}
 	if (ProjectileClass)
 	{
 
@@ -95,7 +97,7 @@ void AAct_DB_ProjectileWeaponBase::UpFire()
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
-			SpawnParams.Instigator = Instigator;
+			SpawnParams.Instigator = this->Instigator;
 			AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
 
 
@@ -107,6 +109,10 @@ void AAct_DB_ProjectileWeaponBase::UpFire()
 void AAct_DB_ProjectileWeaponBase::DownFire()
 {
 	class UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
+	if (!IsValid(Anim)) {
+		CHECK_LOG(!IsValid(Anim));
+		return;
+	}
 	if (ProjectileClass)
 	{
 
@@ -118,7 +124,7 @@ void AAct_DB_ProjectileWeaponBase::DownFire()
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
-			SpawnParams.Instigator = Instigator;
+			SpawnParams.Instigator = this->Instigator;
 			AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
 
 
