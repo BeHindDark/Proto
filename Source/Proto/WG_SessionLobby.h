@@ -33,13 +33,13 @@ protected:
     virtual void NativeConstruct() override;
 	
 public:
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
     class UWG_Chat* WG_Chat;
 
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
     class UWG_LobbyTeam* WG_LobbyTeam;
 
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
     class UButton* GameStartButton;
 
 private:
