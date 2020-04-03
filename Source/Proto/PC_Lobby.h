@@ -37,13 +37,6 @@ public:
 	void OnTeamClicked();
 	void OnSquadClicked();
 
-	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const;
-
-	UFUNCTION(BlueprintCallable, Category = "Chat/Messaging")
-	void AttemptToSendChatMessage(const FString& Message);
-
-	void SendChatMessage(const FString& Message);
-
 private:
 	/*
 	 * 최근, 악성 데이터/입력 감지를 위한 관문 역할을 위해 RPC 에 인증(validation) 함수를 추가하는 기능이 생겼습니다.
@@ -52,11 +45,17 @@ private:
 	 _Implementation, _Validate 함수 옆에 꼭 붙여줘야된다
 	*/
 	UFUNCTION(Server, Reliable, WithValidation)
+	void ClientReceiveChatMessage(const FString& message);
+	void ClientReceiveChatMessage_Implementation(const FString& message);
+	bool ClientReceiveChatMessage_Validate(const FString& message);
+
+	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSendChatMessage(const FString& message);
 	void ServerSendChatMessage_Implementation(const FString& message);
 	bool ServerSendChatMessage_Validate(const FString& message);
 
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(Client, Reliable, WithValidation)
 	void ClientSendChatMessage(const FString& message);
 	void ClientSendChatMessage_Implementation(const FString& message);
+	bool ClientSendChatMessage_Validate(const FString& message);
 };
