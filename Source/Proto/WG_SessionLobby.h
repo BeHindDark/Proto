@@ -32,8 +32,14 @@ protected:
 
     virtual void NativeConstruct() override;
 	
-protected:
-    UPROPERTY(meta = (BindWidget))
+public:
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UWG_Chat* WG_Chat;
+
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UWG_LobbyTeam* WG_LobbyTeam;
+
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
     class UButton* GameStartButton;
 
 private:

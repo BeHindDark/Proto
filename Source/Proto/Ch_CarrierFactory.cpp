@@ -19,6 +19,8 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 
+	WCS = CreateDefaultSubobject<UWeaponControlSystem>(TEXT("WeaponControlSystem"));
+
 	CameraPitchSpeed = 60.0f;
 	CameraYawSpeed = 120.0f;
 	
@@ -33,6 +35,7 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	SpringArm->bInheritRoll = false;
 	Camera->bUsePawnControlRotation = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 30.0f, 0.0f);
+
 	
 	FName TopSocket(TEXT("Mount_Top"));
 	FName CockpitSocket(TEXT("Mount_Cockpit"));
@@ -45,15 +48,7 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	FName TopComponentName(TEXT("ShoulderMesh"));
 	
 	const USkeletalMeshSocket* MainMeshSocket = GetMesh()->GetSocketByName(TopSocket);
-	/*
-	FName CockpitComponentName(TEXT("CockpitSocket"));
-	FName LShoulderComponentName(TEXT("LShoulderMesh"));
-	FName RShoulderComponentName(TEXT("RShoulderMesh"));
-	FName LWeaponComponentName(TEXT("LWeaponMesh"));
-	FName RWeaponComponentName(TEXT("RWeaponMesh"));
-	FName WeaponComponentName(TEXT("WeaponMesh"));
-	*/
-	
+
 	if (GetMesh()->DoesSocketExist(TopSocket)) {
 		//애로우를 이용해서 간접적으로 붙이지말고 그냥 소켓에 직접적으로 붙이기
 		//CockpitArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("CockpitArrow"));
@@ -68,6 +63,16 @@ void ACh_CarrierFactory::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void ACh_CarrierFactory::PossessedBy(AController* NewController) {
+	Super::PossessedBy(NewController);
+	if (IsPlayerControlled()) {
+		PlayerController = Cast<APlayerController>(GetController());
+		if (PlayerController != nullptr) {
+			bIsPlayerControlling = true;
+		}
+	}
 }
 
 // Called every frame
@@ -86,6 +91,7 @@ void ACh_CarrierFactory::Tick(float DeltaTime)
 		AimLocation = GetCameraAimLocation();
 	}
 
+	WCS->TargetWorldLocation = AimLocation;
 }
 
 // Called to bind functionality to input

@@ -47,3 +47,46 @@ void APC_Lobby::OnSquadClicked()
 {
 	GEngine->AddOnScreenDebugMessage(10, 10, FColor::Blue, TEXT("OnSquadClicked"));
 }
+
+
+
+void APC_Lobby::ClientReceiveChatMessage_Implementation(const FString& message)
+{
+}
+
+bool APC_Lobby::ClientReceiveChatMessage_Validate(const FString& message)
+{
+	return false;
+}
+
+void APC_Lobby::ServerSendChatMessage_Implementation(const FString& message)
+{
+	for (auto Iter = GetWorld()->GetPlayerControllerIterator(); Iter; ++Iter)
+	{
+		auto PC = Cast<APC_Lobby>(*Iter);
+		if (PC)
+		{
+
+		}
+	}
+}
+
+bool APC_Lobby::ServerSendChatMessage_Validate(const FString& message)
+{
+	if (message.Len() < 255) return true;
+	else return false;
+}
+
+void APC_Lobby::ClientSendChatMessage_Implementation(const FString& message)
+{
+	if (nullptr == WG_SessionLobby)
+	{
+		return;
+	}
+
+}
+
+bool APC_Lobby::ClientSendChatMessage_Validate(const FString& message)
+{
+	return true;
+}
