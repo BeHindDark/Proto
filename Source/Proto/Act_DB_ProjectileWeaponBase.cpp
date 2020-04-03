@@ -80,29 +80,6 @@ void AAct_DB_ProjectileWeaponBase::GetArrowComponent(UArrowComponent* Arrow1, UA
 	FirstArrow = Arrow1;
 	SecondArrow = Arrow2;
 }
-void AAct_DB_ProjectileWeaponBase::UpFire()
-{
-	class UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
-	if (ProjectileClass)
-	{
-
-		UE_LOG(LogTemp, Warning, TEXT("if projectileClass is Execute"));
-		FVector Front = FirstArrow->GetComponentLocation();
-		FRotator Rotate = GetActorRotation();
-		UWorld* World = GetWorld();
-		if (World)
-		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-			SpawnParams.Instigator = Instigator;
-			AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
-
-
-		}
-
-	}
-
-}
 
 void AAct_DB_ProjectileWeaponBase::UpFire()
 {

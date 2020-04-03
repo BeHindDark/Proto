@@ -39,12 +39,9 @@ public:
 	//	void SetAnimationDBWeapon(TSubclassOf<UAnimInstance> DB_Anim);
 
 
-	UFUNCTION(BlueprintCallable, Category = "Weapon|Projectile|DB")
-		void UpFire();
+	void UpFire();
 
-
-	UFUNCTION(BlueprintCallable, Category = "Weapon|Projectile|DB")
-		void DownFire();
+	void DownFire();
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
