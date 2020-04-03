@@ -17,7 +17,7 @@ void UPC_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	auto Pawn = TryGetPawnOwner();
 	if (IsValid(Pawn))
 	{
-		Direction=(Pawn->GetActorForwardVector().ToOrientationRotator() - Pawn->GetVelocity().ToOrientationRotator()).Yaw;
+		Direction = (Pawn->GetActorForwardVector().ToOrientationRotator() - Pawn->GetVelocity().ToOrientationRotator()).Yaw;
 		Speed = Pawn->GetVelocity().Size();
 		//DiagonalMode=Pawn.DiagonalMode;
 		//HorizentalMode=Pawn.HorizentalMode;

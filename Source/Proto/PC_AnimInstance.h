@@ -7,12 +7,12 @@
 #include "PC_AnimInstance.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class PROTO_API UPC_AnimInstance : public UAnimInstance
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 
 public:
