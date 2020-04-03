@@ -35,11 +35,16 @@ public:
 		void GetArrowComponent(UArrowComponent* Arrow1, UArrowComponent* Arrow2);
 
 
+//	UFUNCTION(BlueprintCallable, Category = "Weapon|Projectile|DB")
+	//	void SetAnimationDBWeapon(TSubclassOf<UAnimInstance> DB_Anim);
+
+
 	UFUNCTION(BlueprintCallable, Category = "Weapon|Projectile|DB")
-		void SetAnimationDBWeapon(TSubclassOf<UAnimInstance> DB_Anim);
+		void UpFire();
 
 
-
+	UFUNCTION(BlueprintCallable, Category = "Weapon|Projectile|DB")
+		void DownFire();
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
