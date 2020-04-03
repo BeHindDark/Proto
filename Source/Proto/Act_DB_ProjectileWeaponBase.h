@@ -22,17 +22,17 @@ public:
 	AAct_DB_ProjectileWeaponBase();
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon|Projectile|DB")
-		USkeletalMeshComponent* Mesh;
+	USkeletalMeshComponent* Mesh;
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapon|Projectile|DB")
-		UArrowComponent* FirstArrow;
+	UArrowComponent* FirstArrow;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapon|Projectile|DB")
-		UArrowComponent* SecondArrow;
+	UArrowComponent* SecondArrow;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon|Projectile|DB")
-		void GetArrowComponent(UArrowComponent* Arrow1, UArrowComponent* Arrow2);
+	void GetArrowComponent(UArrowComponent* Arrow1, UArrowComponent* Arrow2);
 
 
 //	UFUNCTION(BlueprintCallable, Category = "Weapon|Projectile|DB")
@@ -45,9 +45,9 @@ public:
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-		FVector MuzzleOffset;
+	FVector MuzzleOffset;
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)  // 발사체 클래스를 넣어준다.
-		TSubclassOf<class AAct_Bullet> ProjectileClass;
+	TSubclassOf<class AAct_Bullet> ProjectileClass;
 };
