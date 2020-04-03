@@ -32,7 +32,5 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bullet")
 	class UCapsuleComponent* CollisionCapsule;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bullet")
-	class UProjectileMovementComponent* ProjectileMovement;
+		
 };
