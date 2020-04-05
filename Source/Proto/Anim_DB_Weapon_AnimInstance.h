@@ -21,6 +21,11 @@ class PROTO_API UAnim_DB_Weapon_AnimInstance : public UAnimInstance
 public:
 	FUpFireCheckDelegate UpFireCheck;
 	FDownFireCheckDelegate DownFireCheck;
+
+	UPROPERTY(Category="Attack", EditAnywhere, BlueprintReadOnly, Meta=(AllowPrivateAccess="true"))
+	bool IsAttacking;
+
+
 private:
 	UFUNCTION()
 	void AnimNotify_UpFireCheck();
