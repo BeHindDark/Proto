@@ -65,6 +65,8 @@ private:
 
 	APlayerController* PlayerController;
 
+	float ShoulderMeshRotationSpeed = 40.0f;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -83,4 +85,6 @@ public:
 	UCameraComponent* Camera;
 
 	FVector GetCameraAimLocation();
+
+	void TurnShoulderMesh(UStaticMeshComponent* ShoulderComponent, FName SocketName, float DeltaTime);
 };

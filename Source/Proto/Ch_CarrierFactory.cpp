@@ -15,7 +15,8 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	
+	//기본값(컴포넌트 등록, 좌표, 기타 기본 값) 정렬
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 
@@ -36,7 +37,7 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	Camera->bUsePawnControlRotation = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 30.0f, 0.0f);
 
-	
+	//스태틱 메시에 붙어있는 각 소켓의 이름 정렬
 	FName TopSocket(TEXT("Mount_Top"));
 	FName CockpitSocket(TEXT("Mount_Cockpit"));
 	FName LShoulderSocket(TEXT("Mount_HalfShoulder_L"));
@@ -62,7 +63,7 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 void ACh_CarrierFactory::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 void ACh_CarrierFactory::PossessedBy(AController* NewController) {
@@ -92,6 +93,9 @@ void ACh_CarrierFactory::Tick(float DeltaTime)
 	}
 
 	WCS->TargetWorldLocation = AimLocation;
+	if (ShoulderMesh != nullptr) {
+		TurnShoulderMesh(ShoulderMesh, TEXT("Mount_Top"), DeltaTime);
+	}
 }
 
 // Called to bind functionality to input
@@ -168,4 +172,32 @@ void ACh_CarrierFactory::MoveRight(float NewAxisValue) {
 
 void ACh_CarrierFactory::TurnBody(float NewAxisValue) {
 	AddControllerYawInput(NewAxisValue * BodyYawSpeed);
+}
+
+void ACh_CarrierFactory::TurnShoulderMesh(UStaticMeshComponent* ShoulderComponent, FName SocketName, float DeltaTime) {
+	FVector ShoulderAim = CameraAimLocation(Camera);
+	FVector ShoulderLocation = ShoulderMesh->GetComponentLocation();
+
+	FRotator TargetDirection = FTransform(FRotator::ZeroRotator, AimLocation).GetRelativeTransform(GetActorTransform()).GetLocation().ToOrientationRotator();
+	FRotator TurnRotation = FRotator(0.0f, TargetDirection.Yaw, 0.0f);
+	FRotator CurrentShoulderRotation = ShoulderComponent->GetRelativeTransform().Rotator();
+	FRotator TurningRotator = FRotator::ZeroRotator;
+	FRotator TempRotator = FRotator::ZeroRotator;
+
+	(TargetDirection - TurnRotation).GetWindingAndRemainder(TempRotator, TurningRotator);
+
+	if (!TurningRotator.IsNearlyZero(0.001f)) {
+		FRotator DeltaRotation = FRotator::ZeroRotator;
+		if (FMath::Abs(TurningRotator.Yaw) <= ShoulderMeshRotationSpeed * DeltaTime) {
+			DeltaRotation.Yaw = TurningRotator.Yaw;
+		}
+		else {
+			DeltaRotation.Yaw = FMath::Sign(TurningRotator.Yaw) * ShoulderMeshRotationSpeed * DeltaTime;
+		}
+
+		FRotator NewShoulderRotation = CurrentShoulderRotation + DeltaRotation;
+		NewShoulderRotation.Pitch = 0.0f;
+		NewShoulderRotation.Roll = 0.0f;
+		ShoulderComponent->SetRelativeRotation(NewShoulderRotation);
+	}
 }
