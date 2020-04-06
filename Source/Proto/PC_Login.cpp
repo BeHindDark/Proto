@@ -29,13 +29,14 @@ void APC_Login::BeginPlay() {
 
 void APC_Login::OnLogin(FText ID, FText PW)
 {
-	// RequestLogin() 함수 일단 봉인 
-	// RequestLogin(ID.ToString(), PW.ToString());
-	
+	//RequestLogin() 함수 일단 봉인 
+	RequestLogin(ID.ToString(), PW.ToString());
+	/*
 	FActorSpawnParameters spawnparams;
 	spawnparams.Owner = this;
 	ALoginHttp* Login_Http = GetWorld()->SpawnActor<ALoginHttp>(FVector::ZeroVector, FRotator::ZeroRotator, spawnparams);
 	Login_Http->SendLoginRequest(ID.ToString(), PW.ToString());
+	*/
 }
 
 void APC_Login::OnJoin(FText ID, FText PW, FText PW2)

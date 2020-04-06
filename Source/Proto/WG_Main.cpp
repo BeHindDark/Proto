@@ -5,6 +5,7 @@
 #include "Components/Button.h"
 #include "PC_Main.h"
 #include "LoginHttp.h"
+#include "GI_Proto.h"
 #include "Components/TextBlock.h"
 
 void UWG_Main::NativeConstruct()
@@ -15,13 +16,16 @@ void UWG_Main::NativeConstruct()
 	if (nullptr == UserIDText) return;
 
 	//MyGameInstance->GetWebConnector().GetUserNickname()
-	FActorSpawnParameters spawnparams;
-	ALoginHttp* Login_Http = GetWorld()->SpawnActor<ALoginHttp>(FVector::ZeroVector, 
-		FRotator::ZeroRotator, spawnparams);
-
-	UserIDText->SetText(FText::FromString(Login_Http->GetUserId()));
+	
 	SessionBrowserButton->OnClicked.AddDynamic(this, &UWG_Main::SessionBrowserButtonClicked);
 	AmoryButton->OnClicked.AddDynamic(this, &UWG_Main::AmoryButtonClicked);
+
+	auto MyGameInstance = GetGameInstance<UGI_Proto>();
+	if (MyGameInstance)
+	{
+		UserIDText->SetText(FText::FromString(MyGameInstance->GetWebconnect().GetUserId()));
+	}
+
 }
 
 void UWG_Main::SessionBrowserButtonClicked()

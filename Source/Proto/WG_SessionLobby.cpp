@@ -9,6 +9,8 @@
 #include "Components/ScrollBox.h"
 #include "Components/VerticalBox.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerState.h"
+
 
 void UWG_SessionLobby::NativeConstruct()
 {
@@ -20,11 +22,18 @@ void UWG_SessionLobby::NativeConstruct()
 	BlueButton->OnClicked.AddDynamic(this, &UWG_SessionLobby::BlueClicked);
 	
 	GameStartButton->OnClicked.AddDynamic(this, &UWG_SessionLobby::OnGameStartClicked);
+
+	/*
+	APlayerState* t = Cast<APlayerState>(GetOwningPlayer());
+	t->Tags.Add(FName("mytag"));
+	t->Tags.Find(FName("mytag"));
+	*/
 }
 
 void UWG_SessionLobby::OnGameStartClicked()
 {
 	GEngine->AddOnScreenDebugMessage(10, 10, FColor::Red, TEXT("GameStartButton Clicked"));
+	
 }
 
 

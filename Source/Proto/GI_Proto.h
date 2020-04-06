@@ -36,6 +36,8 @@ class PROTO_API UGI_Proto : public UGameInstance
 public:
 	UGI_Proto(const FObjectInitializer& ObjectInitializer);
 
+	virtual void Init() override;
+
 public:
 
 	/* Loing server 통신 관련 */
