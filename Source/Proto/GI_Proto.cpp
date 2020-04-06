@@ -17,6 +17,12 @@ UGI_Proto::UGI_Proto(const FObjectInitializer& ObjectInitializer) {
 	OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Proto::OnDestroySessionComplete);
 }
 
+void UGI_Proto::Init()
+{
+	Super::Init();
+	OJ_Webconnect = NewObject<UOJ_Webconnect>(this);
+}
+
 UOJ_Webconnect& UGI_Proto::GetWebconnect()
 {
 	// TODO: 여기에 return 문을 삽입합니다.
