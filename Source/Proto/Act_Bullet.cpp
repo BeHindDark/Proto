@@ -44,7 +44,43 @@ AAct_Bullet::AAct_Bullet()
 	BulletCollision->SetCapsuleSize(7.0f, 30.0f);
 
 	//충돌설정 마저 해야함
-	BulletCollision->SetGenerateOverlapEvents(true);
+
+	//본인을 발사한 액터 제외
+	BulletCollision->MoveIgnoreActors.Add(GetOwner());
+
+	//본인을 발사한 무기 외 다른 무기들 제외
+	AAct_WeaponBase* Weapon = Cast<AAct_WeaponBase>(GetOwner());
+	if(IsValid(Weapon))
+	{
+		for(FWeaponData WeaponData :Weapon->GetWeaponControlSystem()->WeaponDataArray)
+		{
+			if(IsValid(WeaponData.Weapon))
+			{
+				if(WeaponData.Weapon!=GetOwner())
+				{
+					BulletCollision->MoveIgnoreActors.Add(WeaponData.Weapon);
+				}
+			}
+		}
+
+		//캐릭터로부터 플레이어컨트롤러를 받아온다.
+		APawn* WeaponOwner = Cast<APawn>(Weapon->GetWeaponControlSystem()->GetOwner());
+		if(IsValid(WeaponOwner))
+		{
+			//캐릭터 제외
+			BulletCollision->MoveIgnoreActors.Add(WeaponOwner);
+
+			if(IsValid(WeaponOwner->GetController()))
+			{
+				DamageInstigatorPlayer = WeaponOwner->GetController();
+			}
+		}
+	}
+	
+	
+	
+
+	BulletCollision->SetGenerateOverlapEvents(false);
 	BulletCollision->OnComponentBeginOverlap.AddDynamic(this, &AAct_Bullet::BeginOverlap);
 
 	//파티클 설정
@@ -60,6 +96,7 @@ AAct_Bullet::AAct_Bullet()
 	ProjectileMovement->InitialSpeed = 0.0f;
 	ProjectileMovement->MaxSpeed = 30000.0f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
+	ProjectileMovement->bAutoActivate = false;
 	
 }
 
@@ -81,7 +118,7 @@ void AAct_Bullet::InitializeBullet(float InitialSpeed,float WeaponDamage,FLinear
 {
 	ProjectileMovement->SetVelocityInLocalSpace(FVector(InitialSpeed, 0.0f, 0.0f ));
 	Damage = WeaponDamage;
-
+	ProjectileMovement->bAutoActivate = true;
 }
 
 void AAct_Bullet::BeginOverlap(UPrimitiveComponent * OverlappedComponent,AActor * OtherActor,UPrimitiveComponent * OtherComp,int32 OtherBodyIndex,bool bFromSweep,const FHitResult & SweepResult)

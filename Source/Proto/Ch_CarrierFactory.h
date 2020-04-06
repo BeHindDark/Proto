@@ -26,10 +26,10 @@ protected:
 	//TArray<WeaponIndexArray> WeaponControllIndex;
 		
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* ShoulderMesh = nullptr;
+	UStaticMeshComponent* ShoulderMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* CockpitMesh = nullptr;
+	UStaticMeshComponent* CockpitMesh;
 	
 
 private:
@@ -84,7 +84,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* Camera;
 
-	FVector GetCameraAimLocation();
 
 	void TurnShoulderMesh(UStaticMeshComponent* ShoulderComponent, FName SocketName, float DeltaTime);
 };
