@@ -49,14 +49,19 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	FName TopComponentName(TEXT("ShoulderMesh"));
 	
 	const USkeletalMeshSocket* MainMeshSocket = GetMesh()->GetSocketByName(TopSocket);
+	
+	//메시에 소켓이름이 없음에도 , 메시 자체가 지정되지 않았음에도 컴포넌트가 attach되는 것을 확인, 메시가 생성되면 해당 소켓으로 붙는것도 같이 확인.
+	//if (GetMesh()->DoesSocketExist(TopSocket)) {
+	//애로우를 이용해서 간접적으로 붙이지말고 그냥 소켓에 직접적으로 붙이기
+	//CockpitArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("CockpitArrow"));
+		ShoulderMesh = CreateDefaultSubobject<UStaticMeshComponent>(TopComponentName);
+		ConstructorHelpers::FObjectFinder<UStaticMesh> SHOULDER(TEXT("/Game/Mech_Constructor_Spiders/Meshes/Shoulders_Med_Tank.Shoulders_Med_Tank"));
+		if (SHOULDER.Succeeded()) {
+			ShoulderMesh->SetStaticMesh(SHOULDER.Object);
+		}
 
-	if (GetMesh()->DoesSocketExist(TopSocket)) {
-		//애로우를 이용해서 간접적으로 붙이지말고 그냥 소켓에 직접적으로 붙이기
-		//CockpitArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("CockpitArrow"));
-		CockpitMesh = CreateDefaultSubobject<UStaticMeshComponent>(TopComponentName);
-		CockpitMesh->SetupAttachment(GetMesh(), TopSocket);
-		//WCS.TargetWorldLocation = GetCameraAimLocation();
-	}
+		ShoulderMesh->SetupAttachment(GetMesh(), TopSocket);
+	//}
 }
 
 // Called when the game starts or when spawned
@@ -85,17 +90,16 @@ void ACh_CarrierFactory::Tick(float DeltaTime)
 		Camera->AddRelativeRotation(FRotator(CameraPitchMovement * DeltaTime, 0.0f, 0.0f));
 	}
 	if (Camera != nullptr) {
-		Camera->AddRelativeRotation(FRotator(0.0f, CameraYawMovement * DeltaTime, 0.0f));
+		SpringArm->AddRelativeRotation(FRotator(0.0f, CameraYawMovement * DeltaTime, 0.0f));
 	}
 
 	if (bIsPlayerControlling) {
-		AimLocation = GetCameraAimLocation();
+		AimLocation = CameraAimLocation(Camera);
 	}
 
 	WCS->TargetWorldLocation = AimLocation;
-	if (ShoulderMesh != nullptr) {
-		TurnShoulderMesh(ShoulderMesh, TEXT("Mount_Top"), DeltaTime);
-	}
+
+	//TurnShoulderMesh(ShoulderMesh, TEXT("Mount_Top"), DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -135,16 +139,12 @@ FVector ACh_CarrierFactory::CameraAimLocation(UCameraComponent* CurrentCamera) {
 	}
 }
 
-FVector ACh_CarrierFactory::GetCameraAimLocation() {
-	return CameraAimLocation(Camera);
-}
-
 void ACh_CarrierFactory::Turn(float NewAxisValue) {
 	CameraYawMovement = CameraYawSpeed * NewAxisValue;
 }
 
 void ACh_CarrierFactory::LookUp(float NewAxisValue) {
-	CameraPitchMovement = CameraPitchSpeed * NewAxisValue;
+	CameraPitchMovement = CameraPitchSpeed * -NewAxisValue;
 }
 
 void ACh_CarrierFactory::MoveForward(float NewAxisValue) {
@@ -175,9 +175,6 @@ void ACh_CarrierFactory::TurnBody(float NewAxisValue) {
 }
 
 void ACh_CarrierFactory::TurnShoulderMesh(UStaticMeshComponent* ShoulderComponent, FName SocketName, float DeltaTime) {
-	FVector ShoulderAim = CameraAimLocation(Camera);
-	FVector ShoulderLocation = ShoulderMesh->GetComponentLocation();
-
 	FRotator TargetDirection = FTransform(FRotator::ZeroRotator, AimLocation).GetRelativeTransform(GetActorTransform()).GetLocation().ToOrientationRotator();
 	FRotator TurnRotation = FRotator(0.0f, TargetDirection.Yaw, 0.0f);
 	FRotator CurrentShoulderRotation = ShoulderComponent->GetRelativeTransform().Rotator();
