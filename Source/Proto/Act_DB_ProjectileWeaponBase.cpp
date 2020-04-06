@@ -11,12 +11,25 @@
 void AAct_DB_ProjectileWeaponBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> Fire(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion_C"));
-	if (Fire.Succeeded())
-	{
-		FireParticle = Fire.Object;
-	}
+	
+		 
 }
+AAct_DB_ProjectileWeaponBase::AAct_DB_ProjectileWeaponBase()
+{
+	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
+	Mesh->AddRelativeRotation(FRotator(90, -90, 0));
+	FireParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("EFFECT"));
+	FireParticle->SetupAttachment(RootComponent);
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem>P_Fire(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
+	if (P_Fire.Succeeded())
+	{
+		FireParticle->SetTemplate(P_Fire.Object);
+		FireParticle->bAutoActivate = false;
+	}
+
+}
+
 
 void AAct_DB_ProjectileWeaponBase::BeginPlay()
 {
@@ -34,13 +47,6 @@ void AAct_DB_ProjectileWeaponBase::BeginPlay()
 	
 }
 
-AAct_DB_ProjectileWeaponBase::AAct_DB_ProjectileWeaponBase()
-{
-	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
-
-
-
-}
 
 void AAct_DB_ProjectileWeaponBase::GetArrowComponent(UArrowComponent* Arrow1, UArrowComponent* Arrow2)
 {
@@ -62,7 +68,7 @@ void AAct_DB_ProjectileWeaponBase::UpFire()
 	if (ProjectileClass)
 	{
 
-		GameStatic->SpawnEmitterAttached(FireParticle, Mesh, FName("Barrel_End_1"));
+		//GameStatic->SpawnEmitterAttached(FireParticle, Mesh, FName("Barrel_End_1"));
 
 		//Barrel_End_1
 		UE_LOG(LogTemp, Warning, TEXT("if projectileClass is Execute"));
@@ -73,9 +79,10 @@ void AAct_DB_ProjectileWeaponBase::UpFire()
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
-			SpawnParams.Instigator = this->Instigator;
+			//SpawnParams.Instigator = this->Instigator;
 			AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
-			
+			FireParticle->Activate(true);
+			FireParticle->OnSystemFinished.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::OnEffectFinished);
 
 		}
 
@@ -101,12 +108,15 @@ void AAct_DB_ProjectileWeaponBase::DownFire()
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
-			SpawnParams.Instigator = this->Instigator;
+			//SpawnParams.Instigator = this->Instigator;
 			AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
-
 
 		}
 
 	}
 
+}
+void AAct_DB_ProjectileWeaponBase::OnEffectFinished(class UParticleSystemComponent* PSystem)
+{
+	FireParticle->Activate(false);
 }

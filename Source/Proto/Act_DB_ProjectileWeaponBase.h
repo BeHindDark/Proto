@@ -21,7 +21,7 @@ private:
 public:
 	AAct_DB_ProjectileWeaponBase();
 
-	UPROPERTY(VisibleAnywhere, Category = "Weapon|Projectile|DB")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite,Category = "Weapon|Projectile|DB")
 
 	/** 이중총열 무기 메쉬
 	*/
@@ -67,11 +67,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
 	/** 총구화염 이펙트를 저장해줄 파티클 시스템입니다.
 	*/
-	class UParticleSystem* FireParticle;
+	class UParticleSystemComponent* FireParticle;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
-	/** 이펙트를 Spawn하기위해 필요한 UGameplayStatics입니다.
-	*/
-	class UGameplayStatics* GameStatic;
+	UFUNCTION()
+	void OnEffectFinished(class UParticleSystemComponent* PSystem);
+
+	
 
 };
