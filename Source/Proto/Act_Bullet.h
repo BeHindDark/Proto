@@ -47,6 +47,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Bullet")
 	float Damage;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bullet")
+	FVector ProjectileVelocity;
+
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bullet|Tracer", meta = (AllowPrivateAccess = true))
 	FLinearColor TracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f);

@@ -104,6 +104,8 @@ AAct_Bullet::AAct_Bullet()
 void AAct_Bullet::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ProjectileMovement->Velocity = ProjectileVelocity;
 	
 }
 
@@ -114,19 +116,17 @@ void AAct_Bullet::Tick(float DeltaTime)
 
 }
 
-void AAct_Bullet::InitializeBullet(float InitialSpeed,float WeaponDamage,FLinearColor NewTracerColor)
-{
-	ProjectileMovement->SetVelocityInLocalSpace(FVector(InitialSpeed, 0.0f, 0.0f ));
+void AAct_Bullet::InitializeBullet(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
+	ProjectileMovement->SetVelocityInLocalSpace(FVector(InitialSpeed, 0.0f, 0.0f));
 	Damage = WeaponDamage;
 	ProjectileMovement->bAutoActivate = true;
 }
 
-void AAct_Bullet::BeginOverlap(UPrimitiveComponent * OverlappedComponent,AActor * OtherActor,UPrimitiveComponent * OtherComp,int32 OtherBodyIndex,bool bFromSweep,const FHitResult & SweepResult)
-{
+void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	ProjectileMovement->StopMovementImmediately();
 
 	//멀티캐스트 : 메쉬 및 예광탄 이펙트 끄기, 피격 이펙트 및 사운드 재생
-	
+
 	//Instigator를 구하는 이 부분은 차라리 Weapon쪽으로 빼서 처리하는 게 나아보임.
 	//WeaponBase에 GetInstigator함수를 만들어서 AController를 구하게 하고
 	//스폰 시 변수로 넘겨주는게 나아보임.
