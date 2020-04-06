@@ -11,7 +11,7 @@ class PROTO_API AAct_Bullet : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
 	// Sets default values for this actor's properties
 	AAct_Bullet();
 
@@ -22,6 +22,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bullet")
+	//나중에 ApplyDamage할 때 줄 컨트롤러 값(플레이어 또는 AI)
+	AController* DamageInstigatorPlayer = nullptr;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bullet")
