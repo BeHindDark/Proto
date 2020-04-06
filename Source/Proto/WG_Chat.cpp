@@ -4,29 +4,41 @@
 #include "WG_Chat.h"
 #include "PC_Lobby.h"
 #include "WG_TextBox.h"
+#include "Components/TextBlock.h"
 #include "Components/EditableTextBox.h"
+#include "Components/ScrollBox.h"
+#include "Components/Button.h"
 
 UWG_Chat::UWG_Chat(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	static ConstructorHelpers::FClassFinder<UWG_TextBox> WG_TextBox_C(TEXT("/Game/Blueprints/Widget/UMG_TextBox.UMG_TextBox_C"));
-	if (WG_TextBox_C.Succeeded()) {
-		WG_TextBoxClass = WG_TextBox_C.Class;
-	}
+	
 }
 
 void UWG_Chat::NativeConstruct()
 {
-	ChatEnty->OnTextCommitted.AddDynamic(this, &UWG_Chat::ChattingCommitted);
+	ChatEntry->OnTextCommitted.AddDynamic(this, &UWG_Chat::OnInputChatCommit);
 }
 
-void UWG_Chat::ChattingCommitted(const FText& Input, ETextCommit::Type InCommitType)
+void UWG_Chat::UpdateChatBox(const FString& message)
+{
+	FString Chat = FString::Printf(TEXT("%s"), *message);
+
+	UTextBlock* NewText = NewObject<UTextBlock>(ChatLog);
+	NewText->SetText(FText::FromString(Chat));
+	NewText->SetAutoWrapText(true);
+
+	ChatLog->AddChild(NewText);
+	ChatLog->ScrollToEnd();
+}
+
+void UWG_Chat::OnInputChatCommit(const FText& Input, ETextCommit::Type InCommitType)
 {
 	if (InCommitType == ETextCommit::OnEnter)
 	{
 		if (Input.IsEmpty())
 		{
-			ChatEnty->SetText(Input);
-			//GetOwningPlayer()->SetInputMode(GetOwningPlayer())
+			ChatEntry->SetText(Input);
+
 		}
 		else
 		{
@@ -35,10 +47,3 @@ void UWG_Chat::ChattingCommitted(const FText& Input, ETextCommit::Type InCommitT
 	}
 }
 
-void UWG_Chat::AddChatLog(const FText& UserName, const FText& Message)
-{
-	if (GetOwningPlayer()->IsLocalPlayerController())
-	{
-		
-	}
-}

@@ -2,6 +2,7 @@
 
 
 #include "GI_Proto.h"
+#include "OJ_Webconnect.h"
 
 UGI_Proto::UGI_Proto(const FObjectInitializer& ObjectInitializer) {
 	// 초기화
@@ -15,6 +16,13 @@ UGI_Proto::UGI_Proto(const FObjectInitializer& ObjectInitializer) {
 	OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Proto::OnJoinSessionComplete);
 	OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Proto::OnDestroySessionComplete);
 }
+
+UOJ_Webconnect& UGI_Proto::GetWebconnect()
+{
+	// TODO: 여기에 return 문을 삽입합니다.
+	return *OJ_Webconnect;
+}
+
 void UGI_Proto::CreateOnlineSession(FString SessionFrontName,FString HostName,FString SessionDescription,int32 MaxPlayerNum)
 {
 	ULocalPlayer* const Player = GetFirstGamePlayer();

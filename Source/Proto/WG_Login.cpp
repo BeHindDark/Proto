@@ -6,6 +6,7 @@
 #include "Components/Button.h"
 #include "Components/CheckBox.h"
 #include "Components/EditableTextBox.h"
+#include "GI_Proto.h"
 
 
 void UWG_Login::NativeConstruct() {

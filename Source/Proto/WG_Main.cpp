@@ -14,7 +14,12 @@ void UWG_Main::NativeConstruct()
 	UserIDText = Cast<UTextBlock>(GetWidgetFromName(TEXT("UserIDText")));
 	if (nullptr == UserIDText) return;
 
-	UserIDText->SetText(FText::FromString("test1"));
+	//MyGameInstance->GetWebConnector().GetUserNickname()
+	FActorSpawnParameters spawnparams;
+	ALoginHttp* Login_Http = GetWorld()->SpawnActor<ALoginHttp>(FVector::ZeroVector, 
+		FRotator::ZeroRotator, spawnparams);
+
+	UserIDText->SetText(FText::FromString(Login_Http->GetUserId()));
 	SessionBrowserButton->OnClicked.AddDynamic(this, &UWG_Main::SessionBrowserButtonClicked);
 	AmoryButton->OnClicked.AddDynamic(this, &UWG_Main::AmoryButtonClicked);
 }

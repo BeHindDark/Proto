@@ -13,10 +13,10 @@ void UWG_LobbyTeam::NativeConstruct()
 
 void UWG_LobbyTeam::RedClicked()
 {
-	GEngine->AddOnScreenDebugMessage(10, 10, FColor::Blue, TEXT("RedClicked"));
+	UE_LOG(Proto, Error, TEXT("Red"));
 }
 
 void UWG_LobbyTeam::BlueClicked()
 {
-	GEngine->AddOnScreenDebugMessage(10, 10, FColor::Blue, TEXT("BlueClicked"));
+	UE_LOG(Proto, Error, TEXT("Blue"));
 }

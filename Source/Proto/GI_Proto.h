@@ -4,6 +4,13 @@
 
 #include "Proto.h"
 #include "Engine/GameInstance.h"
+#include "OJ_Webconnect.h"
+
+#include "Http.h"
+#include "Interfaces/IHttpResponse.h"
+#include "Interfaces/IHttpRequest.h"
+#include "Loginhttp.h"
+
 #include "GI_Proto.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCreateSessionReportDelegate, bool);
@@ -28,6 +35,19 @@ class PROTO_API UGI_Proto : public UGameInstance
 
 public:
 	UGI_Proto(const FObjectInitializer& ObjectInitializer);
+
+public:
+
+	/* Loing server 통신 관련 */
+	UOJ_Webconnect& GetWebconnect();
+
+protected:
+	
+	// Login server 통신 변수
+	UPROPERTY(BlueprintReadOnly)
+	UOJ_Webconnect* OJ_Webconnect;
+
+public:
 
 	/**
 	$$각종 게임 정보 저장에 필요한 변수들.

@@ -5,7 +5,9 @@
 #include "WG_Login.h"
 #include "WG_Join.h"
 #include "LoginHttp.h"
+#include "GI_Proto.h"
 #include "Blueprint/UserWidget.h"
+#include "Json.h"
 
 APC_Login::APC_Login() 
 {
@@ -27,6 +29,9 @@ void APC_Login::BeginPlay() {
 
 void APC_Login::OnLogin(FText ID, FText PW)
 {
+	// RequestLogin() 함수 일단 봉인 
+	// RequestLogin(ID.ToString(), PW.ToString());
+	
 	FActorSpawnParameters spawnparams;
 	spawnparams.Owner = this;
 	ALoginHttp* Login_Http = GetWorld()->SpawnActor<ALoginHttp>(FVector::ZeroVector, FRotator::ZeroRotator, spawnparams);
@@ -35,10 +40,12 @@ void APC_Login::OnLogin(FText ID, FText PW)
 
 void APC_Login::OnJoin(FText ID, FText PW, FText PW2)
 {
+	
 	FActorSpawnParameters spawnparams;
 	spawnparams.Owner = this;
 	ALoginHttp* Login_Http = GetWorld()->SpawnActor<ALoginHttp>(FVector::ZeroVector, FRotator::ZeroRotator, spawnparams);
 	Login_Http->SendAccountCreationRequest(ID.ToString(), PW.ToString(), PW2.ToString());
+	
 }
 
 void APC_Login::ShowJoinWG(int Zorder)
@@ -75,4 +82,35 @@ void APC_Login::InitializeWidget()
 		WG_Join_Class = WG_Join_C.Class;
 	}
 
+}
+
+// 일단 봉인 나중에 GetGameInstance 분석하자
+void APC_Login::RequestLogin(const FString& UserID, const FString& UserPW)
+{
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("userName : Id : %s, Pw : %s"), *UserID, *UserPW));
+	
+	auto MyGameInstance = GetGameInstance<UGI_Proto>();
+	if (nullptr == MyGameInstance)
+	{
+		UE_LOG(Proto, Error, TEXT("Invalid game instance.."));
+		return;
+	}
+	
+	//FInputActionHandlerSignature::CreateUObject(this, &APC_Login::ReceiveLoginResponse);
+
+	//FOnLoginResponse::CreateUObject(this,&APC_Login::ReceiveLoginResponse);
+	
+	MyGameInstance->GetWebconnect().SendLoginCreationRequest(UserID, UserPW);
+	
+	/*
+	MyGameInstance->GetWebConnector().Login(UserID, UserPW,
+		FOnLoginResponse::CreateUObject(this, &UZInputIDWidget::ReceiveLoginResponse));
+		*/
+}
+
+void APC_Login::ReceiveLoginResponse()
+{
+	// MainMap으로 이동한다
+	UGameplayStatics::OpenLevel(this, "MainMap");
 }
