@@ -65,12 +65,15 @@ private:
 
 	APlayerController* PlayerController;
 
+	float ShoulderMeshRotationSpeed = 40.0f;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponControlSystem")
 	class UWeaponControlSystem* WCS;
@@ -82,4 +85,6 @@ public:
 	UCameraComponent* Camera;
 
 	FVector GetCameraAimLocation();
+
+	void TurnShoulderMesh(UStaticMeshComponent* ShoulderComponent, FName SocketName, float DeltaTime);
 };

@@ -85,6 +85,7 @@ void AAct_DB_ProjectileWeaponBase::UpFire()
 void AAct_DB_ProjectileWeaponBase::DownFire()
 {
 	class UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
+
 	if (!IsValid(Anim)) {
 		CHECK_LOG(!IsValid(Anim));
 		return;

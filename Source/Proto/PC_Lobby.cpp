@@ -26,7 +26,7 @@ void APC_Lobby::SetupInputComponent()
 
 void APC_Lobby::InitializeWidget()
 {
-	static ConstructorHelpers::FClassFinder<UWG_SessionLobby> WG_SessionLobby_C(TEXT("/Game/Blueprints/Widget/UMG_SessionLobyy.UMG_SessionLobyy_C"));
+	static ConstructorHelpers::FClassFinder<UWG_SessionLobby> WG_SessionLobby_C(TEXT("/Game/Blueprints/Widget/UMG_SessionLobby.UMG_SessionLobby_C"));
 	if (WG_SessionLobby_C.Succeeded()) {
 		WG_SessionLobby_Class = WG_SessionLobby_C.Class;
 	}

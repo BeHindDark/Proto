@@ -25,6 +25,11 @@ public:
 	/** 아래 포대 노티파이 델리게이트
 	*/
 	FDownFireCheckDelegate DownFireCheck;
+
+	UPROPERTY(Category="Attack", EditAnywhere, BlueprintReadOnly, Meta=(AllowPrivateAccess="true"))
+	bool IsAttacking;
+
+
 private:
 	UFUNCTION()
 	/** 위에 포대 애니메이션 노티파이
