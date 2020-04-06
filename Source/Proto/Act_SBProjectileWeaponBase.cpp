@@ -4,6 +4,7 @@
 #include "Act_SBProjectileWeaponBase.h"
 #include "WeaponControlSystem.h"
 #include "Components/ArrowComponent.h"
+#include "Anim_DB_Weapon_AnimInstance.h"
 #include "Act_Bullet.h"
 
 // Sets default values
@@ -44,6 +45,39 @@ void AAct_SBProjectileWeaponBase::PostInitializeComponents()
 		//AnimInstance->UpFireCheck.AddDynamic(this, && AAct_SBProjectileWeaponBase::);
 	}
 
+}
+
+void AAct_SBProjectileWeaponBase::GetArrowComponent_SB(UArrowComponent* Arrow1)
+{
+	FirstArrow = Arrow1;
+}
+
+void AAct_SBProjectileWeaponBase::UpFire()
+{
+	class UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
+		
+	if (!IsValid(Anim)) {
+		CHECK_LOG(!IsValid(Anim));
+		return;
+	}
+
+	if (ProjectileClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("If projectileClass is Execute."));
+		FVector Front = FirstArrow->GetComponentLocation();
+		FRotator Rotate = GetActorRotation();
+		UWorld* World = GetWorld();
+
+		if (World)
+		{
+			Anim->IsAttacking = true;		// AnimInstance의 IsAttacking 변수
+			this->IsAttacking = true;		// 무기 Actor의   IsAttacking 변수
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = this->Instigator;
+			AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
+		}
+	}
 }
 
 // Called every frame

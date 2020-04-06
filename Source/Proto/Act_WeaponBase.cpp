@@ -4,6 +4,7 @@
 #include "Act_WeaponBase.h"
 #include "Components/ArrowComponent.h"
 #include "WeaponControlSystem.h"
+#include "Act_Bullet.h"
 
 // Sets default values
 AAct_WeaponBase::AAct_WeaponBase()
@@ -35,7 +36,12 @@ void AAct_WeaponBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 void AAct_WeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	FActorSpawnParameters spawnparam;
+	
+	//GetWorld()->SpawnActor<AAct_Bullet>()
+	//GetWorld()->SpawnActorDiffed<>
+	//https://docs.unrealengine.com/en-US/API/Runtime/Engine/Engine/UWorld/SpawnActorDeferred/index.html
 }
 
 // Called every frame
@@ -50,6 +56,7 @@ void AAct_WeaponBase::Tick(float DeltaTime)
 	*/
 
 }
+
 
 void AAct_WeaponBase::ServerOnFireOrder()
 {
@@ -85,6 +92,11 @@ void AAct_WeaponBase::ConnectWeaponControlSystem(UWeaponControlSystem * NewWeapo
 void AAct_WeaponBase::SetSingleMuzzleArrow(UArrowComponent * MuzzleArrow)
 {
 	SingleMuzzleArrow = MuzzleArrow;
+}
+
+UWeaponControlSystem * AAct_WeaponBase::GetWeaponControlSystem()
+{
+	return WeaponControlSystem_Ref.Get();
 }
 
 void AAct_WeaponBase::TurnTowardDirectAim(float DeltaTime)

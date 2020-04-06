@@ -22,7 +22,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	
 public:
 	UPROPERTY(Replicated, VisibleAnywhere, Category = "Weapon")
 	//매틱마다 WeaponControlSystem으로부터 전달받은 조준위치를 저장해두는 변수입니다.
@@ -130,6 +130,9 @@ public:
 	*	@param MuzzleArrow	등록시킬 ArrowComponent의 포인터
 	*/
 	virtual void SetSingleMuzzleArrow(class UArrowComponent* MuzzleArrow);
+
+	UFUNCTION(BlueprintCallable, Category = "Custom|Weapon")
+	class UWeaponControlSystem* GetWeaponControlSystem();
 
 protected:
 	/**	직사사격을 위해 Target방향으로 포탑을 회전시키는 함수입니다.
