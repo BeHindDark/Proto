@@ -25,23 +25,22 @@ protected:
 	TSubclassOf<class UWG_TextBox> WG_TextBoxClass;
 
 public:
+	
 	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* ChatEnty;
-
+	class UEditableTextBox* ChatEntry;
+	
 	UPROPERTY(meta = (BindWidget))
 	class UScrollBox* ChatLog;
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* ChatMode;
 
-	class UWG_TextBox* WG_TextBox;
+public:
+	void UpdateChatBox(const FString& message);
 
 private:
 
 	UFUNCTION()
-	void ChattingCommitted(const FText& Input, ETextCommit::Type InCommitType);
-
-	UFUNCTION()
-	void AddChatLog(const FText& UserName, const FText& Message);
+	void OnInputChatCommit(const FText& Input, ETextCommit::Type InCommitType);
 
 };

@@ -94,6 +94,7 @@ void AAct_Bullet::BeginOverlap(UPrimitiveComponent * OverlappedComponent,AActor 
 	//WeaponBase에 GetInstigator함수를 만들어서 AController를 구하게 하고
 	//스폰 시 변수로 넘겨주는게 나아보임.
 	//왜냐면 총알이 명중했을 떄 이미 주인이 죽었을 가능... 성도 있으니까?
+	/*
 	AAct_WeaponBase* Weapon = Cast<AAct_WeaponBase>(GetOwner());
 	if(!IsValid(Weapon))
 	{
@@ -116,6 +117,6 @@ void AAct_Bullet::BeginOverlap(UPrimitiveComponent * OverlappedComponent,AActor 
 	}
 	UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetVelocity(), SweepResult, BulletInstigator, GetOwner(),UDamageType::StaticClass());
 	//UGameplayStatics::ApplyDamage(OtherActor, Damage, Instigator, GetOwner(), UDamageType::StaticClass());
-		
+	*/
 }
 

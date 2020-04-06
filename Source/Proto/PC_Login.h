@@ -4,7 +4,14 @@
 
 #include "Proto.h"
 #include "GameFramework/PlayerController.h"
+
+#include "Http.h"
+#include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
+
 #include "PC_Login.generated.h"
+
+DECLARE_DELEGATE_OneParam(FOnIdentify, bool);
 
 /**
  * 
@@ -28,7 +35,10 @@ protected:
 private:
 	class UWG_Login* WG_Login_Ref;
 
+	void RequestLogin(const FString& UserID, const FString& UserPW);
 public:
+
+
 	void OnLogin(FText ID, FText PW);
 
 	void OnJoin(FText ID, FText PW, FText PW2);
@@ -36,4 +46,6 @@ public:
 	void ShowJoinWG(int Zorder = 0);
 
 	void InitializeWidget();
+
+	void ReceiveLoginResponse();
 };

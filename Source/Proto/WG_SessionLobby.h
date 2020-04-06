@@ -33,16 +33,58 @@ protected:
     virtual void NativeConstruct() override;
 	
 public:
-    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-    class UWG_Chat* WG_Chat;
 
-    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-    class UWG_LobbyTeam* WG_LobbyTeam;
+    //UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    // class UWG_Chat* UMG_Chat;
+
+    //UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    //class UWG_LobbyTeam* UMG_LobbyTeam;
 
     UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
     class UButton* GameStartButton;
 
+protected:
+    // 팀 바인딩
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UVerticalBox* RedPlayerList;
+
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UVerticalBox* BluePlayerList;
+
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UVerticalBox* UnchosenPlayers;
+
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UButton* RedButton;
+
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UButton* BlueButton;
+    
+    // 채팅 바인딩 
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UEditableTextBox* ChatInput;
+
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UScrollBox* ChatBox;
+
+    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UTextBlock* ChatMode;
+
 private:
     UFUNCTION()
     void OnGameStartClicked();
+
+
+    UFUNCTION()
+    void OnInputChatCommit(const FText& Input, ETextCommit::Type InCommitType);
+public:
+
+    void UpdateChatBox(const FString& message);
+    
+    void RedClicked();
+    void BlueClicked();
+    
+    void UpdateRedList(const FString& Name);
+    void UpdateBlueList(const FString& Name);
+    void UnchosenPlayersList(const FString& Name);
 };

@@ -11,57 +11,27 @@
 void AAct_DB_ProjectileWeaponBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> Fire(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion_C"));
+	if (Fire.Succeeded())
+	{
+		FireParticle = Fire.Object;
+	}
 }
 
 void AAct_DB_ProjectileWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
+
 	//블루프린트에 애님인스턴스 추가해야함!
 
-	/*UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
+	UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
+	Anim->UpFireCheck.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::UpFire);
+	Anim->DownFireCheck.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::DownFire);
 	
-	Anim->UpFireCheck.AddLambda([this]()->void {
-
-		if (ProjectileClass)
-		{
-
-			UE_LOG(LogTemp, Warning, TEXT("if projectileClass is Execute"));
-			FVector Front = FirstArrow->GetComponentLocation();
-			FRotator Rotate = GetActorRotation();
-			UWorld* World = GetWorld();
-			if (World)
-			{
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.Owner = this;
-				SpawnParams.Instigator = Instigator;
-				AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
-
-			}
-		}//람다말고 ㅠ그냥함수로 변경하기 UFUCNTION ADDDYNAMIC UpFireCheck.AddDynamic(this, &AAct_DBkdjfladjf::함수이름);
-		// 
-
-
-		});
-	Anim->DownFireCheck.AddLambda([this]()->void {
-
-		if (ProjectileClass)
-		{
-			FVector Front = SecondArrow->GetForwardVector();
-			FRotator Rotate = SecondArrow->GetRelativeRotation();
-			UWorld* World = GetWorld();
-			if (World)
-			{
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.Owner = this;
-				SpawnParams.Instigator = Instigator;
-				 AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
-
-			}
-		}
-
-
-		});*/
+	/** 이펙트를 지정해줍니다.
+	*/
+	
+	
 }
 
 AAct_DB_ProjectileWeaponBase::AAct_DB_ProjectileWeaponBase()
@@ -80,15 +50,21 @@ void AAct_DB_ProjectileWeaponBase::GetArrowComponent(UArrowComponent* Arrow1, UA
 
 void AAct_DB_ProjectileWeaponBase::UpFire()
 {
-	
+
+	UE_LOG(LogTemp, Warning, TEXT("UpFire is Execute"));
 	class UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
 	if (!IsValid(Anim)) {
+
+		UE_LOG(LogTemp, Warning, TEXT("if Anim is Execute"));
 		CHECK_LOG(!IsValid(Anim));
 		return;
 	}
 	if (ProjectileClass)
 	{
 
+		GameStatic->SpawnEmitterAttached(FireParticle, Mesh, FName("Barrel_End_1"));
+
+		//Barrel_End_1
 		UE_LOG(LogTemp, Warning, TEXT("if projectileClass is Execute"));
 		FVector Front = FirstArrow->GetComponentLocation();
 		FRotator Rotate = GetActorRotation();
@@ -99,7 +75,7 @@ void AAct_DB_ProjectileWeaponBase::UpFire()
 			SpawnParams.Owner = this;
 			SpawnParams.Instigator = this->Instigator;
 			AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
-
+			
 
 		}
 
@@ -134,26 +110,3 @@ void AAct_DB_ProjectileWeaponBase::DownFire()
 	}
 
 }
-/*
-void AAct_DB_ProjectileWeaponBase::SetAnimationDBWeapon(TSubclassOf<UAnimInstance> DB_Anim)//TsubclassOf는 클래스의 범위를 제한해준다.
-{
-	UAnim_DB_Weapon_AnimInstance* anim = Cast<UAnim_DB_Weapon_AnimInstance>(DB_Anim);
-	if (nullptr == anim)
-	{
-		//에러처리
-		return;
-	}
-
-	if (IsValid(DB_Anim))
-	{
-		Mesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-		Mesh->SetAnimInstanceClass(DB_Anim);
-		//UAnimInstance::StaticClass()
-	}
-
-}
-
-애니메이션은 블루프린트에서
-*/
-//묶어준다.?커스텀 애님인스턴스 세팅된 애니메이션이 우리가만든 C++애님 인스턴스인지? 인식을해야된다. 애님인스턴스에서 노티파이함수
-
