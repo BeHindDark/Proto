@@ -29,6 +29,9 @@ public:
 	UPROPERTY(Category="Attack", EditAnywhere, BlueprintReadOnly, Meta=(AllowPrivateAccess="true"))
 	bool IsAttacking;
 
+	UPROPERTY(Category = "Attack", EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
+		bool CanAttack;
+
 
 private:
 	UFUNCTION()
@@ -40,5 +43,9 @@ private:
 	/** 아래 포대 애니메이션 노티파이
 	*/
 	void AnimNotify_DownFireCheck();
+
+	UFUNCTION()
+	void AnimNotify_AnimationFireCheck();
+
 
 };
