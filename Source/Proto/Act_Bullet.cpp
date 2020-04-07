@@ -116,7 +116,11 @@ void AAct_Bullet::Tick(float DeltaTime)
 
 }
 
-void AAct_Bullet::InitializeBullet(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
+bool AAct_Bullet::InitializeBullet_Validate(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
+	return true;
+}
+
+void AAct_Bullet::InitializeBullet_Implementation(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
 	ProjectileMovement->SetVelocityInLocalSpace(FVector(InitialSpeed, 0.0f, 0.0f));
 	Damage = WeaponDamage;
 	ProjectileMovement->bAutoActivate = true;
