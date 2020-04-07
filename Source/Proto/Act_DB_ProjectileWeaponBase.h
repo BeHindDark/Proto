@@ -42,6 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon|Projectile|DB")
 	void GetArrowComponent(UArrowComponent* Arrow1, UArrowComponent* Arrow2);
 
+	UFUNCTION(BlueprintCallable, Category = "Weapon|Projectile|DB")
+		void AnimationEnd();
+
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon|Projectile|DB")
 	/** 윗총열에서 총알을 발사하는 함수입니다
@@ -72,6 +75,14 @@ public:
 	UFUNCTION()
 	void OnEffectFinished(class UParticleSystemComponent* PSystem);
 
+	UPROPERTY(Category = "Attack", EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
+		bool IsAttacking = false;
+
+	UPROPERTY(Category = "Attack", EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
+		bool CanAttack = true;
+
+	UPROPERTY(Category = "Attack", EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
+		bool IsAttackEnd = false;
 	
 
 };

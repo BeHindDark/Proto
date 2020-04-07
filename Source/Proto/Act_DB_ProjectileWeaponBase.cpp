@@ -40,6 +40,7 @@ void AAct_DB_ProjectileWeaponBase::BeginPlay()
 	UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
 	Anim->UpFireCheck.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::UpFire);
 	Anim->DownFireCheck.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::DownFire);
+	Anim->AnimationEnd.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::AnimationEnd);
 	
 	/** 이펙트를 지정해줍니다.
 	*/
