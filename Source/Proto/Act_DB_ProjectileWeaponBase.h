@@ -21,6 +21,7 @@ private:
 public:
 	AAct_DB_ProjectileWeaponBase();
 
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite,Category = "Weapon|Projectile|DB")
 
 	/** 이중총열 무기 메쉬

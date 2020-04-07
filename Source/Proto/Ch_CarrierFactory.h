@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Proto.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
@@ -22,19 +22,67 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	//TArray<WeaponIndexArray> WeaponControllIndex;
-		
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* ShoulderMesh;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	UStaticMeshComponent* CockpitMesh;
 	
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
-private:
-	//void AttachMesh(FName SocketName, UStaticMeshComponent* MotherMeshName, UStaticMeshComponent* AttachMeshName, FName ComponentName);
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const override;
 
+protected:
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category = "Spider|WeaponControlSystem")
+	class UWeaponControlSystem* WCS;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Spider|Camera")
+	USpringArmComponent* SpringArm;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Spider|Camera")
+	UCameraComponent* Camera;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintreadWrite, Category = "Spider|Body")
+	USceneComponent* WaistSceneComponent;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Spider|Camera")
+	float CameraPitchMovement;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spider|Camera")
+	float CameraPitchSpeed = 60.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spider|Camera")
+	float CameraYawMovement;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "Spider|Camera")
+	float CameraYawSpeed  = 120.0f;;
+
+	float MoveInput = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spider|Movement")
+	float BodyYawSpeed = 0.3;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spider|WeaponControlSystem")
+	bool bIsPlayerControlling = false;
+
+	UPROPERTY(replicated,VisibleAnywhere, BlueprintReadWrite, Category = "Spider|WeaponControlSystem")
+	FVector AimLocation = FVector::ZeroVector;
+
+	APlayerController* PlayerController;
+
+	//void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spider|Movement")
+	float UpperBodyRotationSpeed = 140.0f;
+
+public:
+	UFUNCTION(Server,Reliable,WithValidation)
+	void ServerNetTick(FVector CameraAim,float Deltatime);
+	void ServerNetTick_Implementation(FVector CameraAim,float Deltatime);
+	bool ServerNetTick_Validate(FVector CameraAim,float Deltatime);
+
+protected:
 	FVector CameraAimLocation(UCameraComponent* CurrentCamera);
 
 	void Turn(float NewAxisValue);
@@ -47,43 +95,9 @@ private:
 
 	void TurnBody(float NewAxisValue);
 
-	float CameraPitchMovement;
+	UFUNCTION(BlueprintCallable)
+	void SetWaistSceneComponent(USceneComponent* BlueprintWaistSceneComponent);
 
-	float CameraPitchSpeed;
-
-	float CameraYawMovement;
-
-	float CameraYawSpeed;
-
-	float MoveInput = 0.0f;
-
-	float BodyYawSpeed = 0.3;
-
-	bool bIsPlayerControlling = false;
-
-	FVector AimLocation;
-
-	APlayerController* PlayerController;
-
-	float ShoulderMeshRotationSpeed = 40.0f;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "WeaponControlSystem")
-	class UWeaponControlSystem* WCS;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
-	USpringArmComponent* SpringArm;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
-	UCameraComponent* Camera;
-
-
-	void TurnShoulderMesh(UStaticMeshComponent* ShoulderComponent, FName SocketName, float DeltaTime);
+private:
+	void TurnUpperBody(USceneComponent* WaistComponent, float DeltaTime);
 };
