@@ -75,6 +75,8 @@ public:
 	UFUNCTION()
 	void OnEffectFinished(class UParticleSystemComponent* PSystem);
 
+	void Attack();
+
 	UPROPERTY(Category = "Attack", EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
 		bool IsAttacking = false;
 

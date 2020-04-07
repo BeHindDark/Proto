@@ -21,6 +21,9 @@ AAct_DB_ProjectileWeaponBase::AAct_DB_ProjectileWeaponBase()
 	FireParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("EFFECT"));
 	FireParticle->SetupAttachment(RootComponent);
 
+	
+
+
 	static ConstructorHelpers::FObjectFinder<UParticleSystem>P_Fire(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
 	if (P_Fire.Succeeded())
 	{
@@ -82,8 +85,8 @@ void AAct_DB_ProjectileWeaponBase::UpFire()
 			SpawnParams.Owner = this;
 			//SpawnParams.Instigator = this->Instigator;
 			AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
-			FireParticle->Activate(true);
-			FireParticle->OnSystemFinished.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::OnEffectFinished);
+			//FireParticle->Activate(true);
+			//FireParticle->OnSystemFinished.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::OnEffectFinished);
 
 		}
 
@@ -120,4 +123,20 @@ void AAct_DB_ProjectileWeaponBase::DownFire()
 void AAct_DB_ProjectileWeaponBase::OnEffectFinished(class UParticleSystemComponent* PSystem)
 {
 	FireParticle->Activate(false);
+}
+
+void AAct_DB_ProjectileWeaponBase::AnimationEnd()
+{
+	IsAttacking = false;
+	//IsAttackEnd = true;
+	//CanAttack = true;
+}
+
+
+void AAct_DB_ProjectileWeaponBase::Attack()
+{
+	IsAttacking = true;
+	//IsAttackEnd = false;
+	//CanAttack = false;
+	
 }
