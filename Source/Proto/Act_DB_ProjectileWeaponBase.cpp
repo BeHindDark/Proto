@@ -52,10 +52,11 @@ void AAct_DB_ProjectileWeaponBase::BeginPlay()
 }
 
 
-void AAct_DB_ProjectileWeaponBase::GetArrowComponent(UArrowComponent* Arrow1, UArrowComponent* Arrow2)
+void AAct_DB_ProjectileWeaponBase::GetBlueprint(UArrowComponent* Arrow1, UArrowComponent* Arrow2, USceneComponent* EX_Muzzle_Location)
 {
 	FirstArrow = Arrow1;
 	SecondArrow = Arrow2;
+	ExMuzzle = EX_Muzzle_Location;
 }
 
 void AAct_DB_ProjectileWeaponBase::UpFire()
@@ -101,9 +102,8 @@ void AAct_DB_ProjectileWeaponBase::DownFire()
 		CHECK_LOG(!IsValid(Anim));
 		return;
 	}
-	if (ProjectileClass)
+	if (ProjectileClass&&ExMuzzle)
 	{
-
 		UE_LOG(LogTemp, Warning, TEXT("if projectileClass is Execute"));
 		FVector Front = SecondArrow->GetComponentLocation();
 		FRotator Rotate = GetActorRotation();
@@ -127,16 +127,11 @@ void AAct_DB_ProjectileWeaponBase::OnEffectFinished(class UParticleSystemCompone
 
 void AAct_DB_ProjectileWeaponBase::AnimationEnd()
 {
-	IsAttacking = false;
-	//IsAttackEnd = true;
-	//CanAttack = true;
+
 }
 
 
 void AAct_DB_ProjectileWeaponBase::Attack()
 {
-	IsAttacking = true;
-	//IsAttackEnd = false;
-	//CanAttack = false;
 	
 }

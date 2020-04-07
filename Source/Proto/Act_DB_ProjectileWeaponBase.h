@@ -85,6 +85,10 @@ public:
 
 	UPROPERTY(Category = "Attack", EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
 		bool IsAttackEnd = false;
-	
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
+		/** 총구화염 이펙트를 저장해줄 파티클 시스템입니다.
+		*/
+		USceneComponent* ExMuzzle;
 
 };
