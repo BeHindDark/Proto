@@ -15,16 +15,14 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 	
 	//기본값(컴포넌트 등록, 좌표, 기타 기본 값) 정렬
+	//WaistSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("WaistSceneComponent"));
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-
-	WCS = CreateDefaultSubobject<UWeaponControlSystem>(TEXT("WeaponControlSystem"));
-
-	CameraPitchSpeed = 60.0f;
-	CameraYawSpeed = 120.0f;
-	
+	WCS = CreateDefaultSubobject<UWeaponControlSystem>(TEXT("WCS"));
+		
 	SpringArm->TargetArmLength = 800.0f;
 	SpringArm->SocketOffset = FVector(0.0f, 0.0f, 300.0f);
 
@@ -37,31 +35,22 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	Camera->bUsePawnControlRotation = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 30.0f, 0.0f);
 
-	//스태틱 메시에 붙어있는 각 소켓의 이름 정렬
-	FName TopSocket(TEXT("Mount_Top"));
-	FName CockpitSocket(TEXT("Mount_Cockpit"));
-	FName LShoulderSocket(TEXT("Mount_HalfShoulder_L"));
-	FName RShoulderSocket(TEXT("Mount_HalfShoulder_R"));
-	FName LWeaponSocket(TEXT("Mount_Weapon_L"));
-	FName RWeaponSocket(TEXT("Mount_Weapon_R"));
-	FName WeaponSocket(TEXT("Mount_Weapon"));
-
-	FName TopComponentName(TEXT("ShoulderMesh"));
+	if(GetLocalRole()>=ROLE_Authority)
+	{
+		AimLocation = GetActorLocation() + 100.0f*GetActorForwardVector();
+	}
 	
-	const USkeletalMeshSocket* MainMeshSocket = GetMesh()->GetSocketByName(TopSocket);
-	
-	//메시에 소켓이름이 없음에도 , 메시 자체가 지정되지 않았음에도 컴포넌트가 attach되는 것을 확인, 메시가 생성되면 해당 소켓으로 붙는것도 같이 확인.
-	//if (GetMesh()->DoesSocketExist(TopSocket)) {
-	//애로우를 이용해서 간접적으로 붙이지말고 그냥 소켓에 직접적으로 붙이기
-	//CockpitArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("CockpitArrow"));
-		ShoulderMesh = CreateDefaultSubobject<UStaticMeshComponent>(TopComponentName);
-		ConstructorHelpers::FObjectFinder<UStaticMesh> SHOULDER(TEXT("/Game/Mech_Constructor_Spiders/Meshes/Shoulders_Med_Tank.Shoulders_Med_Tank"));
-		if (SHOULDER.Succeeded()) {
-			ShoulderMesh->SetStaticMesh(SHOULDER.Object);
-		}
 
-		ShoulderMesh->SetupAttachment(GetMesh(), TopSocket);
-	//}
+	//WCS->SetIsReplicated(true);
+}
+
+void ACh_CarrierFactory::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	//변수 리플리케이션을 할 때 항상 삽입해야 하는 함수입니다.
+	//선언은 없이 정의부분만 넣어주면 됩니다.
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACh_CarrierFactory, AimLocation);
 }
 
 // Called when the game starts or when spawned
@@ -86,20 +75,26 @@ void ACh_CarrierFactory::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Camera != nullptr) {
-		Camera->AddRelativeRotation(FRotator(CameraPitchMovement * DeltaTime, 0.0f, 0.0f));
+	if(bIsPlayerControlling)
+	{
+		if(GetController()->IsLocalPlayerController())
+		{
+			if(Camera != nullptr)
+			{
+				Camera->AddRelativeRotation(FRotator(CameraPitchMovement * DeltaTime,0.0f,0.0f));
+			}
+			if(SpringArm != nullptr)
+			{
+				SpringArm->AddRelativeRotation(FRotator(0.0f,CameraYawMovement * DeltaTime,0.0f));
+			}
+			FVector NewLocalAim = CameraAimLocation(Camera);
+			ServerNetTick(NewLocalAim, DeltaTime);
+		}
 	}
-	if (Camera != nullptr) {
-		SpringArm->AddRelativeRotation(FRotator(0.0f, CameraYawMovement * DeltaTime, 0.0f));
-	}
+	
 
-	if (bIsPlayerControlling) {
-		AimLocation = CameraAimLocation(Camera);
-	}
-
-	WCS->TargetWorldLocation = AimLocation;
-
-	//TurnShoulderMesh(ShoulderMesh, TEXT("Mount_Top"), DeltaTime);
+	
+	
 }
 
 // Called to bind functionality to input
@@ -170,31 +165,84 @@ void ACh_CarrierFactory::MoveRight(float NewAxisValue) {
 	}
 }
 
-void ACh_CarrierFactory::TurnBody(float NewAxisValue) {
+void ACh_CarrierFactory::TurnBody(float NewAxisValue)
+{
 	AddControllerYawInput(NewAxisValue * BodyYawSpeed);
 }
 
-void ACh_CarrierFactory::TurnShoulderMesh(UStaticMeshComponent* ShoulderComponent, FName SocketName, float DeltaTime) {
-	FRotator TargetDirection = FTransform(FRotator::ZeroRotator, AimLocation).GetRelativeTransform(GetActorTransform()).GetLocation().ToOrientationRotator();
-	FRotator TurnRotation = FRotator(0.0f, TargetDirection.Yaw, 0.0f);
-	FRotator CurrentShoulderRotation = ShoulderComponent->GetRelativeTransform().Rotator();
-	FRotator TurningRotator = FRotator::ZeroRotator;
-	FRotator TempRotator = FRotator::ZeroRotator;
+void ACh_CarrierFactory::SetWaistSceneComponent(USceneComponent * BlueprintWaistSceneComponent)
+{
+	WaistSceneComponent = BlueprintWaistSceneComponent;
+}
 
-	(TargetDirection - TurnRotation).GetWindingAndRemainder(TempRotator, TurningRotator);
 
-	if (!TurningRotator.IsNearlyZero(0.001f)) {
+void ACh_CarrierFactory::ServerNetTick_Implementation(FVector CameraAim, float Deltatime)
+{
+	if(GetLocalRole()<ROLE_Authority)
+	{
+		return;
+	}
+	AimLocation = CameraAim;
+	WCS->TargetWorldLocation = AimLocation;
+	if(IsValid(WaistSceneComponent))
+	{
+		TurnUpperBody(WaistSceneComponent,Deltatime);
+	}
+}
+
+bool ACh_CarrierFactory::ServerNetTick_Validate(FVector CameraAim,float Deltatime)
+{
+	return true;
+}
+
+void ACh_CarrierFactory::TurnUpperBody(USceneComponent* WaistComponent, float DeltaTime)
+{
+	//상대좌표계 상에서 목표의 방향
+	FRotator RelativeTargetDirection;
+	
+	//만약 제대로 소켓에 붙어있다면 소켓기준 좌표를, 아니면 액터 기준 좌표계를 이용
+	if(!WaistComponent->GetAttachSocketName().IsNone())
+	{
+		const USkeletalMeshSocket* WaistSocket = GetMesh()->GetSocketByName(WaistComponent->GetAttachSocketName());
+		RelativeTargetDirection = FTransform(FRotator::ZeroRotator,AimLocation).GetRelativeTransform(WaistSocket->GetSocketTransform(GetMesh())).GetLocation().ToOrientationRotator();
+	}
+	else
+	{
+		RelativeTargetDirection = FTransform(FRotator::ZeroRotator,AimLocation).GetRelativeTransform(GetActorTransform()).GetLocation().ToOrientationRotator();
+	}
+	
+	//포탑이 가져야하는 상대회전
+	FRotator TargetUpperBodyRotation = FRotator(0.0f,RelativeTargetDirection.Yaw, 0.0f);
+
+	//현재 상체의 상대회전
+	FRotator CurrentUpperBodyRotation = WaistComponent->GetRelativeTransform().Rotator();
+
+	//현재 회전과 목표 회전의 차이값
+	FRotator RotationDiff = FRotator::ZeroRotator;
+
+	//덜어내기용 더미값
+	FRotator DummyRot = FRotator::ZeroRotator;
+
+	//이 함수를 이용해 Rotation을 Pitch, yaw, Roll이 -180 ~ +180의 값을 갖도록 한다.
+	(TargetUpperBodyRotation - CurrentUpperBodyRotation).GetWindingAndRemainder(DummyRot, RotationDiff);
+
+	//회전각 차이가 너무 작으면 돌리지 않는다.
+	if (!RotationDiff.IsNearlyZero(0.001f))
+	{
+		//이번 틱에 돌려야하는 로테이션
 		FRotator DeltaRotation = FRotator::ZeroRotator;
-		if (FMath::Abs(TurningRotator.Yaw) <= ShoulderMeshRotationSpeed * DeltaTime) {
-			DeltaRotation.Yaw = TurningRotator.Yaw;
+		if (FMath::Abs(RotationDiff.Yaw) <= UpperBodyRotationSpeed * DeltaTime)
+		{
+			DeltaRotation.Yaw = RotationDiff.Yaw;
 		}
-		else {
-			DeltaRotation.Yaw = FMath::Sign(TurningRotator.Yaw) * ShoulderMeshRotationSpeed * DeltaTime;
+		else
+		{
+			DeltaRotation.Yaw = FMath::Sign(RotationDiff.Yaw) * UpperBodyRotationSpeed * DeltaTime;
 		}
 
-		FRotator NewShoulderRotation = CurrentShoulderRotation + DeltaRotation;
-		NewShoulderRotation.Pitch = 0.0f;
-		NewShoulderRotation.Roll = 0.0f;
-		ShoulderComponent->SetRelativeRotation(NewShoulderRotation);
+		FRotator NewUpperBodyRotation = CurrentUpperBodyRotation + DeltaRotation;
+		NewUpperBodyRotation.Pitch = 0.0f;
+		NewUpperBodyRotation.Roll = 0.0f;
+		WaistComponent->SetRelativeRotation(NewUpperBodyRotation);
 	}
 }
