@@ -57,7 +57,7 @@ void ACh_CarrierFactory::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 void ACh_CarrierFactory::BeginPlay()
 {
 	Super::BeginPlay();
-
+	UE_LOG(Proto,Warning,TEXT("BeginPlay"));
 }
 
 void ACh_CarrierFactory::PossessedBy(AController* NewController) {
@@ -68,6 +68,7 @@ void ACh_CarrierFactory::PossessedBy(AController* NewController) {
 			bIsPlayerControlling = true;
 		}
 	}
+	UE_LOG(Proto, Warning, TEXT("Possessedby"));
 }
 
 // Called every frame
