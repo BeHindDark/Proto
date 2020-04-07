@@ -108,7 +108,7 @@ void UOJ_Webconnect::OnLoginCreationResponse(FHttpRequestPtr Request, FHttpRespo
 			Result = TEXT("로그인 성공");
 
 			// MainMap으로 이동한다
-			UGameplayStatics::OpenLevel(this, "MainMap");
+			 UGameplayStatics::OpenLevel(this, "MainMap");
 		}
 		else
 		{

@@ -17,13 +17,20 @@ APC_Login::APC_Login()
 void APC_Login::BeginPlay() {
 	Super::BeginPlay();
 
-	WG_Login_Ref = CreateWidget<UWG_Login>(this, WG_Login_Class);
+	if (IsLocalPlayerController())
+	{
+		if (WG_Login_Class)
+		{
+			WG_Login_Ref = CreateWidget<UWG_Login>(this, WG_Login_Class);
 
-	FInputModeUIOnly Mode;
-	Mode.SetWidgetToFocus(WG_Login_Ref->GetCachedWidget());
-	SetInputMode(Mode);
-	WG_Login_Ref->AddToViewport(0);
-	bShowMouseCursor = true;
+			FInputModeUIOnly Mode;
+			Mode.SetWidgetToFocus(WG_Login_Ref->GetCachedWidget());
+			SetInputMode(Mode);
+			WG_Login_Ref->AddToViewport(0);
+			bShowMouseCursor = true;
+		}
+	}
+
 }
 
 
@@ -115,3 +122,6 @@ void APC_Login::ReceiveLoginResponse()
 	// MainMap으로 이동한다
 	UGameplayStatics::OpenLevel(this, "MainMap");
 }
+
+
+

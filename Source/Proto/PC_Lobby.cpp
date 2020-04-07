@@ -63,34 +63,34 @@ void APC_Lobby::OnSquadClicked()
 	GEngine->AddOnScreenDebugMessage(10, 10, FColor::Blue, TEXT("OnSquadClicked"));
 }
 
-void APC_Lobby::ClientReceiveChatMessage_Implementation(const FString& message)
+void APC_Lobby::ClientReceiveChatMessage_Implementation(const FString& Username,const FString& message)
 {
 	if (nullptr == WG_SessionLobby)
 	{
 		UE_LOG(Proto, Error, TEXT("Lobby WG_SessionLobby null."));
 		return;
 	}
-	WG_SessionLobby->UpdateChatBox(message);
+	WG_SessionLobby->UpdateChatBox(Username, message);
 }
 
-bool APC_Lobby::ClientReceiveChatMessage_Validate(const FString& message)
+bool APC_Lobby::ClientReceiveChatMessage_Validate(const FString& Username, const FString& message)
 {
 	return true;
 }
 
-void APC_Lobby::ServerReceiveChatMessage_Implementation(const FString& message)
+void APC_Lobby::ServerReceiveChatMessage_Implementation(const FString& Username, const FString& message)
 {
 	for (auto Iter = GetWorld()->GetPlayerControllerIterator(); Iter; ++Iter)
 	{
 		auto PC = Cast<APC_Lobby>(*Iter);
 		if (PC)
 		{
-			PC->ClientReceiveChatMessage(message);
+			PC->ClientReceiveChatMessage(Username, message);
 		}
 	}
 }
 
-bool APC_Lobby::ServerReceiveChatMessage_Validate(const FString& message)
+bool APC_Lobby::ServerReceiveChatMessage_Validate(const FString& Username, const FString& message)
 {
 	if (message.Len() < 255) return true;
 	else return false;

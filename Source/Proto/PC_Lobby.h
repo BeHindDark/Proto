@@ -48,14 +48,14 @@ public:
 
 	
 	UFUNCTION(Client, Reliable, WithValidation)
-	void ClientReceiveChatMessage(const FString& message);
-	void ClientReceiveChatMessage_Implementation(const FString& message);
-	bool ClientReceiveChatMessage_Validate(const FString& message);
+	void ClientReceiveChatMessage(const FString& Username, const FString& message);
+	void ClientReceiveChatMessage_Implementation(const FString& Username, const FString& message);
+	bool ClientReceiveChatMessage_Validate(const FString& Username, const FString& message);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerReceiveChatMessage(const FString& message);
-	void ServerReceiveChatMessage_Implementation(const FString& message);
-	bool ServerReceiveChatMessage_Validate(const FString& message);
+	void ServerReceiveChatMessage(const FString& Username, const FString& message);
+	void ServerReceiveChatMessage_Implementation(const FString& Username, const FString& message);
+	bool ServerReceiveChatMessage_Validate(const FString& Username, const FString& message);
 
 
 	UFUNCTION(NetMulticast, Reliable, WithValidation)

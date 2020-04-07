@@ -10,6 +10,7 @@
 #include "Components/VerticalBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerState.h"
+#include "GI_Proto.h"
 
 
 void UWG_SessionLobby::NativeConstruct()
@@ -66,9 +67,9 @@ void UWG_SessionLobby::UpdateBlueList(const FString& Name)
 
 
 
-void UWG_SessionLobby::UpdateChatBox(const FString& message)
+void UWG_SessionLobby::UpdateChatBox(const FString& Username,const FString& message)
 {
-	FString Chat = FString::Printf(TEXT("%s"), *message);
+	FString Chat = FString::Printf(TEXT("%s : %s"), *Username ,*message);
 
 	UTextBlock* NewText = NewObject<UTextBlock>(ChatBox);
 	NewText->SetText(FText::FromString(Chat));
@@ -88,8 +89,12 @@ void UWG_SessionLobby::OnInputChatCommit(const FText& Input, ETextCommit::Type I
 		{
 			return;
 		}
+		auto MyGameInstance = GetGameInstance<UGI_Proto>();
+		if (MyGameInstance)
+		{
+			MyPC->ServerReceiveChatMessage(MyGameInstance->GetWebconnect().GetUserId(), Input.ToString());
+		}
 
-		MyPC->ServerReceiveChatMessage(Input.ToString());
 		if (ChatInput)
 		{
 			ChatInput->SetText(FText::GetEmpty());
