@@ -8,7 +8,6 @@ void UAnim_DB_Weapon_AnimInstance::AnimNotify_UpFireCheck()
 	/** 위쪽 총열에서 총알이 나갈타이밍에 실행되는 함수입니다. 그타이밍에 브로드캐스트해줍니다.
 	*/
 	UpFireCheck.Broadcast();
-	CanAttack = false;
 }
 
 void UAnim_DB_Weapon_AnimInstance::AnimNotify_DownFireCheck()
@@ -17,7 +16,7 @@ void UAnim_DB_Weapon_AnimInstance::AnimNotify_DownFireCheck()
 	*/
 	DownFireCheck.Broadcast();
 }
-void UAnim_DB_Weapon_AnimInstance::AnimNotify_AnimationFireCheck()
+void UAnim_DB_Weapon_AnimInstance::AnimNotify_AnimationEnd()
 {
-	CanAttack = true;
+	AnimationEnd.Broadcast();
 }
