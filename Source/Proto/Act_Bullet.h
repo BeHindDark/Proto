@@ -53,6 +53,8 @@ protected:
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bullet|Tracer", meta = (AllowPrivateAccess = true))
 	FLinearColor TracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f);
+	
+	void HitCheck(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 public:
 	/**	총알의 속도, 데미지, 색 등을 초기화 하고 발동시킵니다.
@@ -64,6 +66,12 @@ public:
 	void InitializeBullet(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f,0.03f,0.0f,0.5f));
 	bool InitializeBullet_Validate(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
 	void InitializeBullet_Implementation(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
+
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void StopFX();
+	bool StopFX_Validate();
+	void StopFX_Implementation();
+
 
 	UFUNCTION( )
     void BeginOverlap(UPrimitiveComponent* OverlappedComponent, 
