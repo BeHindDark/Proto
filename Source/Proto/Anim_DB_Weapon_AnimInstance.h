@@ -9,6 +9,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUpFireCheckDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDownFireCheckDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAnimationEndDelegate);
 
 /**
  *
@@ -25,12 +26,9 @@ public:
 	/** 아래 포대 노티파이 델리게이트
 	*/
 	FDownFireCheckDelegate DownFireCheck;
-
-	UPROPERTY(Category="Attack", EditAnywhere, BlueprintReadOnly, Meta=(AllowPrivateAccess="true"))
-	bool IsAttacking;
-
-	UPROPERTY(Category = "Attack", EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
-		bool CanAttack;
+	/** 애니메이션 종료 델리게이트
+	*/
+	FAnimationEndDelegate AnimationEnd;
 
 
 private:
@@ -45,7 +43,7 @@ private:
 	void AnimNotify_DownFireCheck();
 
 	UFUNCTION()
-	void AnimNotify_AnimationFireCheck();
+	void AnimNotify_AnimationEnd();
 
 
 };
