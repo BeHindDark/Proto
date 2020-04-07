@@ -16,3 +16,7 @@ void UAnim_DB_Weapon_AnimInstance::AnimNotify_DownFireCheck()
 	*/
 	DownFireCheck.Broadcast();
 }
+void UAnim_DB_Weapon_AnimInstance::AnimNotify_AnimationEnd()
+{
+	AnimationEnd.Broadcast();
+}

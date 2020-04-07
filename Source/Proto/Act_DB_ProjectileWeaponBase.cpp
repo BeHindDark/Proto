@@ -29,6 +29,7 @@ AAct_DB_ProjectileWeaponBase::AAct_DB_ProjectileWeaponBase()
 		FireParticle = P_Fire.Object;
 	}
 
+
 }
 
 
@@ -46,14 +47,13 @@ void AAct_DB_ProjectileWeaponBase::BeginPlay()
 	/** 이펙트를 지정해줍니다.
 	*/
 
-
 	Mesh->SetRelativeRotation(FRotator(90, -90, 0));
 	FirstArrow->SetRelativeRotation(FRotator(90, 0, 0));
 	SecondArrow->SetRelativeRotation(FRotator(90, 0, 0));
 
+
 	
 }
-
 
 void AAct_DB_ProjectileWeaponBase::GetBlueprint(UArrowComponent* Arrow1, UArrowComponent* Arrow2, USceneComponent* EX_Muzzle_Location, USceneComponent* EX_Muzzle_Location2)
 {
