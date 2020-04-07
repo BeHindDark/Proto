@@ -17,25 +17,33 @@ APC_Login::APC_Login()
 void APC_Login::BeginPlay() {
 	Super::BeginPlay();
 
-	WG_Login_Ref = CreateWidget<UWG_Login>(this, WG_Login_Class);
+	if (IsLocalPlayerController())
+	{
+		if (WG_Login_Class)
+		{
+			WG_Login_Ref = CreateWidget<UWG_Login>(this, WG_Login_Class);
 
-	FInputModeUIOnly Mode;
-	Mode.SetWidgetToFocus(WG_Login_Ref->GetCachedWidget());
-	SetInputMode(Mode);
-	WG_Login_Ref->AddToViewport(0);
-	bShowMouseCursor = true;
+			FInputModeUIOnly Mode;
+			Mode.SetWidgetToFocus(WG_Login_Ref->GetCachedWidget());
+			SetInputMode(Mode);
+			WG_Login_Ref->AddToViewport(0);
+			bShowMouseCursor = true;
+		}
+	}
+
 }
 
 
 void APC_Login::OnLogin(FText ID, FText PW)
 {
-	// RequestLogin() 함수 일단 봉인 
-	// RequestLogin(ID.ToString(), PW.ToString());
-	
+	//RequestLogin() 함수 일단 봉인 
+	RequestLogin(ID.ToString(), PW.ToString());
+	/*
 	FActorSpawnParameters spawnparams;
 	spawnparams.Owner = this;
 	ALoginHttp* Login_Http = GetWorld()->SpawnActor<ALoginHttp>(FVector::ZeroVector, FRotator::ZeroRotator, spawnparams);
 	Login_Http->SendLoginRequest(ID.ToString(), PW.ToString());
+	*/
 }
 
 void APC_Login::OnJoin(FText ID, FText PW, FText PW2)
@@ -114,3 +122,6 @@ void APC_Login::ReceiveLoginResponse()
 	// MainMap으로 이동한다
 	UGameplayStatics::OpenLevel(this, "MainMap");
 }
+
+
+

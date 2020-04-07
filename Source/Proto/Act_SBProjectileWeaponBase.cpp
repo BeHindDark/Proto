@@ -70,7 +70,7 @@ void AAct_SBProjectileWeaponBase::UpFire()
 
 		if (World)
 		{
-			Anim->IsAttacking = true;		// AnimInstance의 IsAttacking 변수
+			// AnimInstance의 IsAttacking 변수
 			this->IsAttacking = true;		// 무기 Actor의   IsAttacking 변수
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;

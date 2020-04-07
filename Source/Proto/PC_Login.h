@@ -48,4 +48,17 @@ public:
 	void InitializeWidget();
 
 	void ReceiveLoginResponse();
+
+	/*
+public:
+	UFUNCTION(Client, Reliable, WithValidation)
+	void ClientReceiveLogin(const FString& message);
+	void ClientReceiveLogin_Implementation(const FString& message);
+	bool ClientReceiveLogin_Validate(const FString& message);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerReceiveLogin(const FString& message);
+	void ServerReceiveLogin_Implementation(const FString& message);
+	bool ServerReceiveLogin_Validate(const FString& message);
+	*/
 };

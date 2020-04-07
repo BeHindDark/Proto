@@ -79,7 +79,7 @@ private:
     void OnInputChatCommit(const FText& Input, ETextCommit::Type InCommitType);
 public:
 
-    void UpdateChatBox(const FString& message);
+    void UpdateChatBox(const FString& Username, const FString& message);
     
     void RedClicked();
     void BlueClicked();

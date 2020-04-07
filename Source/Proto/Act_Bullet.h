@@ -47,18 +47,23 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Bullet")
 	float Damage;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bullet")
+	FVector ProjectileVelocity;
+
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bullet|Tracer", meta = (AllowPrivateAccess = true))
 	FLinearColor TracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f);
 
 public:
-	UFUNCTION(BlueprintCallable)
 	/**	총알의 속도, 데미지, 색 등을 초기화 하고 발동시킵니다.
 	*	총알은 Spawn될 때 AActor* FActorSpawnParameters.Owner를 통해 자신을 발사한 무기의 정보를 얻습니다.
 	*	그리고 이 Initiallize에서 무기를 통해 WCS와 무기가 장착된 Actor, 그 무기의 Controller를 구합니다.
 	*	여기서 
 	*/
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation)
 	void InitializeBullet(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f,0.03f,0.0f,0.5f));
+	bool InitializeBullet_Validate(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
+	void InitializeBullet_Implementation(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
 
 	UFUNCTION( )
     void BeginOverlap(UPrimitiveComponent* OverlappedComponent, 
