@@ -17,18 +17,16 @@ void AAct_DB_ProjectileWeaponBase::PostInitializeComponents()
 AAct_DB_ProjectileWeaponBase::AAct_DB_ProjectileWeaponBase()
 {
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
-	Mesh->AddRelativeRotation(FRotator(90, -90, 0));
-	FireParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("EFFECT"));
-	FireParticle->SetupAttachment(RootComponent);
-
-	
-
+	FireParticle = CreateDefaultSubobject<UParticleSystem>(TEXT("FireEffectObject"));
+	EffectFire = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("FireSystem"));
+	FireSound = CreateDefaultSubobject<USoundBase>(TEXT("FireSound"));
+	MyAttenuation = CreateDefaultSubobject<USoundAttenuation>(TEXT("UAttenuationSettings"));
+	SoundConcurrency = CreateDefaultSubobject<USoundConcurrency>(TEXT("USoundConcurrency"));
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem>P_Fire(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
 	if (P_Fire.Succeeded())
 	{
-		FireParticle->SetTemplate(P_Fire.Object);
-		FireParticle->bAutoActivate = false;
+		FireParticle = P_Fire.Object;
 	}
 
 }
@@ -47,16 +45,23 @@ void AAct_DB_ProjectileWeaponBase::BeginPlay()
 	
 	/** 이펙트를 지정해줍니다.
 	*/
-	
+
+
+	Mesh->SetRelativeRotation(FRotator(90, -90, 0));
+	FirstArrow->SetRelativeRotation(FRotator(90, 0, 0));
+	SecondArrow->SetRelativeRotation(FRotator(90, 0, 0));
+
 	
 }
 
 
-void AAct_DB_ProjectileWeaponBase::GetBlueprint(UArrowComponent* Arrow1, UArrowComponent* Arrow2, USceneComponent* EX_Muzzle_Location)
+void AAct_DB_ProjectileWeaponBase::GetBlueprint(UArrowComponent* Arrow1, UArrowComponent* Arrow2, USceneComponent* EX_Muzzle_Location, USceneComponent* EX_Muzzle_Location2)
 {
 	FirstArrow = Arrow1;
 	SecondArrow = Arrow2;
 	ExMuzzle = EX_Muzzle_Location;
+	
+	ExMuzzle2 = EX_Muzzle_Location2;
 }
 
 void AAct_DB_ProjectileWeaponBase::UpFire()
@@ -78,7 +83,7 @@ void AAct_DB_ProjectileWeaponBase::UpFire()
 		//Barrel_End_1
 		UE_LOG(LogTemp, Warning, TEXT("if projectileClass is Execute"));
 		FVector Front = FirstArrow->GetComponentLocation();
-		FRotator Rotate = GetActorRotation();
+		FRotator Rotate = FirstArrow->GetComponentRotation();
 		UWorld* World = GetWorld();
 		if (World)
 		{
@@ -86,8 +91,12 @@ void AAct_DB_ProjectileWeaponBase::UpFire()
 			SpawnParams.Owner = this;
 			//SpawnParams.Instigator = this->Instigator;
 			AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
-			//FireParticle->Activate(true);
-			//FireParticle->OnSystemFinished.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::OnEffectFinished);
+			
+			if (FireParticle)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(World, FireParticle, Front)->AttachToComponent(FirstArrow,FAttachmentTransformRules::KeepRelativeTransform);
+				
+			}
 
 		}
 
@@ -102,11 +111,11 @@ void AAct_DB_ProjectileWeaponBase::DownFire()
 		CHECK_LOG(!IsValid(Anim));
 		return;
 	}
-	if (ProjectileClass&&ExMuzzle)
+	if (ProjectileClass)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("if projectileClass is Execute"));
 		FVector Front = SecondArrow->GetComponentLocation();
-		FRotator Rotate = GetActorRotation();
+		FRotator Rotate = SecondArrow->GetComponentRotation();
 		UWorld* World = GetWorld();
 		if (World)
 		{
@@ -114,17 +123,17 @@ void AAct_DB_ProjectileWeaponBase::DownFire()
 			SpawnParams.Owner = this;
 			//SpawnParams.Instigator = this->Instigator;
 			AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
-
+			if (FireParticle)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(World, FireParticle, Front)->AttachToComponent(SecondArrow,FAttachmentTransformRules::KeepRelativeTransform );
+				
+				
+			}
 		}
 
 	}
 
 }
-void AAct_DB_ProjectileWeaponBase::OnEffectFinished(class UParticleSystemComponent* PSystem)
-{
-	FireParticle->Activate(false);
-}
-
 void AAct_DB_ProjectileWeaponBase::AnimationEnd()
 {
 

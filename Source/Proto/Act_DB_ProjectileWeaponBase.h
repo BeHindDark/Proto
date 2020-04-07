@@ -40,7 +40,7 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon|Projectile|DB")
-	void GetArrowComponent(UArrowComponent* Arrow1, UArrowComponent* Arrow2);
+	void GetBlueprint(UArrowComponent* Arrow1, UArrowComponent* Arrow2, USceneComponent* EX_Muzzle_Location, USceneComponent* EX_Muzzle_Location2);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon|Projectile|DB")
 		void AnimationEnd();
@@ -64,16 +64,34 @@ public:
 	TSubclassOf<class AAct_Bullet> ProjectileClass;
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	FVector MuzzleOffset;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
 	/** 총구화염 이펙트를 저장해줄 파티클 시스템입니다.
 	*/
-	class UParticleSystemComponent* FireParticle;
+	class UParticleSystem* FireParticle;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
+		/** 총구화염 이펙트를 저장해줄 파티클 시스템입니다.
+		*/
+		class UParticleSystemComponent* EffectFire;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
+		/** 총알 사운드를 지정해줄 사운드컴포넌트입니다입니다
+		*/
+		class USoundBase* FireSound;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
+		/** 총알 사운드를 스폰할때 필요한 어세뉴션세팅입니다
+		*/
+		class USoundAttenuation* MyAttenuation;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
+		/** 총알 사운드를 스폰할때 필요한 컨쿼런시세팅입니다
+		*/
+		class USoundConcurrency* SoundConcurrency;
 
 	UFUNCTION()
-	void OnEffectFinished(class UParticleSystemComponent* PSystem);
 
 	void Attack();
 
@@ -84,11 +102,16 @@ public:
 		bool CanAttack = true;
 
 	UPROPERTY(Category = "Attack", EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
-		bool IsAttackEnd = false;
+		bool IsClicking = false;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
-		/** 총구화염 이펙트를 저장해줄 파티클 시스템입니다.
+		/** 총구의 정확한 위치를 받는 씬 컴포넌트입니다.
 		*/
 		USceneComponent* ExMuzzle;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
+		/** 총구의 정확한 위치를 받는 씬 컴포넌트입니다.
+		*/
+		USceneComponent* ExMuzzle2;
 
 };
