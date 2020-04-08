@@ -139,6 +139,14 @@ void AAct_Bullet::HitCheck(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 
 }
 
+bool AAct_Bullet::StopFX_Validate() {
+	return true;
+}
+
+void AAct_Bullet::StopFX_Implementation() {
+
+}
+
 void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	ProjectileMovement->StopMovementImmediately();
 
