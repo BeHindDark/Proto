@@ -47,7 +47,7 @@ AAct_Bullet::AAct_Bullet()
 
 	//충돌 콜리전 설정
 	BulletCollision->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
-	BulletCollision->OnComponentHit.AddDynamic(this, &AAct_Bullet::HitCheck);
+	//BulletCollision->OnComponentHit.AddDynamic(this, &AAct_Bullet::HitCheck);
 
 
 

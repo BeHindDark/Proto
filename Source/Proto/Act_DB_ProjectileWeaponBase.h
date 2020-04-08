@@ -76,22 +76,6 @@ public:
 		*/
 		class UParticleSystemComponent* EffectFire;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
-		/** 총알 사운드를 지정해줄 사운드컴포넌트입니다입니다
-		*/
-		class USoundBase* FireSound;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
-		/** 총알 사운드를 스폰할때 필요한 어세뉴션세팅입니다
-		*/
-		class USoundAttenuation* MyAttenuation;
-
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
-		/** 총알 사운드를 스폰할때 필요한 컨쿼런시세팅입니다
-		*/
-		class USoundConcurrency* SoundConcurrency;
-
 	UFUNCTION()
 
 	void Attack();

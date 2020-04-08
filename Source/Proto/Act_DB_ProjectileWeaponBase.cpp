@@ -19,10 +19,7 @@ AAct_DB_ProjectileWeaponBase::AAct_DB_ProjectileWeaponBase()
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	FireParticle = CreateDefaultSubobject<UParticleSystem>(TEXT("FireEffectObject"));
 	EffectFire = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("FireSystem"));
-	FireSound = CreateDefaultSubobject<USoundBase>(TEXT("FireSound"));
-	MyAttenuation = CreateDefaultSubobject<USoundAttenuation>(TEXT("UAttenuationSettings"));
-	SoundConcurrency = CreateDefaultSubobject<USoundConcurrency>(TEXT("USoundConcurrency"));
-
+	
 	static ConstructorHelpers::FObjectFinder<UParticleSystem>P_Fire(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
 	if (P_Fire.Succeeded())
 	{
@@ -67,11 +64,9 @@ void AAct_DB_ProjectileWeaponBase::GetBlueprint(UArrowComponent* Arrow1, UArrowC
 void AAct_DB_ProjectileWeaponBase::UpFire()
 {
 
-	UE_LOG(LogTemp, Warning, TEXT("UpFire is Execute"));
 	class UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
 	if (!IsValid(Anim)) {
 
-		UE_LOG(LogTemp, Warning, TEXT("if Anim is Execute"));
 		CHECK_LOG(!IsValid(Anim));
 		return;
 	}
@@ -81,7 +76,6 @@ void AAct_DB_ProjectileWeaponBase::UpFire()
 		//GameStatic->SpawnEmitterAttached(FireParticle, Mesh, FName("Barrel_End_1"));
 
 		//Barrel_End_1
-		UE_LOG(LogTemp, Warning, TEXT("if projectileClass is Execute"));
 		FVector Front = FirstArrow->GetComponentLocation();
 		FRotator Rotate = FirstArrow->GetComponentRotation();
 		UWorld* World = GetWorld();
