@@ -45,6 +45,12 @@ AAct_Bullet::AAct_Bullet()
 
 	//충돌설정 마저 해야함
 
+	//충돌 콜리전 설정
+	BulletCollision->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
+	BulletCollision->OnComponentHit.AddDynamic(this, &AAct_Bullet::HitCheck);
+
+
+
 	//본인을 발사한 액터 제외
 	BulletCollision->MoveIgnoreActors.Add(GetOwner());
 
@@ -124,12 +130,29 @@ void AAct_Bullet::InitializeBullet_Implementation(float InitialSpeed, float Weap
 	ProjectileMovement->SetVelocityInLocalSpace(FVector(InitialSpeed, 0.0f, 0.0f));
 	Damage = WeaponDamage;
 	ProjectileMovement->bAutoActivate = true;
+
+}
+
+void AAct_Bullet::HitCheck(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {
+	ProjectileMovement->StopMovementImmediately();
+
+
+}
+
+bool AAct_Bullet::StopFX_Validate() {
+	return true;
+}
+
+void AAct_Bullet::StopFX_Implementation() {
+
 }
 
 void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	ProjectileMovement->StopMovementImmediately();
 
 	//멀티캐스트 : 메쉬 및 예광탄 이펙트 끄기, 피격 이펙트 및 사운드 재생
+
+
 
 	//Instigator를 구하는 이 부분은 차라리 Weapon쪽으로 빼서 처리하는 게 나아보임.
 	//WeaponBase에 GetInstigator함수를 만들어서 AController를 구하게 하고
