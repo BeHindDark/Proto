@@ -5,7 +5,7 @@
 #include "Components/ArrowComponent.h"
 #include "Anim_DB_Weapon_AnimInstance.h"
 #include "Act_Bullet.h"
-
+#include "Oj_Build_Act.h"
 
 
 void AAct_DB_ProjectileWeaponBase::PostInitializeComponents()
@@ -29,7 +29,13 @@ AAct_DB_ProjectileWeaponBase::AAct_DB_ProjectileWeaponBase()
 		FireParticle = P_Fire.Object;
 	}
 
-
+	auto DefaultSetting = GetDefault<UOj_Build_Act>();
+	if (DefaultSetting->CharacterAssets.Num() > 0) {
+		for (auto CharacterAsset : DefaultSetting->CharacterAssets)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("CharacterAsset: %s"), *CharacterAsset.ToString());
+		}
+	}
 }
 
 
@@ -138,4 +144,25 @@ void AAct_DB_ProjectileWeaponBase::AnimationEnd()
 void AAct_DB_ProjectileWeaponBase::Attack()
 {
 	
+}
+
+void AAct_DB_ProjectileWeaponBase::ServerOnFireOrder()
+{
+	Super::ServerOnFireOrder();
+
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		return;
+	}
+	IsClicking = true;
+}
+
+void AAct_DB_ProjectileWeaponBase::ServerOnCeaseFireOrder()
+{
+	Super::ServerOnCeaseFireOrder();
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		return;
+	}
+	IsClicking = false;
 }

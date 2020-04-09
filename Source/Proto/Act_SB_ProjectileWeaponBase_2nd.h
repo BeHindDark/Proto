@@ -77,4 +77,8 @@ public:
 	UPROPERTY(Category = "Attack", EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
 		bool IsClicking = false;
 
+protected:
+	virtual void ServerOnFireOrder() override;
+
+	virtual void ServerOnCeaseFireOrder() override;
 };

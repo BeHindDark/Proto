@@ -56,7 +56,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon|Projectile|DB")
 	/** 아래 총열에서 총알을 발사하는 함수입니다.
 	*/
-
 	void DownFire();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)  // 발사체 클래스를 넣어준다.
@@ -72,31 +71,36 @@ public:
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
-		/** 총구화염 이펙트를 저장해줄 파티클 시스템입니다.
-		*/
-		class UParticleSystemComponent* EffectFire;
+	/** 총구화염 이펙트를 저장해줄 파티클 시스템입니다.
+	*/
+	class UParticleSystemComponent* EffectFire;
 
 	UFUNCTION()
 
 	void Attack();
 
 	UPROPERTY(Category = "Attack", EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
-		bool IsAttacking = false;
+	bool IsAttacking = false;
 
 	UPROPERTY(Category = "Attack", EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
-		bool CanAttack = true;
+	bool CanAttack = true;
 
 	UPROPERTY(Category = "Attack", EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = "true"))
-		bool IsClicking = false;
+	bool IsClicking = false;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
-		/** 총구의 정확한 위치를 받는 씬 컴포넌트입니다.
-		*/
-		USceneComponent* ExMuzzle;
+	/** 총구의 정확한 위치를 받는 씬 컴포넌트입니다.
+	*/
+	USceneComponent* ExMuzzle;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Projectile)
-		/** 총구의 정확한 위치를 받는 씬 컴포넌트입니다.
-		*/
-		USceneComponent* ExMuzzle2;
+	/** 총구의 정확한 위치를 받는 씬 컴포넌트입니다.
+	*/
+	USceneComponent* ExMuzzle2;
 
+
+protected:
+	virtual void ServerOnFireOrder() override;
+
+	virtual void ServerOnCeaseFireOrder() override;
 };

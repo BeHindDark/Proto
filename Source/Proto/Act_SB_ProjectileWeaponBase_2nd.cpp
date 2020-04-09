@@ -73,7 +73,7 @@ void AAct_SB_ProjectileWeaponBase_2nd::UpFire()
 			//this->IsAttacking = true;		// 무기 Actor의   IsAttacking 변수
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
-			SpawnParams.Instigator = this->Instigator;
+			//SpawnParams.Instigator = this->Instigator;
 			AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
 			if (FireParticle)
 			{
@@ -87,4 +87,25 @@ void AAct_SB_ProjectileWeaponBase_2nd::UpFire()
 void AAct_SB_ProjectileWeaponBase_2nd::AnimationEnd()
 {
 
+}
+
+void AAct_SB_ProjectileWeaponBase_2nd::ServerOnFireOrder()
+{
+	Super::ServerOnFireOrder();
+
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		return;
+	}
+	IsClicking = true;
+}
+
+void AAct_SB_ProjectileWeaponBase_2nd::ServerOnCeaseFireOrder()
+{
+	Super::ServerOnCeaseFireOrder();
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		return;
+	}
+	IsClicking = false;
 }
