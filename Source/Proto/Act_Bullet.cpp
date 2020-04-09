@@ -47,10 +47,8 @@ AAct_Bullet::AAct_Bullet()
 	//충돌설정 마저 해야함
 
 	//충돌 콜리전 설정
-	BulletCollision->SetSimulatePhysics(true);
-	BulletCollision->SetNotifyRigidBodyCollision(true);
-	BulletCollision->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
-	//BulletCollision->OnComponentHit.AddDynamic(this, &AAct_Bullet::HitCheck);
+	BulletCollision->SetCollisionProfileName(TEXT("Projectile"));
+	BulletCollision->OnComponentHit.AddDynamic(this, &AAct_Bullet::HitCheck);
 
 
 
