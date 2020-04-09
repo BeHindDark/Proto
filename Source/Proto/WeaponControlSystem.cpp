@@ -34,28 +34,33 @@ void UWeaponControlSystem::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// ...
 }
 
-bool UWeaponControlSystem::ActivateWeaponGroup(int WeaponGroupIndex)
+
+void UWeaponControlSystem::ActivateWeaponGroup_Implementation(int WeaponGroupIndex)
 {
 	if((WeaponGroupIndex>=0)&&(WeaponGroupArray.Num()>WeaponGroupIndex))
 	{
 		if(WeaponGroupArray[WeaponGroupIndex].Num()>0)
 		{
 			WeaponGroupSelector = WeaponGroupIndex;
-			return true;
+			return;
 		}
 		else
 		{
-			UE_LOG(Proto,Warning,TEXT("%s / %s : There is no registered Weapon in WeaponGroup(%d)."),*LINE_INFO,*GetNameSafe(GetOwner()), WeaponGroupIndex);
-			return false;
+			UE_LOG(Proto,Warning,TEXT("%s / %s : There is no registered Weapon in WeaponGroup(%d)."),*LINE_INFO,*GetNameSafe(GetOwner()),WeaponGroupIndex);
+			return;
 		}
-		
+
 	}
 	else
 	{
 		UE_LOG(Proto,Warning,TEXT("%s / %s : The Index is out of range. Fail to change active weapon group."),*LINE_INFO,*GetNameSafe(GetOwner()));
-		return false;
+		return;
 	}
-	
+}
+
+bool UWeaponControlSystem::ActivateWeaponGroup_Validate(int WeaponGroupIndex)
+{
+	return true;
 }
 
 
@@ -106,10 +111,14 @@ bool UWeaponControlSystem::SyncNewWeapon(AAct_WeaponBase * NewWeapon,int WeaponI
 	return true;
 }
 
-void UWeaponControlSystem::InitializeWeaponNumber(int NewWeaponNum)
+void UWeaponControlSystem::InitializeWeaponNumber(int32 NewWeaponNum)
 {
 	//WeaponDataArray와 WeaponGroupArray를 초기화 시키고, 해당 TArray에 메모리를 할당한다.
 	//Reserve로 미리 메모리 공간을 확보하여, Add 등으로 TArray의 크기가 변할때 공간이 부족하여 새로운 메모리를 할당하는 일이 없도록 방지한다.(최적화)
+	if(NewWeaponNum <=0)
+	{
+		NewWeaponNum = 1;
+	}
 	WeaponDataArray.Init(FWeaponData(), NewWeaponNum);
 	WeaponDataArray.Reserve(NewWeaponNum);
 	WeaponGroupArray.Init(TArray<int>(), NewWeaponNum);
