@@ -54,7 +54,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bullet|Tracer", meta = (AllowPrivateAccess = true))
 	FLinearColor TracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f);
 	
-	void HitCheck(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION()
+	void HitCheck(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
 public:
 	/**	총알의 속도, 데미지, 색 등을 초기화 하고 발동시킵니다.
