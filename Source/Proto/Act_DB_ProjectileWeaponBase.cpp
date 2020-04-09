@@ -149,7 +149,7 @@ void AAct_DB_ProjectileWeaponBase::Attack()
 void AAct_DB_ProjectileWeaponBase::ServerOnFireOrder()
 {
 	Super::ServerOnFireOrder();
-
+	
 	if (GetLocalRole() < ROLE_Authority)
 	{
 		return;
@@ -160,9 +160,10 @@ void AAct_DB_ProjectileWeaponBase::ServerOnFireOrder()
 void AAct_DB_ProjectileWeaponBase::ServerOnCeaseFireOrder()
 {
 	Super::ServerOnCeaseFireOrder();
+	IsClicking = false;
 	if (GetLocalRole() < ROLE_Authority)
 	{
 		return;
 	}
-	IsClicking = false;
+	
 }
