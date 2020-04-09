@@ -27,8 +27,12 @@ AAct_Bullet::AAct_Bullet()
 	BulletCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("BulletCollision"));
 	TracerFX = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("TracerFX"));
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
+	ExplodeAudio = CreateDefaultSubobject<USoundCue>(TEXT("ExplodeAudio"));
+	ExplodeFX = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ExplodeFX"));
 	
 	RootComponent = DefaultSceneRoot;
+
+	//static ConstructorHelpers::FObjectFinder<USoundCue> EXPLODE_FX(TEXT(""));
 
 	//총알 메쉬 설정
 	BulletMesh->SetupAttachment(RootComponent);
@@ -50,7 +54,14 @@ AAct_Bullet::AAct_Bullet()
 	BulletCollision->SetCollisionProfileName(TEXT("Projectile"));
 	BulletCollision->OnComponentHit.AddDynamic(this, &AAct_Bullet::HitCheck);
 
+	//폭발이펙트 설정
 
+	ExplodeFX->SetupAttachment(RootComponent);
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> EXPLODE_EFFECT(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
+	if (EXPLODE_EFFECT.Succeeded()) {
+		ExplodeFX->SetTemplate(EXPLODE_EFFECT.Object);
+		ExplodeFX->SetAutoActivate(false);
+	}
 
 	//본인을 발사한 액터 제외
 	BulletCollision->MoveIgnoreActors.Add(GetOwner());
@@ -145,6 +156,9 @@ void AAct_Bullet::HitCheck(UPrimitiveComponent* HitComponent, AActor* OtherActor
 		UGameplayStatics::ApplyDamage(OtherActor, Damage, PlayerController, this, UDamageType::StaticClass());
 	}
 
+	ExplodeFX->Activate(true);
+	BulletCollision->SetHiddenInGame(true, true);
+	SetActorEnableCollision(false);
 
 	Destroy();
 
