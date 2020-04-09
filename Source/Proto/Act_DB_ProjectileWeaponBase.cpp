@@ -19,7 +19,10 @@ AAct_DB_ProjectileWeaponBase::AAct_DB_ProjectileWeaponBase()
 	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	FireParticle = CreateDefaultSubobject<UParticleSystem>(TEXT("FireEffectObject"));
 	EffectFire = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("FireSystem"));
-	
+
+	Mesh->SetupAttachment(DefaultSceneRoot);
+	Mesh->SetRelativeRotation(FRotator(90, -90, 0));
+
 	static ConstructorHelpers::FObjectFinder<UParticleSystem>P_Fire(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
 	if (P_Fire.Succeeded())
 	{
@@ -37,16 +40,14 @@ void AAct_DB_ProjectileWeaponBase::BeginPlay()
 	//블루프린트에 애님인스턴스 추가해야함!
 
 	UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
-	Anim->UpFireCheck.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::UpFire);
-	Anim->DownFireCheck.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::DownFire);
-	Anim->AnimationEnd.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::AnimationEnd);
-	
+	if(IsValid(Anim)){
+		Anim->UpFireCheck.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::UpFire);
+		Anim->DownFireCheck.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::DownFire);
+		Anim->AnimationEnd.AddDynamic(this, &AAct_DB_ProjectileWeaponBase::AnimationEnd);
+	}
 	/** 이펙트를 지정해줍니다.
 	*/
 
-	Mesh->SetRelativeRotation(FRotator(90, -90, 0));
-	FirstArrow->SetRelativeRotation(FRotator(90, 0, 0));
-	SecondArrow->SetRelativeRotation(FRotator(90, 0, 0));
 
 
 	
