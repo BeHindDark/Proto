@@ -22,7 +22,6 @@ AAct_DB_ProjectileWeaponBase::AAct_DB_ProjectileWeaponBase()
 
 	Mesh->SetupAttachment(DefaultSceneRoot);
 	Mesh->SetRelativeRotation(FRotator(90, -90, 0));
-
 	static ConstructorHelpers::FObjectFinder<UParticleSystem>P_Fire(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
 	if (P_Fire.Succeeded())
 	{
