@@ -41,7 +41,7 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	}
 	
 
-	//WCS->SetIsReplicated(true);
+	WCS->SetIsReplicated(true);
 }
 
 void ACh_CarrierFactory::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -58,6 +58,7 @@ void ACh_CarrierFactory::BeginPlay()
 {
 	Super::BeginPlay();
 	UE_LOG(Proto,Warning,TEXT("BeginPlay"));
+	
 }
 
 void ACh_CarrierFactory::PossessedBy(AController* NewController) {
@@ -69,6 +70,7 @@ void ACh_CarrierFactory::PossessedBy(AController* NewController) {
 		}
 	}
 	UE_LOG(Proto, Warning, TEXT("Possessedby"));
+	
 }
 
 // Called every frame
