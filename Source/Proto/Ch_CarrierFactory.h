@@ -19,6 +19,8 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	virtual void PostInitializeComponents() override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -31,6 +33,11 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const override;
+
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spider|Movement")
+	float MoveInput = 0.0f;
 
 protected:
 
@@ -58,7 +65,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "Spider|Camera")
 	float CameraYawSpeed  = 120.0f;;
 
-	float MoveInput = 0.0f;
+
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spider|Movement")
 	float BodyYawSpeed = 0.3;
@@ -70,11 +78,13 @@ protected:
 	FVector AimLocation = FVector::ZeroVector;
 
 	APlayerController* PlayerController;
-
-	//void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const override;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spider|Movement")
 	float UpperBodyRotationSpeed = 140.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spider|WeaponControlSystem")
+	//무기를 장착가능한 슬롯의 수입니다. 블루프린트에서 초기값을 꼭 변경시켜야 합니다.
+	int32 WeaponSlotNum = 0;
 
 public:
 	UFUNCTION(Server,Reliable,WithValidation)

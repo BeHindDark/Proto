@@ -91,12 +91,12 @@ public:
 
 	//void AsyncWeapon(int WeaponIndex);
 
-	UFUNCTION(BlueprintCallable, Category = "Custom|WeaponControlSystem")
+	
 	/**	이 WCS이 다룰 무기의 개수를 설정하고 이에 맞게 WeaponArray, SocketArrowArray의 크기를 초기화합니다.
 	*	@param WeaponNum	이 WCS에 연결될 무기의 수입니다. 캐릭터로부터 받아옵니다.
 	*	@detail	미리 TArray의 크기를 초기화 함으로서 약간의 성능 향상 가능.
 	*/
-	void InitializeWeaponNumber(int NewWeaponNum);
+	void InitializeWeaponNumber(int32 NewWeaponNum);
 
 	UFUNCTION(BlueprintCallable, Category = "Custom|WeaponControlSystem")
 	/**	새로운 ArrowComponent를 SocketArrowArray에 추가합니다.

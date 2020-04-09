@@ -106,10 +106,14 @@ bool UWeaponControlSystem::SyncNewWeapon(AAct_WeaponBase * NewWeapon,int WeaponI
 	return true;
 }
 
-void UWeaponControlSystem::InitializeWeaponNumber(int NewWeaponNum)
+void UWeaponControlSystem::InitializeWeaponNumber(int32 NewWeaponNum)
 {
 	//WeaponDataArray와 WeaponGroupArray를 초기화 시키고, 해당 TArray에 메모리를 할당한다.
 	//Reserve로 미리 메모리 공간을 확보하여, Add 등으로 TArray의 크기가 변할때 공간이 부족하여 새로운 메모리를 할당하는 일이 없도록 방지한다.(최적화)
+	if(NewWeaponNum <=0)
+	{
+		NewWeaponNum = 1;
+	}
 	WeaponDataArray.Init(FWeaponData(), NewWeaponNum);
 	WeaponDataArray.Reserve(NewWeaponNum);
 	WeaponGroupArray.Init(TArray<int>(), NewWeaponNum);

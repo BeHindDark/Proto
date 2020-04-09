@@ -40,8 +40,10 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 		AimLocation = GetActorLocation() + 100.0f*GetActorForwardVector();
 	}
 	
-
 	WCS->SetIsReplicated(true);
+
+	
+	//OnTakeAnyDamage.AddDynamic(this, &ACh_CarrierFactory::함수);
 }
 
 void ACh_CarrierFactory::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -49,7 +51,6 @@ void ACh_CarrierFactory::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 	//변수 리플리케이션을 할 때 항상 삽입해야 하는 함수입니다.
 	//선언은 없이 정의부분만 넣어주면 됩니다.
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
 	DOREPLIFETIME(ACh_CarrierFactory, AimLocation);
 }
 
@@ -57,7 +58,6 @@ void ACh_CarrierFactory::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 void ACh_CarrierFactory::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(Proto,Warning,TEXT("BeginPlay"));
 	
 }
 
@@ -69,8 +69,13 @@ void ACh_CarrierFactory::PossessedBy(AController* NewController) {
 			bIsPlayerControlling = true;
 		}
 	}
-	UE_LOG(Proto, Warning, TEXT("Possessedby"));
 	
+}
+
+void ACh_CarrierFactory::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	WCS->InitializeWeaponNumber(WeaponSlotNum);
 }
 
 // Called every frame
