@@ -78,8 +78,10 @@ protected:
 	TArray<TArray<int>> WeaponGroupArray;
 	
 public:
-	UFUNCTION(BlueprintCallable, Category = "Custom|WeaponControlSystem")
-	bool ActivateWeaponGroup(int WeaponGroupIndex);
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "Custom|WeaponControlSystem")
+	void ActivateWeaponGroup(int WeaponGroupIndex);
+	void ActivateWeaponGroup_Implementation(int WeaponGroupIndex);
+	bool ActivateWeaponGroup_Validate(int WeaponGroupIndex);
 
 	UFUNCTION(BlueprintCallable,Category = "Custom|WeaponControlSystem")
 	/**	스폰되어 SocketArrow에 Attach까지 완료된 무기를 WCS과 연동시킵니다.

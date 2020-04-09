@@ -115,7 +115,32 @@ void ACh_CarrierFactory::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ACh_CarrierFactory::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ACh_CarrierFactory::MoveRight);
 	PlayerInputComponent->BindAxis(TEXT("TurnBody"), this, &ACh_CarrierFactory::TurnBody);
+	
+	
+	//무기 선택 액션 바인딩
+	//바인드할 입력 이름 설정
+	TArray<FName> WeaponGroupName = {FName(TEXT("WeaponGroup1")), FName(TEXT("WeaponGroup2")), FName(TEXT("WeaponGroup3"))};
+	for(int i=0; i<3; i++)
+	{
+		//바이드할 액션 이름과 키로 액션바인딩 생성
+		FInputActionBinding WeaponGroupActionBinding(WeaponGroupName[i],IE_Pressed);
 
+		//델리게이트 생성
+		FInputActionHandlerSignature WeaponGroupActionHandler;
+
+		//델리게이트에 함수 바인딩
+		WeaponGroupActionHandler.BindUFunction(this,FName("ChangeWeaponGroup"),i);
+
+		//액션바인딩에 델리게이트 설정
+		WeaponGroupActionBinding.ActionDelegate = WeaponGroupActionHandler;
+
+		//완성된 액션바인딩을 InputComponent에 추가
+		PlayerInputComponent->AddActionBinding(WeaponGroupActionBinding);
+	}
+	
+	PlayerInputComponent->BindAction(FName(TEXT("Fire")), IE_Pressed, this, &ACh_CarrierFactory::OnTriggerDown);
+	PlayerInputComponent->BindAction(FName(TEXT("Fire")), IE_Released, this, &ACh_CarrierFactory::OnTriggerUp);
+	
 }
 
 FVector ACh_CarrierFactory::CameraAimLocation(UCameraComponent* CurrentCamera) {
@@ -178,6 +203,52 @@ void ACh_CarrierFactory::TurnBody(float NewAxisValue)
 	AddControllerYawInput(NewAxisValue * BodyYawSpeed);
 }
 
+void ACh_CarrierFactory::ChangeWeaponGroup(int NewGroup)
+{
+	//IsLocallyControlled()
+	
+	if(NewGroup>=WeaponSlotNum)
+	{
+		UE_LOG(Proto,Warning,TEXT("%s / %s : The Index is out of range. Fail to change active weapon group."),*LINE_INFO,*GetNameSafe(this));
+		return;
+	}
+	if(!IsValid(WCS))
+	{
+		return;
+	}
+
+	WCS->ActivateWeaponGroup(NewGroup);
+}
+
+void ACh_CarrierFactory::OnTriggerDown_Implementation()
+{
+	if(GetLocalRole()<ROLE_Authority)
+	{
+		return;
+	}
+
+	WCS->SendFireOrder();
+}
+
+bool ACh_CarrierFactory::OnTriggerDown_Validate()
+{
+	return true;
+}
+
+void ACh_CarrierFactory::OnTriggerUp_Implementation()
+{
+	if(GetLocalRole()<ROLE_Authority)
+	{
+		return;
+	}
+
+	WCS->SendCeaseFireOrder();
+}
+
+bool ACh_CarrierFactory::OnTriggerUp_Validate()
+{
+	return true;
+}
 void ACh_CarrierFactory::SetWaistSceneComponent(USceneComponent * BlueprintWaistSceneComponent)
 {
 	WaistSceneComponent = BlueprintWaistSceneComponent;

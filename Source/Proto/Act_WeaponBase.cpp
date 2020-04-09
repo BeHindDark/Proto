@@ -65,6 +65,7 @@ void AAct_WeaponBase::ServerOnFireOrder()
 		return;
 	}
 	//이제 하위 무기에 맞게 오버라이드 하여 사용하면 됩니다.
+	UE_LOG(Proto,Warning,TEXT("%s / %s : FireOrder"),*LINE_INFO,*GetNameSafe(this));
 }
 
 void AAct_WeaponBase::ServerOnCeaseFireOrder()
@@ -74,6 +75,7 @@ void AAct_WeaponBase::ServerOnCeaseFireOrder()
 		return;
 	}
 	//이제 하위 무기에 맞게 오버라이드 하여 사용하면 됩니다.
+	UE_LOG(Proto,Warning,TEXT("%s / %s : CeaseFireOrder"),*LINE_INFO,*GetNameSafe(this));
 }
 
 void AAct_WeaponBase::ConnectWeaponControlSystem(UWeaponControlSystem * NewWeaponControlSystem,int NewWeaponIndex)

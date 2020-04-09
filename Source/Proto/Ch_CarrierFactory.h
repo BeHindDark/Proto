@@ -36,7 +36,7 @@ public:
 
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spider|Movement")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Spider|Movement")
 	float MoveInput = 0.0f;
 
 protected:
@@ -104,6 +104,19 @@ protected:
 	void MoveRight(float NewAxisValue);
 
 	void TurnBody(float NewAxisValue);
+
+	UFUNCTION()
+	void ChangeWeaponGroup(int NewGroup);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void OnTriggerDown();
+	void OnTriggerDown_Implementation();
+	bool OnTriggerDown_Validate();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void OnTriggerUp();
+	void OnTriggerUp_Implementation();
+	bool OnTriggerUp_Validate();
 
 	UFUNCTION(BlueprintCallable)
 	void SetWaistSceneComponent(USceneComponent* BlueprintWaistSceneComponent);

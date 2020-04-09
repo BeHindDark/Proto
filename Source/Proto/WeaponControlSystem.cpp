@@ -34,28 +34,33 @@ void UWeaponControlSystem::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// ...
 }
 
-bool UWeaponControlSystem::ActivateWeaponGroup(int WeaponGroupIndex)
+
+void UWeaponControlSystem::ActivateWeaponGroup_Implementation(int WeaponGroupIndex)
 {
 	if((WeaponGroupIndex>=0)&&(WeaponGroupArray.Num()>WeaponGroupIndex))
 	{
 		if(WeaponGroupArray[WeaponGroupIndex].Num()>0)
 		{
 			WeaponGroupSelector = WeaponGroupIndex;
-			return true;
+			return;
 		}
 		else
 		{
-			UE_LOG(Proto,Warning,TEXT("%s / %s : There is no registered Weapon in WeaponGroup(%d)."),*LINE_INFO,*GetNameSafe(GetOwner()), WeaponGroupIndex);
-			return false;
+			UE_LOG(Proto,Warning,TEXT("%s / %s : There is no registered Weapon in WeaponGroup(%d)."),*LINE_INFO,*GetNameSafe(GetOwner()),WeaponGroupIndex);
+			return;
 		}
-		
+
 	}
 	else
 	{
 		UE_LOG(Proto,Warning,TEXT("%s / %s : The Index is out of range. Fail to change active weapon group."),*LINE_INFO,*GetNameSafe(GetOwner()));
-		return false;
+		return;
 	}
-	
+}
+
+bool UWeaponControlSystem::ActivateWeaponGroup_Validate(int WeaponGroupIndex)
+{
+	return true;
 }
 
 
