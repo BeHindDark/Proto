@@ -4,17 +4,26 @@
 #include "Act_ProjectileWeaponBase.h"
 #include "WeaponControlSystem.h"
 #include "Components/ArrowComponent.h"
+#include "Act_Bullet.h"
 
 AAct_ProjectileWeaponBase::AAct_ProjectileWeaponBase()
 {
+	WeaponSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
+	MuzzleFrameParticle = CreateDefaultSubobject<UParticleSystem>(TEXT("MuzzleFrameParticleSystem"));
 
+	WeaponSkeletalMesh->SetupAttachment(DefaultSceneRoot);
+	WeaponSkeletalMesh->SetRelativeRotation(FRotator(90,-90,0));
+}
+
+void AAct_ProjectileWeaponBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AAct_ProjectileWeaponBase,IsTriggerOn);
 }
 
 void AAct_ProjectileWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	
 }
 
 void AAct_ProjectileWeaponBase::Tick(float DeltaTime)
@@ -123,3 +132,44 @@ void AAct_ProjectileWeaponBase::TurnTowardProjectileAim(float DeltaTime)
 		SetActorRelativeRotation(NewRelativeRotation);
 	}
 }
+
+void AAct_ProjectileWeaponBase::SpawnBulletInServer(FVector MuzzleLocation, FRotator LaunchRotation)
+{
+	if(GetLocalRole()<ROLE_Authority)
+	{
+		return;
+	}
+	if(GetWorld())
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		//SpawnParams.Instigator = this->Instigator;
+		AAct_Bullet* Bullet = GetWorld()->SpawnActor<AAct_Bullet>(AAct_Bullet::StaticClass(), MuzzleLocation, LaunchRotation, SpawnParams);
+		if(IsValid(InstigatorController))
+		{
+			Bullet->SetInstigator(Cast<APawn>(InstigatorController));
+			//initializebullet
+		}
+		else
+		{
+			Bullet->InitializeBullet(LaunchSpeed, Damage*DamageMultiplier, TracerColor);
+		}
+	}
+}
+
+void AAct_ProjectileWeaponBase::MulticastFireFX_Implementation(UArrowComponent* MuzzleArrow)
+{
+	if(GetWorld())
+	{
+		if(IsValid(MuzzleFrameParticle))
+		{
+			if(IsValid(MuzzleArrow))
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),MuzzleFrameParticle,MuzzleArrow->GetComponentLocation())
+					->AttachToComponent(MuzzleArrow,FAttachmentTransformRules::KeepRelativeTransform);
+			}
+
+		}
+	}
+}
+

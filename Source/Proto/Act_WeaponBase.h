@@ -60,6 +60,15 @@ public:
 	*/
 	int WeaponIndex = -1;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon|WeaponControlSystem")
+	/**	실제로 무기를 다루는 PlayerController, 또는 AIController입니다.
+	*	Controller가 OwningPawn에 Possess할 될 떄 값을 전달합니다.
+	*/
+	AController* InstigatorController = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon|WeaponControlSystem")
+	APawn* OwningPawn = nullptr;
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = true))
 	USceneComponent* DefaultSceneRoot;

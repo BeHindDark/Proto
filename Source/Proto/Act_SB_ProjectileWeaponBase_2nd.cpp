@@ -9,85 +9,36 @@
 
 AAct_SB_ProjectileWeaponBase_2nd::AAct_SB_ProjectileWeaponBase_2nd()
 {
-	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
-	FireParticle = CreateDefaultSubobject<UParticleSystem>(TEXT("FireEffectObject"));
-	EffectFire = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("FireSystem"));
-	
-	Mesh->SetupAttachment(DefaultSceneRoot);
+}
 
-	Mesh->SetRelativeRotation(FRotator(90, -90, 0));
-
-	static ConstructorHelpers::FObjectFinder<UParticleSystem>P_Fire(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
-	if (P_Fire.Succeeded())
+void AAct_SB_ProjectileWeaponBase_2nd::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(WeaponSkeletalMesh->GetAnimInstance());
+	if(IsValid(Anim))
 	{
-		FireParticle = P_Fire.Object;
+		Anim->UpFireCheck.AddDynamic(this,&AAct_SB_ProjectileWeaponBase_2nd::SBFire);
 	}
-
 }
 
 void AAct_SB_ProjectileWeaponBase_2nd::BeginPlay()
 {
-
 	Super::BeginPlay();
-	
-	UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
-	if (IsValid(Anim))
+}
+
+
+void AAct_SB_ProjectileWeaponBase_2nd::SBFire()
+{
+	if(GetLocalRole()<ROLE_Authority)
 	{
-		Anim->UpFireCheck.AddDynamic(this, &AAct_SB_ProjectileWeaponBase_2nd::UpFire);
-		Anim->AnimationEnd.AddDynamic(this, &AAct_SB_ProjectileWeaponBase_2nd::AnimationEnd);
-	}
-	
-}
-void AAct_SB_ProjectileWeaponBase_2nd::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-}
-
-void AAct_SB_ProjectileWeaponBase_2nd::GetArrowComponent_SB(UArrowComponent* Arrow1USceneComponent, USceneComponent* EX_Muzzle_Location)
-{
-	FirstArrow = Arrow1USceneComponent;
-	ExMuzzle = EX_Muzzle_Location;
-
-}
-
-
-void AAct_SB_ProjectileWeaponBase_2nd::UpFire()
-{
-	class UAnim_DB_Weapon_AnimInstance* Anim = Cast<UAnim_DB_Weapon_AnimInstance>(Mesh->GetAnimInstance());
-
-	if (!IsValid(Anim)) {
-		CHECK_LOG(!IsValid(Anim));
 		return;
 	}
-
-	if (ProjectileClass)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("If projectileClass is Execute."));
-		FVector Front = FirstArrow->GetComponentLocation();
-		FRotator Rotate = FirstArrow->GetComponentRotation();
-		UWorld* World = GetWorld();
-
-		if (World)
-		{
-			// AnimInstance의 IsAttacking 변수
-			//this->IsAttacking = true;		// 무기 Actor의   IsAttacking 변수
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-			//SpawnParams.Instigator = this->Instigator;
-			AAct_Bullet* Bullet = World->SpawnActor<AAct_Bullet>(ProjectileClass, Front, Rotate, SpawnParams);
-			if (FireParticle)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(World, FireParticle, Front)->AttachToComponent(FirstArrow, FAttachmentTransformRules::KeepRelativeTransform);
-
-			}
-		}
-	}
+	FVector MuzzleLocation = SingleMuzzleArrow->GetComponentLocation();
+	FRotator LaunchDirection = GetActorRotation();
+	SpawnBulletInServer(MuzzleLocation,LaunchDirection);
+	MulticastFireFX(SingleMuzzleArrow);
 }
 
-void AAct_SB_ProjectileWeaponBase_2nd::AnimationEnd()
-{
-
-}
 
 void AAct_SB_ProjectileWeaponBase_2nd::ServerOnFireOrder()
 {
@@ -97,7 +48,7 @@ void AAct_SB_ProjectileWeaponBase_2nd::ServerOnFireOrder()
 	{
 		return;
 	}
-	IsClicking = true;
+	IsTriggerOn = true;
 }
 
 void AAct_SB_ProjectileWeaponBase_2nd::ServerOnCeaseFireOrder()
@@ -107,5 +58,5 @@ void AAct_SB_ProjectileWeaponBase_2nd::ServerOnCeaseFireOrder()
 	{
 		return;
 	}
-	IsClicking = false;
+	IsTriggerOn  = false;
 }
