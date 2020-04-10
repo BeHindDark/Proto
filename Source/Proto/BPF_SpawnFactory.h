@@ -18,11 +18,12 @@ public:
 	UBPF_SpawnFactory(const FObjectInitializer& ObjectInitializer);
 
 	UFUNCTION(BlueprintCallable)
-	static class ACh_SpiderBase* SpawnSpider(UWorld* World, int32 CharacterClassIndex, FVector Location, FRotator Rotation, AActor* Owner);
+	static class ACh_SpiderBase* SpawnSpider( int32 CharacterClassIndex, FVector Location, FRotator Rotation, AActor* Owner);
 
 	UFUNCTION(BlueprintCallable)
-	static class AAct_WeaponBase* SpawnWeapon(UWorld* World, int32 WeaponClassIndex, FVector Location, FRotator Rotation, AActor* Owner);
+	static class AAct_WeaponBase* SpawnWeapon( int32 WeaponClassIndex, FVector Location, FRotator Rotation, AActor* Owner);
 	//static으로 만들어야하나 계속 에러먹어서안됨
+
 
 	UPROPERTY(BlueprintReadOnly)
 	bool IsInitialized;
