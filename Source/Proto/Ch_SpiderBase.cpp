@@ -65,9 +65,12 @@ void ACh_SpiderBase::BeginPlay()
 
 void ACh_SpiderBase::PossessedBy(AController* NewController) {
 	Super::PossessedBy(NewController);
-	if(IsPlayerControlled()) {
-		PlayerController = Cast<APlayerController>(GetController());
-		if(PlayerController != nullptr) {
+
+	if(IsPlayerControlled())
+	{
+		PlayerController = Cast<APlayerController>(NewController);
+		if(PlayerController != nullptr)
+		{
 			bIsPlayerControlling = true;
 		}
 	}
@@ -83,24 +86,31 @@ void ACh_SpiderBase::PostInitializeComponents()
 void ACh_SpiderBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	Super::Tick(DeltaTime);
-
-	if(bIsPlayerControlling)
+	
+	if(IsPlayerControlled())
 	{
-		if(GetController()->IsLocalPlayerController())
+		
+		if(IsValid(GetController()))
 		{
-			if(Camera != nullptr)
+			if(GetController()->IsLocalController())
 			{
-				Camera->AddRelativeRotation(FRotator(CameraPitchMovement * DeltaTime,0.0f,0.0f));
+				if(Camera != nullptr)
+				{
+					Camera->AddRelativeRotation(FRotator(CameraPitchMovement * DeltaTime,0.0f,0.0f));
+				}
+				if(SpringArm != nullptr)
+				{
+					SpringArm->AddRelativeRotation(FRotator(0.0f,CameraYawMovement * DeltaTime,0.0f));
+				}
+				FVector NewLocalAim = CameraAimLocation(Camera);
+				ServerNetTick(NewLocalAim,DeltaTime);
 			}
-			if(SpringArm != nullptr)
-			{
-				SpringArm->AddRelativeRotation(FRotator(0.0f,CameraYawMovement * DeltaTime,0.0f));
-			}
-			FVector NewLocalAim = CameraAimLocation(Camera);
-			ServerNetTick(NewLocalAim,DeltaTime);
+			
 		}
+	}
+	if(IsValid(WaistSceneComponent))
+	{
+		TurnUpperBody(WaistSceneComponent,DeltaTime);
 	}
 }
 
@@ -261,10 +271,7 @@ void ACh_SpiderBase::ServerNetTick_Implementation(FVector CameraAim,float Deltat
 	}
 	AimLocation = CameraAim;
 	WCS->TargetWorldLocation = AimLocation;
-	if(IsValid(WaistSceneComponent))
-	{
-		TurnUpperBody(WaistSceneComponent,Deltatime);
-	}
+	
 }
 
 bool ACh_SpiderBase::ServerNetTick_Validate(FVector CameraAim,float Deltatime)

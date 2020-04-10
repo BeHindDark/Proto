@@ -22,6 +22,7 @@ void AAct_DB_ProjectileWeaponBase::PostInitializeComponents()
 		Anim->UpFireCheck.AddDynamic(this,&AAct_DB_ProjectileWeaponBase::UpFire);
 		Anim->DownFireCheck.AddDynamic(this,&AAct_DB_ProjectileWeaponBase::DownFire);
 	}
+	
 }
 
 void AAct_DB_ProjectileWeaponBase::BeginPlay()
