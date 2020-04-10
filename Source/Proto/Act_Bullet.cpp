@@ -144,14 +144,17 @@ bool AAct_Bullet::InitializeBullet_Validate(AController* InputPlayerController, 
 void AAct_Bullet::InitializeBullet_Implementation(AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
 	ProjectileMovement->SetVelocityInLocalSpace(FVector(InitialSpeed, 0.0f, 0.0f));
 	Damage = WeaponDamage;
-	ProjectileMovement->Activate();
 	DamageInstigatorPlayer = InputPlayerController;
 	BulletCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	if(!TracerColor.Equals(NewTracerColor, 0.000001f))
 	{
 		TracerColor = NewTracerColor;
 	}
-	//TracerFX->GetMaterial(0)->OverrideVectorParameterDefault(FMaterialParameterInfo(FName(TEXT(""
+	UMaterialInstanceDynamic* MaterialInstance = TracerFX->CreateDynamicMaterialInstance(0);
+	MaterialInstance->SetVectorParameterValue(FName(TEXT("TracerBaseColor")), TracerColor);
+	TracerFX->SetMaterial(0, MaterialInstance);
+	TracerFX->Activate();
+	ProjectileMovement->Activate();
 }
 
 void AAct_Bullet::HitCheck(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit) {

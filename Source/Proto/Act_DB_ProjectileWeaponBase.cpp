@@ -44,6 +44,7 @@ void AAct_DB_ProjectileWeaponBase::UpFire()
 	}
 	FVector MuzzleLocation = UpperArrow->GetComponentLocation();
 	FRotator LaunchDirection = GetActorRotation();
+	
 	SpawnBulletInServer(MuzzleLocation,LaunchDirection);
 	MulticastFireFX(UpperArrow);
 }
