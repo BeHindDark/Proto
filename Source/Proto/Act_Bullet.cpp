@@ -54,7 +54,7 @@ AAct_Bullet::AAct_Bullet()
 
 	//충돌 콜리전 설정
 	BulletCollision->SetCollisionProfileName(TEXT("Projectile"));
-	BulletCollision->OnComponentHit.AddDynamic(this, &AAct_Bullet::HitCheck);
+	//BulletCollision->OnComponentHit.AddDynamic(this, &AAct_Bullet::HitCheck);
 
 	//폭발이펙트 설정
 
@@ -82,7 +82,7 @@ AAct_Bullet::AAct_Bullet()
 				}
 			}
 		}
-		
+		/*
 		//캐릭터로부터 플레이어컨트롤러를 받아온다.
 		APawn* WeaponOwner = Cast<APawn>(Weapon->GetWeaponControlSystem()->GetOwner());
 		if(IsValid(WeaponOwner))
@@ -95,7 +95,7 @@ AAct_Bullet::AAct_Bullet()
 				DamageInstigatorPlayer = WeaponOwner->GetController();
 			}
 		}
-		
+		*/
 	}	
 
 	BulletCollision->SetGenerateOverlapEvents(false);
@@ -156,10 +156,8 @@ void AAct_Bullet::HitCheck(UPrimitiveComponent* HitComponent, AActor* OtherActor
 	if (OtherActor != nullptr && OtherActor != this && OtherComponent != nullptr) {
 		GEngine->AddOnScreenDebugMessage(10, 5.0f, FColor::Red, FString::Printf(TEXT("Hit Component : %s"), *OtherActor->GetName()));
 
-		APlayerController* const PlayerController = Cast<APlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
-
 		ProjectileMovement->StopMovementImmediately();
-		UGameplayStatics::ApplyDamage(OtherActor, Damage, PlayerController, this, UDamageType::StaticClass());
+		UGameplayStatics::ApplyDamage(OtherActor, Damage, DamageInstigatorPlayer, this, UDamageType::StaticClass());
 	}
 
 	ExplodeFX->Activate(true);
@@ -179,41 +177,21 @@ void AAct_Bullet::StopFX_Implementation(UParticleSystemComponent* PSystem) {
 	Destroy();
 }
 
-void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
+void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	ProjectileMovement->StopMovementImmediately();
 
-	//멀티캐스트 : 메쉬 및 예광탄 이펙트 끄기, 피격 이펙트 및 사운드 재생
-	//액터 Destroy를 시키면 예광탄 이펙트도 같이 꺼질텐데 굳이... 이걸 멀티캐스트 함수를 써서 해야되나 의문입니다..
+	if (OtherActor != nullptr && OtherActor != this && OtherComponent != nullptr) {
+		GEngine->AddOnScreenDebugMessage(10, 5.0f, FColor::Red, FString::Printf(TEXT("Hit Component : %s"), *OtherActor->GetName()));
 
-
-
-	//Instigator를 구하는 이 부분은 차라리 Weapon쪽으로 빼서 처리하는 게 나아보임.
-	//WeaponBase에 GetInstigator함수를 만들어서 AController를 구하게 하고
-	//스폰 시 변수로 넘겨주는게 나아보임.
-	//왜냐면 총알이 명중했을 떄 이미 주인이 죽었을 가능... 성도 있으니까?
-	
-	AAct_WeaponBase* Weapon = Cast<AAct_WeaponBase>(GetOwner());
-	if(!IsValid(Weapon))
-	{
-		CHECK_LOG(!IsValid(Weapon));
-		return;
+		ProjectileMovement->StopMovementImmediately();
+		UGameplayStatics::ApplyDamage(OtherActor, Damage, DamageInstigatorPlayer, this, UDamageType::StaticClass());
 	}
 
-	APawn* WeaponOwenr = Cast<APawn>(Weapon->GetWeaponControlSystem()->GetOwner());
-	if(!IsValid(WeaponOwenr))
-	{
-		CHECK_LOG(!IsValid(WeaponOwner));
-		return;
-	}
+	ExplodeFX->Activate(true);
+	BulletCollision->SetHiddenInGame(true, true);
+	SetActorEnableCollision(false);
 
-	AController* BulletInstigator = Cast<AController>(WeaponOwenr->GetController());
-	if(!IsValid(BulletInstigator))
-	{
-		CHECK_LOG(!IsValid(WeaponOwner));
-		return;
-	}
-	UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetVelocity(), SweepResult, BulletInstigator, GetOwner(),UDamageType::StaticClass());
-	//UGameplayStatics::ApplyDamage(OtherActor, Damage, Instigator, GetOwner(), UDamageType::StaticClass());
+	ExplodeFX->OnSystemFinished.AddDynamic(this, &AAct_Bullet::StopFX);
 	
 }
 
