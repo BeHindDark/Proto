@@ -3,6 +3,7 @@
 
 #include "GI_Proto.h"
 #include "OJ_Webconnect.h"
+#include "BPF_SpawnFactory.h"
 
 UGI_Proto::UGI_Proto(const FObjectInitializer& ObjectInitializer) {
 	// 초기화
@@ -15,6 +16,7 @@ UGI_Proto::UGI_Proto(const FObjectInitializer& ObjectInitializer) {
 	OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &UGI_Proto::OnFindSessionsComplete);
 	OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Proto::OnJoinSessionComplete);
 	OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Proto::OnDestroySessionComplete);
+	UBPF_SpawnFactory::Initialize();
 }
 
 void UGI_Proto::Init()
