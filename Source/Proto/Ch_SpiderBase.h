@@ -3,19 +3,17 @@
 #pragma once
 
 #include "Proto.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
-#include "Ch_CarrierFactory.generated.h"
+#include "Ch_SpiderBase.generated.h"
 
 UCLASS()
-class PROTO_API ACh_CarrierFactory : public ACharacter
+class PROTO_API ACh_SpiderBase : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	ACh_CarrierFactory();
+	ACh_SpiderBase();
 
 	virtual void PossessedBy(AController* NewController) override;
 
