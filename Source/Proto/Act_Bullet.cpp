@@ -178,20 +178,19 @@ void AAct_Bullet::StopFX_Implementation(UParticleSystemComponent* PSystem) {
 }
 
 void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
-	ProjectileMovement->StopMovementImmediately();
 
 	if (OtherActor != nullptr && OtherActor != this && OtherComponent != nullptr) {
 		GEngine->AddOnScreenDebugMessage(10, 5.0f, FColor::Red, FString::Printf(TEXT("Hit Component : %s"), *OtherActor->GetName()));
 
 		ProjectileMovement->StopMovementImmediately();
 		UGameplayStatics::ApplyDamage(OtherActor, Damage, DamageInstigatorPlayer, this, UDamageType::StaticClass());
+
+		ExplodeFX->Activate(true);
+		BulletCollision->SetHiddenInGame(true, true);
+		SetActorEnableCollision(false);
+
+		ExplodeFX->OnSystemFinished.AddDynamic(this, &AAct_Bullet::StopFX);
 	}
-
-	ExplodeFX->Activate(true);
-	BulletCollision->SetHiddenInGame(true, true);
-	SetActorEnableCollision(false);
-
-	ExplodeFX->OnSystemFinished.AddDynamic(this, &AAct_Bullet::StopFX);
 	
 }
 
