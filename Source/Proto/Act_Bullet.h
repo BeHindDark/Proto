@@ -87,7 +87,7 @@ public:
 	UFUNCTION( )
     void BeginOverlap(UPrimitiveComponent* OverlappedComponent, 
                       AActor* OtherActor, 
-                      UPrimitiveComponent* OtherComp, 
+                      UPrimitiveComponent* OtherComponent, 
                       int32 OtherBodyIndex, 
                       bool bFromSweep, 
                       const FHitResult &SweepResult );
