@@ -32,6 +32,8 @@ AAct_Bullet::AAct_Bullet()
 	
 	RootComponent = DefaultSceneRoot;
 
+	SpanTime = 10;
+
 	//static ConstructorHelpers::FObjectFinder<USoundCue> EXPLODE_FX(TEXT(""));
 
 	//총알 메쉬 설정
@@ -93,10 +95,7 @@ AAct_Bullet::AAct_Bullet()
 				DamageInstigatorPlayer = WeaponOwner->GetController();
 			}
 		}
-	}
-	
-	
-	
+	}	
 
 	BulletCollision->SetGenerateOverlapEvents(false);
 	BulletCollision->OnComponentBeginOverlap.AddDynamic(this, &AAct_Bullet::BeginOverlap);
@@ -115,6 +114,8 @@ AAct_Bullet::AAct_Bullet()
 	ProjectileMovement->MaxSpeed = 30000.0f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bAutoActivate = false;
+
+
 	
 }
 
@@ -124,7 +125,9 @@ void AAct_Bullet::BeginPlay()
 	Super::BeginPlay();
 
 	ProjectileMovement->Velocity = ProjectileVelocity;
-	
+
+	//총알액터 수명설정
+	SetLifeSpan(SpanTime);
 }
 
 // Called every frame
@@ -160,16 +163,17 @@ void AAct_Bullet::HitCheck(UPrimitiveComponent* HitComponent, AActor* OtherActor
 	BulletCollision->SetHiddenInGame(true, true);
 	SetActorEnableCollision(false);
 
-	Destroy();
+	ExplodeFX->OnSystemFinished.AddDynamic(this, &AAct_Bullet::StopFX);
+
 
 }
 
-bool AAct_Bullet::StopFX_Validate() {
+bool AAct_Bullet::StopFX_Validate(UParticleSystemComponent* PSystem) {
 	return true;
 }
 
-void AAct_Bullet::StopFX_Implementation() {
-
+void AAct_Bullet::StopFX_Implementation(UParticleSystemComponent* PSystem) {
+	Destroy();
 }
 
 void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {

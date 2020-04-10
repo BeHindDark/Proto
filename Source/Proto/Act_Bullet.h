@@ -69,15 +69,19 @@ public:
 	*	그리고 이 Initiallize에서 무기를 통해 WCS와 무기가 장착된 Actor, 그 무기의 Controller를 구합니다.
 	*	여기서 
 	*/
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "")
+	float SpanTime;
+
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation)
 	void InitializeBullet(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f,0.03f,0.0f,0.5f));
 	bool InitializeBullet_Validate(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
 	void InitializeBullet_Implementation(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
 
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
-	void StopFX();
-	bool StopFX_Validate();
-	void StopFX_Implementation();
+	void StopFX(UParticleSystemComponent* PSystem);
+	bool StopFX_Validate(UParticleSystemComponent* PSystem);
+	void StopFX_Implementation(UParticleSystemComponent* PSystem);
 
 
 	UFUNCTION( )
