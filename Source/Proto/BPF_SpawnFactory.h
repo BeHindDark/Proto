@@ -17,18 +17,25 @@ class PROTO_API UBPF_SpawnFactory : public UBlueprintFunctionLibrary
 public:
 	UBPF_SpawnFactory(const FObjectInitializer& ObjectInitializer);
 
+	UFUNCTION(BlueprintCallable)
+	static class ACh_SpiderBase* SpawnSpider(UWorld* World, int32 CharacterClassIndex, FVector Location, FRotator Rotation, AActor* Owner);
 
-	 class ACh_SpiderBase* SpawnSpider(int32 CharacterClassIndex, FVector Location, FRotator Rotation, AActor* Owner);
-	 class AAct_WeaponBase* SpawnWeapon(int32 WeaponClassIndex, FVector Location, FRotator Rotation, AActor* Owner);
-	 //static으로 만들어야하나 계속 에러먹어서안됨
-	 bool IsInitialized;
+	UFUNCTION(BlueprintCallable)
+	static class AAct_WeaponBase* SpawnWeapon(UWorld* World, int32 WeaponClassIndex, FVector Location, FRotator Rotation, AActor* Owner);
+	//static으로 만들어야하나 계속 에러먹어서안됨
+
+	UPROPERTY(BlueprintReadOnly)
+	bool IsInitialized;
 
 protected:
 
 
-	 TArray<TSubclassOf<class AAct_WeaponBase>> WeaponArray;
+	static TArray<TSubclassOf<class AAct_WeaponBase>> WeaponArray ;
 
-	 TArray<TSubclassOf<class ACh_SpiderBase>> CharacterArray;
+	static TArray<TSubclassOf<class ACh_SpiderBase>> CharacterArray ;
 	 //마찬가지로 스태틱으로 해야됨
+	
 
 };
+
+
