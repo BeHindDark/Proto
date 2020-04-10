@@ -14,7 +14,7 @@ class PROTO_API UWG_InGame_Game : public UUserWidget
 {
 	GENERATED_BODY()
 	
-
+public:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* UserIDText;
 
