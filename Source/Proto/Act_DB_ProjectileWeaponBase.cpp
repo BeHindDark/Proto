@@ -5,7 +5,6 @@
 #include "Components/ArrowComponent.h"
 #include "Anim_DB_Weapon_AnimInstance.h"
 #include "Act_Bullet.h"
-#include "Oj_Build_Act.h"
 
 
 AAct_DB_ProjectileWeaponBase::AAct_DB_ProjectileWeaponBase()
@@ -22,6 +21,7 @@ void AAct_DB_ProjectileWeaponBase::PostInitializeComponents()
 		Anim->UpFireCheck.AddDynamic(this,&AAct_DB_ProjectileWeaponBase::UpFire);
 		Anim->DownFireCheck.AddDynamic(this,&AAct_DB_ProjectileWeaponBase::DownFire);
 	}
+	
 }
 
 void AAct_DB_ProjectileWeaponBase::BeginPlay()

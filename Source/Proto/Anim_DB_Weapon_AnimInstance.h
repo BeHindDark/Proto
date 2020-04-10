@@ -30,6 +30,8 @@ public:
 	*/
 	FAnimationEndDelegate AnimationEnd;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class AAct_ProjectileWeaponBase* Weapon;
 
 private:
 	UFUNCTION()
