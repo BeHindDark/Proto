@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Act_Bullet.h"
@@ -17,7 +17,7 @@ AAct_Bullet::AAct_Bullet()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//¸®ÇÃ¸®ÄÉÀÌ¼Ç ¼³Á¤
+	//ë¦¬í”Œë¦¬ì¼€ì´ì…˜ ì„¤ì •
 	bReplicates = true;
 	bAlwaysRelevant = true;
 	SetReplicatingMovement(true);
@@ -36,7 +36,7 @@ AAct_Bullet::AAct_Bullet()
 
 	//static ConstructorHelpers::FObjectFinder<USoundCue> EXPLODE_FX(TEXT(""));
 
-	//ÃÑ¾Ë ¸Ş½¬ ¼³Á¤
+	//ì´ì•Œ ë©”ì‰¬ ì„¤ì •
 	BulletMesh->SetupAttachment(RootComponent);
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> SM_Bullet(TEXT("/Game/Mech_Constructor_Spiders/Meshes/Projectile_Bullet.Projectile_Bullet"));
 	if(SM_Bullet.Succeeded())
@@ -45,14 +45,14 @@ AAct_Bullet::AAct_Bullet()
 	}
 	BulletMesh->SetRelativeLocationAndRotation(FVector(-10.0f, 0.0f, 0.0f), FRotator(0.0f,-90.0f,0.0f));
 
-	//Ãæµ¹ ¼³Á¤
+	//ì¶©ëŒ ì„¤ì •
 	BulletCollision->SetupAttachment(RootComponent);
 	BulletCollision->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
 	BulletCollision->SetCapsuleSize(7.0f, 30.0f);
 
-	//Ãæµ¹¼³Á¤ ¸¶Àú ÇØ¾ßÇÔ
+	//ì¶©ëŒì„¤ì • ë§ˆì € í•´ì•¼í•¨
 
-	//Ãæµ¹ Äİ¸®Àü ¼³Á¤
+	//ì¶©ëŒ ì½œë¦¬ì „ ì„¤ì •
 	BulletCollision->SetCollisionProfileName(TEXT("Projectile"));
 	//BulletCollision->OnComponentHit.AddDynamic(this, &AAct_Bullet::HitCheck);
 	BulletCollision->SetGenerateOverlapEvents(true);
@@ -60,10 +60,10 @@ AAct_Bullet::AAct_Bullet()
 	BulletCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 
-	//º»ÀÎÀ» ¹ß»çÇÑ ¾×ÅÍ Á¦¿Ü
+	//ë³¸ì¸ì„ ë°œì‚¬í•œ ì•¡í„° ì œì™¸
 	BulletCollision->MoveIgnoreActors.Add(GetOwner());
 
-	//º»ÀÎÀ» ¹ß»çÇÑ ¹«±â ¿Ü ´Ù¸¥ ¹«±âµé Á¦¿Ü
+	//ë³¸ì¸ì„ ë°œì‚¬í•œ ë¬´ê¸° ì™¸ ë‹¤ë¥¸ ë¬´ê¸°ë“¤ ì œì™¸
 	AAct_WeaponBase* Weapon = Cast<AAct_WeaponBase>(GetOwner());
 	if(IsValid(Weapon))
 	{
@@ -80,11 +80,11 @@ AAct_Bullet::AAct_Bullet()
 				}
 			}
 		}
-		//Ä³¸¯ÅÍ·ÎºÎÅÍ ÇÃ·¹ÀÌ¾îÄÁÆ®·Ñ·¯¸¦ ¹Ş¾Æ¿Â´Ù.
+		//ìºë¦­í„°ë¡œë¶€í„° í”Œë ˆì´ì–´ì»¨íŠ¸ë¡¤ëŸ¬ë¥¼ ë°›ì•„ì˜¨ë‹¤.
 		APawn* WeaponOwner = Cast<APawn>(Weapon->GetWeaponControlSystem()->GetOwner());
 		if(IsValid(WeaponOwner))
 		{
-			//Ä³¸¯ÅÍ Á¦¿Ü
+			//ìºë¦­í„° ì œì™¸
 			UE_LOG(Proto,Warning,TEXT("4"));
 			BulletCollision->MoveIgnoreActors.Add(WeaponOwner);
 		}
@@ -92,7 +92,7 @@ AAct_Bullet::AAct_Bullet()
 
 	
 
-	//Æø¹ßÀÌÆåÆ® ¼³Á¤
+	//í­ë°œì´í™íŠ¸ ì„¤ì •
 
 	ExplodeFX->SetupAttachment(RootComponent);
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> EXPLODE_EFFECT(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
@@ -100,7 +100,7 @@ AAct_Bullet::AAct_Bullet()
 		ExplodeFX->SetTemplate(EXPLODE_EFFECT.Object);
 		ExplodeFX->SetAutoActivate(false);
 	}
-	//ÆÄÆ¼Å¬ ¼³Á¤
+	//íŒŒí‹°í´ ì„¤ì •
 	TracerFX->SetupAttachment(RootComponent);
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> PS_Tracer(TEXT("/Game/CustomFX/BulletTracer.BulletTracer"));
 	if(PS_Tracer.Succeeded())
@@ -109,7 +109,7 @@ AAct_Bullet::AAct_Bullet()
 	}
 	TracerFX->SetRelativeLocation(FVector(-20.0f,0.0f,0.0f));
 
-	//ProjectielMovement¼³Á¤
+	//ProjectielMovementì„¤ì •
 	ProjectileMovement->InitialSpeed = 0.0f;
 	ProjectileMovement->MaxSpeed = 30000.0f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
@@ -126,7 +126,7 @@ void AAct_Bullet::BeginPlay()
 
 	ProjectileMovement->Velocity = ProjectileVelocity;
 
-	//ÃÑ¾Ë¾×ÅÍ ¼ö¸í¼³Á¤
+	//ì´ì•Œì•¡í„° ìˆ˜ëª…ì„¤ì •
 	SetLifeSpan(SpanTime);
 }
 
@@ -151,7 +151,7 @@ void AAct_Bullet::InitializeBullet_Implementation(AController* InputPlayerContro
 	{
 		TracerColor = NewTracerColor;
 	}
-	TracerFX->GetMaterial()
+	//TracerFX->GetMaterial(0)->OverrideVectorParameterDefault(FMaterialParameterInfo(FName(TEXT(""
 }
 
 void AAct_Bullet::HitCheck(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit) {
