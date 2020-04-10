@@ -4,26 +4,29 @@
 
 #include "Proto.h"
 #include "Blueprint/UserWidget.h"
-#include "WG_InGame_Game.generated.h"
+#include "WG_InGame_Information.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROTO_API UWG_InGame_Game : public UUserWidget
+class PROTO_API UWG_InGame_Information : public UUserWidget
 {
 	GENERATED_BODY()
-
+	
 protected:
 	virtual void NativeConstruct() override;
 
 protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-		class UTextBlock* txtScore1;
+		class UTextBlock* txtBodyHP;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-		class UTextBlock* txtScore2;
+		class UTextBlock* txtWeaponeHP1;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-		class UTextBlock* txtTime;
+		class UTextBlock* txtWeaponeHP2;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+		class UTextBlock* txtWeaponeHP3;
 };
