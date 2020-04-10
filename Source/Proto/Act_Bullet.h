@@ -70,13 +70,13 @@ public:
 	*	¿©±â¼­ 
 	*/
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bullet")
 	float SpanTime;
 
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation)
-	void InitializeBullet(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f,0.03f,0.0f,0.5f));
-	bool InitializeBullet_Validate(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
-	void InitializeBullet_Implementation(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
+	void InitializeBullet(AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f,0.03f,0.0f,0.5f));
+	bool InitializeBullet_Validate(AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
+	void InitializeBullet_Implementation(AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
 
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
 	void StopFX(UParticleSystemComponent* PSystem);

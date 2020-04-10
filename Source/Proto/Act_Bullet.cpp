@@ -82,7 +82,7 @@ AAct_Bullet::AAct_Bullet()
 				}
 			}
 		}
-
+		
 		//캐릭터로부터 플레이어컨트롤러를 받아온다.
 		APawn* WeaponOwner = Cast<APawn>(Weapon->GetWeaponControlSystem()->GetOwner());
 		if(IsValid(WeaponOwner))
@@ -95,6 +95,7 @@ AAct_Bullet::AAct_Bullet()
 				DamageInstigatorPlayer = WeaponOwner->GetController();
 			}
 		}
+		
 	}	
 
 	BulletCollision->SetGenerateOverlapEvents(false);
@@ -137,14 +138,16 @@ void AAct_Bullet::Tick(float DeltaTime)
 
 }
 
-bool AAct_Bullet::InitializeBullet_Validate(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
+bool AAct_Bullet::InitializeBullet_Validate(AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
 	return true;
 }
 
-void AAct_Bullet::InitializeBullet_Implementation(float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
+void AAct_Bullet::InitializeBullet_Implementation(AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
 	ProjectileMovement->SetVelocityInLocalSpace(FVector(InitialSpeed, 0.0f, 0.0f));
 	Damage = WeaponDamage;
 	ProjectileMovement->bAutoActivate = true;
+
+	DamageInstigatorPlayer = InputPlayerController;
 
 }
 
