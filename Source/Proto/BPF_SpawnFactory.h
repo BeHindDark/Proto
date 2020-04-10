@@ -24,12 +24,15 @@ public:
 	static class AAct_WeaponBase* SpawnWeapon( int32 WeaponClassIndex, FVector Location, FRotator Rotation, AActor* Owner);
 	//static으로 만들어야하나 계속 에러먹어서안됨
 
+	
+
 
 	UPROPERTY(BlueprintReadOnly)
-	bool IsInitialized;
+	bool IsInitialized=false;
 
 protected:
 
+	void Initialize();
 
 	static TArray<TSubclassOf<class AAct_WeaponBase>> WeaponArray ;
 
