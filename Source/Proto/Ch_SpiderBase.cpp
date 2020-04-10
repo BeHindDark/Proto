@@ -65,7 +65,7 @@ void ACh_SpiderBase::BeginPlay()
 
 void ACh_SpiderBase::PossessedBy(AController* NewController) {
 	Super::PossessedBy(NewController);
-
+	
 	if(IsPlayerControlled())
 	{
 		PlayerController = Cast<APlayerController>(NewController);
@@ -89,7 +89,6 @@ void ACh_SpiderBase::Tick(float DeltaTime)
 	
 	if(IsPlayerControlled())
 	{
-		
 		if(IsValid(GetController()))
 		{
 			if(GetController()->IsLocalController())
@@ -103,6 +102,8 @@ void ACh_SpiderBase::Tick(float DeltaTime)
 					SpringArm->AddRelativeRotation(FRotator(0.0f,CameraYawMovement * DeltaTime,0.0f));
 				}
 				FVector NewLocalAim = CameraAimLocation(Camera);
+				AimLocation = NewLocalAim;
+				WCS->TargetWorldLocation = NewLocalAim;
 				ServerNetTick(NewLocalAim,DeltaTime);
 			}
 			
@@ -148,7 +149,7 @@ void ACh_SpiderBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction(FName(TEXT("Fire")),IE_Pressed,this,&ACh_SpiderBase::OnTriggerDown);
 	PlayerInputComponent->BindAction(FName(TEXT("Fire")),IE_Released,this,&ACh_SpiderBase::OnTriggerUp);
-
+	//OnTakePointDamage.AddDynamic()
 }
 
 FVector ACh_SpiderBase::CameraAimLocation(UCameraComponent* CurrentCamera) {

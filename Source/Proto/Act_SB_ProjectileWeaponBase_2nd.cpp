@@ -18,6 +18,7 @@ void AAct_SB_ProjectileWeaponBase_2nd::PostInitializeComponents()
 	if(IsValid(Anim))
 	{
 		Anim->UpFireCheck.AddDynamic(this,&AAct_SB_ProjectileWeaponBase_2nd::SBFire);
+		Anim->Weapon = this;
 	}
 }
 
