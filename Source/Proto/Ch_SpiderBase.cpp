@@ -1,19 +1,21 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Ch_CarrierFactory.h"
+#include "Ch_SpiderBase.h"
+#include "Engine/SkeletalMeshSocket.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "WeaponControlSystem.h"
 #include "Act_WeaponBase.h"
-#include "Engine/SkeletalMeshSocket.h"
 
 // Sets default values
-ACh_CarrierFactory::ACh_CarrierFactory()
+ACh_SpiderBase::ACh_SpiderBase()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 	
@@ -42,45 +44,46 @@ ACh_CarrierFactory::ACh_CarrierFactory()
 	
 	WCS->SetIsReplicated(true);
 
-	
-	//OnTakeAnyDamage.AddDynamic(this, &ACh_CarrierFactory::함수);
 }
 
-void ACh_CarrierFactory::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+/**	변수 리플리케이션을 할 때 항상 삽입해야 하는 함수입니다.
+*	선언은 없이 정의부분만 넣어주면 됩니다.
+*/
+void ACh_SpiderBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
-	//변수 리플리케이션을 할 때 항상 삽입해야 하는 함수입니다.
-	//선언은 없이 정의부분만 넣어주면 됩니다.
+
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ACh_CarrierFactory, AimLocation);
+	DOREPLIFETIME(ACh_SpiderBase,AimLocation);
 }
 
 // Called when the game starts or when spawned
-void ACh_CarrierFactory::BeginPlay()
+void ACh_SpiderBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-void ACh_CarrierFactory::PossessedBy(AController* NewController) {
+void ACh_SpiderBase::PossessedBy(AController* NewController) {
 	Super::PossessedBy(NewController);
-	if (IsPlayerControlled()) {
+	if(IsPlayerControlled()) {
 		PlayerController = Cast<APlayerController>(GetController());
-		if (PlayerController != nullptr) {
+		if(PlayerController != nullptr) {
 			bIsPlayerControlling = true;
 		}
 	}
-	
 }
 
-void ACh_CarrierFactory::PostInitializeComponents()
+void ACh_SpiderBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	WCS->InitializeWeaponNumber(WeaponSlotNum);
 }
 
 // Called every frame
-void ACh_CarrierFactory::Tick(float DeltaTime)
+void ACh_SpiderBase::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
+
 	Super::Tick(DeltaTime);
 
 	if(bIsPlayerControlling)
@@ -96,30 +99,25 @@ void ACh_CarrierFactory::Tick(float DeltaTime)
 				SpringArm->AddRelativeRotation(FRotator(0.0f,CameraYawMovement * DeltaTime,0.0f));
 			}
 			FVector NewLocalAim = CameraAimLocation(Camera);
-			ServerNetTick(NewLocalAim, DeltaTime);
+			ServerNetTick(NewLocalAim,DeltaTime);
 		}
 	}
-	
-
-	
-	
 }
 
 // Called to bind functionality to input
-void ACh_CarrierFactory::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ACh_SpiderBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	PlayerInputComponent->BindAxis(TEXT("Turn"),this,&ACh_SpiderBase::Turn);
+	PlayerInputComponent->BindAxis(TEXT("LookUp"),this,&ACh_SpiderBase::LookUp);
+	PlayerInputComponent->BindAxis(TEXT("MoveForward"),this,&ACh_SpiderBase::MoveForward);
+	PlayerInputComponent->BindAxis(TEXT("MoveRight"),this,&ACh_SpiderBase::MoveRight);
+	PlayerInputComponent->BindAxis(TEXT("TurnBody"),this,&ACh_SpiderBase::TurnBody);
 
-	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ACh_CarrierFactory::Turn);
-	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &ACh_CarrierFactory::LookUp);
-	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ACh_CarrierFactory::MoveForward);
-	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ACh_CarrierFactory::MoveRight);
-	PlayerInputComponent->BindAxis(TEXT("TurnBody"), this, &ACh_CarrierFactory::TurnBody);
-	
-	
+
 	//무기 선택 액션 바인딩
 	//바인드할 입력 이름 설정
-	TArray<FName> WeaponGroupName = {FName(TEXT("WeaponGroup1")), FName(TEXT("WeaponGroup2")), FName(TEXT("WeaponGroup3"))};
+	TArray<FName> WeaponGroupName ={FName(TEXT("WeaponGroup1")), FName(TEXT("WeaponGroup2")), FName(TEXT("WeaponGroup3"))};
 	for(int i=0; i<3; i++)
 	{
 		//바이드할 액션 이름과 키로 액션바인딩 생성
@@ -137,25 +135,25 @@ void ACh_CarrierFactory::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		//완성된 액션바인딩을 InputComponent에 추가
 		PlayerInputComponent->AddActionBinding(WeaponGroupActionBinding);
 	}
-	
-	PlayerInputComponent->BindAction(FName(TEXT("Fire")), IE_Pressed, this, &ACh_CarrierFactory::OnTriggerDown);
-	PlayerInputComponent->BindAction(FName(TEXT("Fire")), IE_Released, this, &ACh_CarrierFactory::OnTriggerUp);
-	
+
+	PlayerInputComponent->BindAction(FName(TEXT("Fire")),IE_Pressed,this,&ACh_SpiderBase::OnTriggerDown);
+	PlayerInputComponent->BindAction(FName(TEXT("Fire")),IE_Released,this,&ACh_SpiderBase::OnTriggerUp);
+
 }
 
-FVector ACh_CarrierFactory::CameraAimLocation(UCameraComponent* CurrentCamera) {
+FVector ACh_SpiderBase::CameraAimLocation(UCameraComponent* CurrentCamera) {
 	FVector AimPoint = Camera->GetComponentLocation() + (Camera->GetForwardVector() * 10000.0f);
 	FCollisionQueryParams AimParams;
 	FHitResult AimResult;
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
-	for (FWeaponData WeaponData:WCS->WeaponDataArray) {
+	for(FWeaponData WeaponData:WCS->WeaponDataArray) {
 		ActorsToIgnore.Add(WeaponData.Weapon);
 	}
 	AimParams.AddIgnoredActors(ActorsToIgnore);
-	bool IsHit = GetWorld()->LineTraceSingleByChannel(AimResult, Camera->GetComponentLocation(), AimPoint, ECC_Visibility, AimParams);
-	if (IsHit) {
-		if (AimResult.bBlockingHit) {
+	bool IsHit = GetWorld()->LineTraceSingleByChannel(AimResult,Camera->GetComponentLocation(),AimPoint,ECC_Visibility,AimParams);
+	if(IsHit) {
+		if(AimResult.bBlockingHit) {
 			return FVector(AimResult.ImpactPoint);
 		}
 		else {
@@ -167,27 +165,27 @@ FVector ACh_CarrierFactory::CameraAimLocation(UCameraComponent* CurrentCamera) {
 	}
 }
 
-void ACh_CarrierFactory::Turn(float NewAxisValue) {
+void ACh_SpiderBase::Turn(float NewAxisValue) {
 	CameraYawMovement = CameraYawSpeed * NewAxisValue;
 }
 
-void ACh_CarrierFactory::LookUp(float NewAxisValue) {
+void ACh_SpiderBase::LookUp(float NewAxisValue) {
 	CameraPitchMovement = CameraPitchSpeed * -NewAxisValue;
 }
 
-void ACh_CarrierFactory::MoveForward(float NewAxisValue) {
+void ACh_SpiderBase::MoveForward(float NewAxisValue) {
 	MoveInput = NewAxisValue;
-	AddMovementInput(GetActorForwardVector(), NewAxisValue);
+	AddMovementInput(GetActorForwardVector(),NewAxisValue);
 }
 
-void ACh_CarrierFactory::MoveRight(float NewAxisValue) {
-	if (FMath::IsNearlyEqual(MoveInput, 0.0f, 0.01f))
+void ACh_SpiderBase::MoveRight(float NewAxisValue) {
+	if(FMath::IsNearlyEqual(MoveInput,0.0f,0.01f))
 	{
-		AddMovementInput(GetActorRightVector(), NewAxisValue);
+		AddMovementInput(GetActorRightVector(),NewAxisValue);
 	}
 	else
 	{
-		if (MoveInput > 0.0f)
+		if(MoveInput > 0.0f)
 		{
 			AddControllerYawInput(NewAxisValue * BodyYawSpeed);
 		}
@@ -198,15 +196,15 @@ void ACh_CarrierFactory::MoveRight(float NewAxisValue) {
 	}
 }
 
-void ACh_CarrierFactory::TurnBody(float NewAxisValue)
+void ACh_SpiderBase::TurnBody(float NewAxisValue)
 {
 	AddControllerYawInput(NewAxisValue * BodyYawSpeed);
 }
 
-void ACh_CarrierFactory::ChangeWeaponGroup(int NewGroup)
+void ACh_SpiderBase::ChangeWeaponGroup(int NewGroup)
 {
 	//IsLocallyControlled()
-	
+
 	if(NewGroup>=WeaponSlotNum)
 	{
 		UE_LOG(Proto,Warning,TEXT("%s / %s : The Index is out of range. Fail to change active weapon group."),*LINE_INFO,*GetNameSafe(this));
@@ -220,7 +218,7 @@ void ACh_CarrierFactory::ChangeWeaponGroup(int NewGroup)
 	WCS->ActivateWeaponGroup(NewGroup);
 }
 
-void ACh_CarrierFactory::OnTriggerDown_Implementation()
+void ACh_SpiderBase::OnTriggerDown_Implementation()
 {
 	if(GetLocalRole()<ROLE_Authority)
 	{
@@ -230,12 +228,12 @@ void ACh_CarrierFactory::OnTriggerDown_Implementation()
 	WCS->SendFireOrder();
 }
 
-bool ACh_CarrierFactory::OnTriggerDown_Validate()
+bool ACh_SpiderBase::OnTriggerDown_Validate()
 {
 	return true;
 }
 
-void ACh_CarrierFactory::OnTriggerUp_Implementation()
+void ACh_SpiderBase::OnTriggerUp_Implementation()
 {
 	if(GetLocalRole()<ROLE_Authority)
 	{
@@ -245,17 +243,17 @@ void ACh_CarrierFactory::OnTriggerUp_Implementation()
 	WCS->SendCeaseFireOrder();
 }
 
-bool ACh_CarrierFactory::OnTriggerUp_Validate()
+bool ACh_SpiderBase::OnTriggerUp_Validate()
 {
 	return true;
 }
-void ACh_CarrierFactory::SetWaistSceneComponent(USceneComponent * BlueprintWaistSceneComponent)
+void ACh_SpiderBase::SetWaistSceneComponent(USceneComponent * BlueprintWaistSceneComponent)
 {
 	WaistSceneComponent = BlueprintWaistSceneComponent;
 }
 
 
-void ACh_CarrierFactory::ServerNetTick_Implementation(FVector CameraAim, float Deltatime)
+void ACh_SpiderBase::ServerNetTick_Implementation(FVector CameraAim,float Deltatime)
 {
 	if(GetLocalRole()<ROLE_Authority)
 	{
@@ -269,16 +267,16 @@ void ACh_CarrierFactory::ServerNetTick_Implementation(FVector CameraAim, float D
 	}
 }
 
-bool ACh_CarrierFactory::ServerNetTick_Validate(FVector CameraAim,float Deltatime)
+bool ACh_SpiderBase::ServerNetTick_Validate(FVector CameraAim,float Deltatime)
 {
 	return true;
 }
 
-void ACh_CarrierFactory::TurnUpperBody(USceneComponent* WaistComponent, float DeltaTime)
+void ACh_SpiderBase::TurnUpperBody(USceneComponent* WaistComponent,float DeltaTime)
 {
 	//상대좌표계 상에서 목표의 방향
 	FRotator RelativeTargetDirection;
-	
+
 	//만약 제대로 소켓에 붙어있다면 소켓기준 좌표를, 아니면 액터 기준 좌표계를 이용
 	if(!WaistComponent->GetAttachSocketName().IsNone())
 	{
@@ -289,9 +287,9 @@ void ACh_CarrierFactory::TurnUpperBody(USceneComponent* WaistComponent, float De
 	{
 		RelativeTargetDirection = FTransform(FRotator::ZeroRotator,AimLocation).GetRelativeTransform(GetActorTransform()).GetLocation().ToOrientationRotator();
 	}
-	
+
 	//포탑이 가져야하는 상대회전
-	FRotator TargetUpperBodyRotation = FRotator(0.0f,RelativeTargetDirection.Yaw, 0.0f);
+	FRotator TargetUpperBodyRotation = FRotator(0.0f,RelativeTargetDirection.Yaw,0.0f);
 
 	//현재 상체의 상대회전
 	FRotator CurrentUpperBodyRotation = WaistComponent->GetRelativeTransform().Rotator();
@@ -303,14 +301,14 @@ void ACh_CarrierFactory::TurnUpperBody(USceneComponent* WaistComponent, float De
 	FRotator DummyRot = FRotator::ZeroRotator;
 
 	//이 함수를 이용해 Rotation을 Pitch, yaw, Roll이 -180 ~ +180의 값을 갖도록 한다.
-	(TargetUpperBodyRotation - CurrentUpperBodyRotation).GetWindingAndRemainder(DummyRot, RotationDiff);
+	(TargetUpperBodyRotation - CurrentUpperBodyRotation).GetWindingAndRemainder(DummyRot,RotationDiff);
 
 	//회전각 차이가 너무 작으면 돌리지 않는다.
-	if (!RotationDiff.IsNearlyZero(0.001f))
+	if(!RotationDiff.IsNearlyZero(0.001f))
 	{
 		//이번 틱에 돌려야하는 로테이션
 		FRotator DeltaRotation = FRotator::ZeroRotator;
-		if (FMath::Abs(RotationDiff.Yaw) <= UpperBodyRotationSpeed * DeltaTime)
+		if(FMath::Abs(RotationDiff.Yaw) <= UpperBodyRotationSpeed * DeltaTime)
 		{
 			DeltaRotation.Yaw = RotationDiff.Yaw;
 		}
