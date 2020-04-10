@@ -20,6 +20,7 @@ void AAct_DB_ProjectileWeaponBase::PostInitializeComponents()
 	if(IsValid(Anim)){
 		Anim->UpFireCheck.AddDynamic(this,&AAct_DB_ProjectileWeaponBase::UpFire);
 		Anim->DownFireCheck.AddDynamic(this,&AAct_DB_ProjectileWeaponBase::DownFire);
+		Anim->Weapon = this;
 	}
 	
 }
