@@ -108,15 +108,14 @@ AAct_Bullet::AAct_Bullet()
 		TracerFX->SetTemplate(PS_Tracer.Object);
 	}
 	TracerFX->SetRelativeLocation(FVector(-20.0f,0.0f,0.0f));
+	TracerFX->bAutoActivate = false;
 
 	//ProjectielMovement설정
 	ProjectileMovement->InitialSpeed = 0.0f;
 	ProjectileMovement->MaxSpeed = 30000.0f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bAutoActivate = false;
-
-
-	
+		
 }
 
 // Called when the game starts or when spawned
@@ -188,9 +187,9 @@ void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 		GEngine->AddOnScreenDebugMessage(10, 5.0f, FColor::Red, FString::Printf(TEXT("Hit Component : %s"), *OtherActor->GetName()));
 
 		ProjectileMovement->StopMovementImmediately();
-		//UGameplayStatics::ApplyDamage(OtherActor, Damage, DamageInstigatorPlayer, this, UDamageType::StaticClass());
+		UGameplayStatics::ApplyDamage(OtherActor, Damage, DamageInstigatorPlayer, this, UDamageType::StaticClass());
 		FVector DamageDirection = SweepResult.ImpactPoint - GetActorLocation();
-		UGameplayStatics::ApplyPointDamage(OtherActor, Damage, DamageDirection, SweepResult, DamageInstigatorPlayer, GetOwner(), UDamageType::StaticClass());
+		//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, DamageDirection, SweepResult, DamageInstigatorPlayer, GetOwner(), UDamageType::StaticClass());
 		
 		ExplodeFX->Activate(true);
 		BulletCollision->SetHiddenInGame(true, true);

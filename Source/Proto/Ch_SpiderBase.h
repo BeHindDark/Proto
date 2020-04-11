@@ -84,11 +84,20 @@ protected:
 	//무기를 장착가능한 슬롯의 수입니다. 블루프린트에서 초기값을 꼭 변경시켜야 합니다.
 	int32 WeaponSlotNum = 0;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HP")
+	float CurrentHP;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HP")
+	float MaxHP;
+
 public:
 	UFUNCTION(Server,Reliable,WithValidation)
 	void ServerNetTick(FVector CameraAim,float Deltatime);
 	void ServerNetTick_Implementation(FVector CameraAim,float Deltatime);
 	bool ServerNetTick_Validate(FVector CameraAim,float Deltatime);
+
+	UFUNCTION()
+	float GetHP();
 
 protected:
 	FVector CameraAimLocation(UCameraComponent* CurrentCamera);
@@ -121,4 +130,5 @@ protected:
 
 private:
 	void TurnUpperBody(USceneComponent* WaistComponent, float DeltaTime);
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 };

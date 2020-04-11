@@ -13,6 +13,10 @@ AAct_ProjectileWeaponBase::AAct_ProjectileWeaponBase()
 
 	WeaponSkeletalMesh->SetupAttachment(DefaultSceneRoot);
 	WeaponSkeletalMesh->SetRelativeRotation(FRotator(90,-90,0));
+	WeaponSkeletalMesh->SetCollisionProfileName(TEXT("HitBox"));
+	WeaponSkeletalMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	
+
 }
 
 void AAct_ProjectileWeaponBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -172,3 +176,9 @@ void AAct_ProjectileWeaponBase::MulticastFireFX_Implementation(UArrowComponent* 
 	}
 }
 
+
+float  AAct_ProjectileWeaponBase::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	DTakeDamage.Broadcast(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	return DamageAmount;
+}

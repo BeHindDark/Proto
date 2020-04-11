@@ -44,6 +44,7 @@ ACh_SpiderBase::ACh_SpiderBase()
 	
 	WCS->SetIsReplicated(true);
 
+	CurrentHP = MaxHP;
 }
 
 /**	변수 리플리케이션을 할 때 항상 삽입해야 하는 함수입니다.
@@ -80,6 +81,7 @@ void ACh_SpiderBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	WCS->InitializeWeaponNumber(WeaponSlotNum);
+
 }
 
 // Called every frame
@@ -330,4 +332,19 @@ void ACh_SpiderBase::TurnUpperBody(USceneComponent* WaistComponent,float DeltaTi
 		NewUpperBodyRotation.Roll = 0.0f;
 		WaistComponent->SetRelativeRotation(NewUpperBodyRotation);
 	}
+}
+float ACh_SpiderBase::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) {
+	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	
+	if (ActualDamage >= 0.0f) {
+		CurrentHP -= Damage;
+		if (CurrentHP <= 0.0f) {
+			//여기에 캐릭터 사망함수 들어가야됩니다
+		}
+	}
+	return ActualDamage;
+}
+
+float ACh_SpiderBase::GetHP() {
+	return CurrentHP;
 }
