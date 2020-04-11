@@ -108,15 +108,14 @@ AAct_Bullet::AAct_Bullet()
 		TracerFX->SetTemplate(PS_Tracer.Object);
 	}
 	TracerFX->SetRelativeLocation(FVector(-20.0f,0.0f,0.0f));
+	TracerFX->bAutoActivate = false;
 
 	//ProjectielMovement설정
 	ProjectileMovement->InitialSpeed = 0.0f;
 	ProjectileMovement->MaxSpeed = 30000.0f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bAutoActivate = false;
-
-
-	
+		
 }
 
 // Called when the game starts or when spawned
