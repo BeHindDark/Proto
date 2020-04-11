@@ -19,11 +19,15 @@ protected:
 
 protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-		class UTextBlock* txtScore1;
+		class UTextBlock* txtScoreRed;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-		class UTextBlock* txtScore2;
+		class UTextBlock* txtScoreBlue;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 		class UTextBlock* txtTime;
+
+public:
+	UFUNCTION()
+	void SetScore(UTextBlock* txtTMP, int score);
 };
