@@ -6,6 +6,8 @@
 #include "Act_WeaponBase.h"
 #include "Act_ProjectileWeaponBase.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FTakeDamage, float, DamageAmount, struct FDamageEvent const&, DamageEvent, class AController*, EventInstigator, AActor*, DamageCouser);
 /**
  * 
  */
@@ -15,13 +17,17 @@ class PROTO_API AAct_ProjectileWeaponBase : public AAct_WeaponBase
 	GENERATED_BODY()
 
 public:	
+
+	UPROPERTY(BlueprintAssignable)
+	FTakeDamage DTakeDamage;
 	// Sets default values for this actor's properties
 	AAct_ProjectileWeaponBase();
 
 protected:
+	virtual float  TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
