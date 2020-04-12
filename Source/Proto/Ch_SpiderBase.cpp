@@ -11,6 +11,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "WeaponControlSystem.h"
 #include "Act_WeaponBase.h"
+#include "Act_ProjectileWeaponBase.h"
 
 // Sets default values
 ACh_SpiderBase::ACh_SpiderBase()
@@ -45,6 +46,8 @@ ACh_SpiderBase::ACh_SpiderBase()
 	WCS->SetIsReplicated(true);
 
 	CurrentHP = MaxHP;
+
+	
 }
 
 /**	변수 리플리케이션을 할 때 항상 삽입해야 하는 함수입니다.
@@ -347,4 +350,26 @@ float ACh_SpiderBase::TakeDamage(float Damage, struct FDamageEvent const& Damage
 
 float ACh_SpiderBase::GetHP() {
 	return CurrentHP;
+}
+
+void ACh_SpiderBase::SetWeapon(AAct_ProjectileWeaponBase* weapon)
+{
+	if (!weapon)
+	{
+		return;
+	}
+	BWeapon = weapon;
+	BWeapon->DTakeDamage.AddDynamic(this, &ACh_SpiderBase::OnWeaponTakeDamage);
+}
+
+void ACh_SpiderBase::OnWeaponTakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	if (ActualDamage >= 0.0f) {
+		CurrentHP -= Damage;
+		if (CurrentHP <= 0.0f) {
+			//여기에 캐릭터 사망함수 들어가야됩니다
+		}
+	}
 }

@@ -15,6 +15,7 @@ public:
 	// Sets default values for this character's properties
 	ACh_SpiderBase();
 
+
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void PostInitializeComponents() override;
@@ -90,6 +91,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HP")
 	float MaxHP;
 
+	class AAct_ProjectileWeaponBase* BWeapon;
+
+	UFUNCTION(BlueprintCallable)
+	void SetWeapon(class AAct_ProjectileWeaponBase* weapon);
+
+	void OnWeaponTakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) ;
 public:
 	UFUNCTION(Server,Reliable,WithValidation)
 	void ServerNetTick(FVector CameraAim,float Deltatime);
