@@ -45,8 +45,6 @@ ACh_SpiderBase::ACh_SpiderBase()
 	
 	WCS->SetIsReplicated(true);
 
-	CurrentHP = MaxHP;
-
 	
 }
 
@@ -63,8 +61,9 @@ void ACh_SpiderBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & Ou
 // Called when the game starts or when spawned
 void ACh_SpiderBase::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	Super::BeginPlay();	
+
+	CurrentHP = MaxHP;
 }
 
 void ACh_SpiderBase::PossessedBy(AController* NewController) {
