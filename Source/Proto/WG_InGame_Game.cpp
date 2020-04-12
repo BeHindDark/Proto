@@ -8,17 +8,31 @@ void UWG_InGame_Game::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	txtScore1 = Cast<UTextBlock>(GetWidgetFromName(TEXT("txtScore1")));
-	if (nullptr == txtScore1) return;
+	txtScoreRed = Cast<UTextBlock>(GetWidgetFromName(TEXT("txtScoreRed")));
+	if (nullptr == txtScoreRed) return;
 
-	txtScore2 = Cast<UTextBlock>(GetWidgetFromName(TEXT("txtScore2")));
-	if (nullptr == txtScore2) return;
+	txtScoreBlue = Cast<UTextBlock>(GetWidgetFromName(TEXT("txtScoreBlue")));
+	if (nullptr == txtScoreBlue) return;
 
 	txtTime = Cast<UTextBlock>(GetWidgetFromName(TEXT("txtTime")));
 	if (nullptr == txtTime) return;	
 
 	//ÃÊ±âÈ­
-	txtScore1->SetText(FText::FromString("000"));
-	txtScore2->SetText(FText::FromString("000"));
+	txtScoreRed->SetText(FText::FromString("000"));
+	txtScoreBlue->SetText(FText::FromString("000"));
 	txtTime->SetText(FText::FromString("00:00"));
+		
+}
+
+void UWG_InGame_Game::SetScore(UTextBlock* txtTMP, int score)
+{
+	if (score >= 100) {
+		txtTMP->SetText(FText::FromString(FString::FromInt(score)));
+	}
+	else if (score <= 0) {
+		txtTMP->SetText(FText::FromString("000"));
+	}
+	else {
+		txtTMP->SetText(FText::FromString("0" + FString::FromInt(score)));
+	}
 }

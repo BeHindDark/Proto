@@ -90,9 +90,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HP")
 	float MaxHP;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "")
-	UAnimInstance* DeathAnim;
-
 public:
 	UFUNCTION(Server,Reliable,WithValidation)
 	void ServerNetTick(FVector CameraAim,float Deltatime);

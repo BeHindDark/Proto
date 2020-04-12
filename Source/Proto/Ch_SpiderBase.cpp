@@ -351,7 +351,11 @@ float ACh_SpiderBase::GetHP() {
 }
 
 void ACh_SpiderBase::Death_Implementation() {
-
+	UAnimationAsset* DeathAnim;
+	DeathAnim = LoadObject<UAnimationAsset>(nullptr, TEXT("/Game/Mech_Constructor_Spiders/Animations/Legs_Spider_Hvy/Legs_Spider_Hvy_Death.Legs_Spider_Hvy_Death"));
+	if (DeathAnim != nullptr) {
+		GetMesh()->PlayAnimation(DeathAnim, false);
+	}
 }
 
 bool ACh_SpiderBase::Death_Validate() {

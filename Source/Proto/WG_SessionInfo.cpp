@@ -10,7 +10,7 @@ void UWG_SessionInfo::NativeConstruct()
 {
 	Super::NativeConstruct();
 	SetIsEditable(bIsEditable);
-	ClearText();
+	ClearText();		
 }
 
 void UWG_SessionInfo::SetIsEditable(bool Editable)
