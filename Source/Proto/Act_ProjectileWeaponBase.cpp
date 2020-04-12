@@ -179,6 +179,5 @@ void AAct_ProjectileWeaponBase::MulticastFireFX_Implementation(UArrowComponent* 
 
 float  AAct_ProjectileWeaponBase::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
-	DTakeDamage.Broadcast(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	return DamageAmount;
 }

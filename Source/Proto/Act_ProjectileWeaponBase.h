@@ -18,7 +18,6 @@ class PROTO_API AAct_ProjectileWeaponBase : public AAct_WeaponBase
 
 public:	
 
-	UPROPERTY(BlueprintAssignable)
 	FTakeDamage DTakeDamage;
 	// Sets default values for this actor's properties
 	AAct_ProjectileWeaponBase();
