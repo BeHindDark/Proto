@@ -41,16 +41,16 @@ void UWG_InGame_Information::NativeConstruct()
 	UseWeapon3 = false;
 }
 
-void UWG_InGame_Information::SetHP(UTextBlock* txtTMP, int hp)
+void UWG_InGame_Information::SetHP(int hp)
 {
 	if (hp >= 100) {
-		txtTMP->SetText(FText::FromString("100"));
+		txtBodyHP->SetText(FText::FromString("100"));
 	}
 	else if (hp <= 0) {
-		txtTMP->SetText(FText::FromString("000"));
+		txtBodyHP->SetText(FText::FromString("000"));
 	}
 	else {
-		txtTMP->SetText(FText::FromString("0" + FString::FromInt(hp)));
+		txtBodyHP->SetText(FText::FromString("0" + FString::FromInt(hp)));
 	}
 }
 

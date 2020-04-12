@@ -89,7 +89,7 @@ protected:
 	float CurrentHP;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HP")
-	float MaxHP;
+	float MaxHP = 100;
 
 	class AAct_ProjectileWeaponBase* BWeapon;
 
@@ -97,14 +97,13 @@ protected:
 	void SetWeapon(class AAct_ProjectileWeaponBase* weapon);
 
 	void OnWeaponTakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) ;
+
+	class UWG_InGame_Information* WG_InGame;
 public:
 	UFUNCTION(Server,Reliable,WithValidation)
 	void ServerNetTick(FVector CameraAim,float Deltatime);
 	void ServerNetTick_Implementation(FVector CameraAim,float Deltatime);
 	bool ServerNetTick_Validate(FVector CameraAim,float Deltatime);
-
-	UFUNCTION()
-	float GetHP();
 
 protected:
 	FVector CameraAimLocation(UCameraComponent* CurrentCamera);

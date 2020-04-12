@@ -19,7 +19,7 @@ protected:
 
 public:
 	UFUNCTION()
-	void SetHP(UTextBlock* txtTMP, int hp);
+	void SetHP(int hp);
 
 	UFUNCTION()
 	void SetUseWeapon(bool used1, bool used2, bool used3);
