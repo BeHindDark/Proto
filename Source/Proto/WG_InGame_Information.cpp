@@ -5,6 +5,8 @@
 #include "Components/TextBlock.h"
 #include "Components/SizeBox.h"
 
+
+
 void UWG_InGame_Information::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -41,16 +43,34 @@ void UWG_InGame_Information::NativeConstruct()
 	UseWeapon3 = false;
 }
 
-void UWG_InGame_Information::SetHP(int hp)
+void UWG_InGame_Information::SetHP(HPType hpType, int hp)
 {
+	FText textHP;
+
+	// int형 hp를 FText형으로 변환
 	if (hp >= 100) {
-		txtBodyHP->SetText(FText::FromString("100"));
+		textHP = (FText::FromString("100"));
 	}
 	else if (hp <= 0) {
-		txtBodyHP->SetText(FText::FromString("000"));
+		textHP = (FText::FromString("000"));
 	}
 	else {
-		txtBodyHP->SetText(FText::FromString("0" + FString::FromInt(hp)));
+		textHP = (FText::FromString("0" + FString::FromInt(hp)));
+	}
+		
+	switch (hpType) {
+	case HPType::BODY:
+		txtBodyHP->SetText(textHP);
+		break;
+	case HPType::WEAPON1:
+		txtWeaponHP1->SetText(textHP);
+		break;
+	case HPType::WEAPON2:
+		txtWeaponHP2->SetText(textHP);
+		break;
+	case HPType::WEAPON3:
+		txtWeaponHP3->SetText(textHP);
+		break;
 	}
 }
 

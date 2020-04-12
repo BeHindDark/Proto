@@ -343,7 +343,8 @@ float ACh_SpiderBase::TakeDamage(float Damage, struct FDamageEvent const& Damage
 		//정말로 간단한 체력계산식
 		CurrentHP -= Damage;
 		//위젯에 체력 넘겨주는 부분
-		WG_InGame->SetHP((int)CurrentHP);
+		//열거형 사용해서 어떤 부위의 HP인지 매개변수로 넘겨줌
+		WG_InGame->SetHP(HPType::BODY, (int)CurrentHP);
 		if (CurrentHP <= 0.0f) {
 			//여기에 캐릭터 사망함수 혹은 패배관련 함수가 들어가야됩니다
 			Death();
