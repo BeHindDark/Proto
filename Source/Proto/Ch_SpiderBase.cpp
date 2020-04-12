@@ -339,7 +339,8 @@ float ACh_SpiderBase::TakeDamage(float Damage, struct FDamageEvent const& Damage
 	if (ActualDamage >= 0.0f) {
 		CurrentHP -= Damage;
 		if (CurrentHP <= 0.0f) {
-			//여기에 캐릭터 사망함수 들어가야됩니다
+			//여기에 캐릭터 사망함수 혹은 패배관련 함수가 들어가야됩니다
+			Death();
 		}
 	}
 	return ActualDamage;
@@ -347,4 +348,17 @@ float ACh_SpiderBase::TakeDamage(float Damage, struct FDamageEvent const& Damage
 
 float ACh_SpiderBase::GetHP() {
 	return CurrentHP;
+}
+
+void ACh_SpiderBase::Death_Implementation() {
+
+}
+
+bool ACh_SpiderBase::Death_Validate() {
+	if (CurrentHP == 0) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }

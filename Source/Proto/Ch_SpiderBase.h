@@ -90,6 +90,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HP")
 	float MaxHP;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "")
+	UAnimInstance* DeathAnim;
+
 public:
 	UFUNCTION(Server,Reliable,WithValidation)
 	void ServerNetTick(FVector CameraAim,float Deltatime);
@@ -127,6 +130,11 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void SetWaistSceneComponent(USceneComponent* BlueprintWaistSceneComponent);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Death();
+	void Death_Implementation();
+	bool Death_Validate();
 
 private:
 	void TurnUpperBody(USceneComponent* WaistComponent, float DeltaTime);
