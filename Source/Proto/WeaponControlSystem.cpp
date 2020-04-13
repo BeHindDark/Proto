@@ -3,6 +3,7 @@
 
 #include "WeaponControlSystem.h"
 #include "Act_WeaponBase.h"
+#include "Ch_SpiderBase.h"
 #include "Components/ArrowComponent.h"
 
 // Sets default values for this component's properties
@@ -97,6 +98,7 @@ bool UWeaponControlSystem::SyncNewWeapon(AAct_WeaponBase * NewWeapon,int WeaponI
 
 	WeaponDataArray[WeaponIndex].Weapon = NewWeapon;
 	WeaponDataArray[WeaponIndex].GroupIndex = WeaponGroupIndex;
+
 	NewWeapon->ConnectWeaponControlSystem(this, WeaponIndex);
 
 	//기존 WeaponIndex 제거
@@ -107,7 +109,11 @@ bool UWeaponControlSystem::SyncNewWeapon(AAct_WeaponBase * NewWeapon,int WeaponI
 
 	//다시 WeaponIndex 추가
 	WeaponGroupArray[WeaponGroupIndex].AddUnique(WeaponIndex);
-
+	ACh_SpiderBase* spider = Cast<ACh_SpiderBase>(GetOwner());
+	if(IsValid(spider))
+	{
+		NewWeapon->OnWeaponTakeDamage.AddDynamic(spider, &ACh_SpiderBase::OnWeaponTakeDamage);
+	}	
 	return true;
 }
 

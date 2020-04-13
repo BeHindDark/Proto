@@ -44,6 +44,12 @@ void AAct_WeaponBase::BeginPlay()
 	//https://docs.unrealengine.com/en-US/API/Runtime/Engine/Engine/UWorld/SpawnActorDeferred/index.html
 }
 
+float AAct_WeaponBase::TakeDamage(float DamageAmount,FDamageEvent const & DamageEvent,AController * EventInstigator,AActor * DamageCauser)
+{
+	OnWeaponTakeDamage.Broadcast(DamageAmount,DamageEvent,EventInstigator,DamageCauser);
+	return DamageAmount;
+}
+
 // Called every frame
 void AAct_WeaponBase::Tick(float DeltaTime)
 {
@@ -78,9 +84,13 @@ void AAct_WeaponBase::ServerOnCeaseFireOrder()
 	UE_LOG(Proto,Warning,TEXT("%s / %s : CeaseFireOrder"),*LINE_INFO,*GetNameSafe(this));
 }
 
-void AAct_WeaponBase::ConnectWeaponControlSystem(UWeaponControlSystem * NewWeaponControlSystem,int NewWeaponIndex)
+void AAct_WeaponBase::ConnectWeaponControlSystem_Implementation(UWeaponControlSystem * NewWeaponControlSystem,int NewWeaponIndex)
 {
-	WeaponControlSystem_Ref = TWeakObjectPtr<UWeaponControlSystem>(NewWeaponControlSystem);
+	WeaponControlSystem_Ref = NewWeaponControlSystem;
+	if(!IsValid(WeaponControlSystem_Ref))
+	{
+		UE_LOG(Proto,Warning,TEXT("%s / %s : fuckfuckfuck"),*LINE_INFO,*GetNameSafe(this));
+	}
 
 	SocketArrow_Ref = NewWeaponControlSystem->WeaponDataArray[NewWeaponIndex].SocketArrow_Ref;
 
@@ -98,12 +108,12 @@ void AAct_WeaponBase::SetSingleMuzzleArrow(UArrowComponent * MuzzleArrow)
 
 UWeaponControlSystem * AAct_WeaponBase::GetWeaponControlSystem()
 {
-	return WeaponControlSystem_Ref.Get();
+	return WeaponControlSystem_Ref;
 }
 
 void AAct_WeaponBase::TurnTowardDirectAim(float DeltaTime)
 {
-	if(!WeaponControlSystem_Ref.IsValid())
+	if(!IsValid(WeaponControlSystem_Ref))
 	{
 		return;
 	}
@@ -113,7 +123,7 @@ void AAct_WeaponBase::TurnTowardDirectAim(float DeltaTime)
 		return;
 	}
 
-	TargetLocation = WeaponControlSystem_Ref.Get()->TargetWorldLocation;
+	TargetLocation = WeaponControlSystem_Ref->TargetWorldLocation;
 
 	FTransform SocketTransform = SocketArrow_Ref.Get()->GetComponentTransform();
 

@@ -7,6 +7,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Act_WeaponBase.h"
+#include "Act_ProjectileWeaponBase.h"
 #include "kismet/GameplayStatics.h"
 #include "WeaponControlSystem.h"
 
@@ -49,49 +50,14 @@ AAct_Bullet::AAct_Bullet()
 	BulletCollision->SetupAttachment(RootComponent);
 	BulletCollision->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
 	BulletCollision->SetCapsuleSize(7.0f, 30.0f);
-
-	//충돌설정 마저 해야함
-
-	//충돌 콜리전 설정
+	
 	BulletCollision->SetCollisionProfileName(TEXT("Projectile"));
 	//BulletCollision->OnComponentHit.AddDynamic(this, &AAct_Bullet::HitCheck);
 	BulletCollision->SetGenerateOverlapEvents(true);
 	BulletCollision->OnComponentBeginOverlap.AddDynamic(this,&AAct_Bullet::BeginOverlap);
-	BulletCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	BulletCollision->bAutoActivate = false;
+	BulletCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	
-
-	//본인을 발사한 액터 제외
-	BulletCollision->MoveIgnoreActors.Add(GetOwner());
-
-	//본인을 발사한 무기 외 다른 무기들 제외
-	AAct_WeaponBase* Weapon = Cast<AAct_WeaponBase>(GetOwner());
-	if(IsValid(Weapon))
-	{
-		UE_LOG(Proto, Warning, TEXT("1"));
-		for(FWeaponData WeaponData :Weapon->GetWeaponControlSystem()->WeaponDataArray)
-		{
-			if(IsValid(WeaponData.Weapon))
-			{
-				UE_LOG(Proto,Warning,TEXT("2"));
-				if(WeaponData.Weapon!=GetOwner())
-				{
-					UE_LOG(Proto,Warning,TEXT("3"));
-					BulletCollision->MoveIgnoreActors.Add(WeaponData.Weapon);
-				}
-			}
-		}
-		//캐릭터로부터 플레이어컨트롤러를 받아온다.
-		APawn* WeaponOwner = Cast<APawn>(Weapon->GetWeaponControlSystem()->GetOwner());
-		if(IsValid(WeaponOwner))
-		{
-			//캐릭터 제외
-			UE_LOG(Proto,Warning,TEXT("4"));
-			BulletCollision->MoveIgnoreActors.Add(WeaponOwner);
-		}
-	}	
-
-	
-
 	//폭발이펙트 설정
 
 	ExplodeFX->SetupAttachment(RootComponent);
@@ -144,16 +110,60 @@ void AAct_Bullet::InitializeBullet_Implementation(AController* InputPlayerContro
 	ProjectileMovement->SetVelocityInLocalSpace(FVector(InitialSpeed, 0.0f, 0.0f));
 	Damage = WeaponDamage;
 	DamageInstigatorPlayer = InputPlayerController;
-	BulletCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	
+	//본인을 발사한 액터 제외
+	BulletCollision->MoveIgnoreActors.Add(GetOwner());
+
+	//본인을 발사한 무기 외 다른 무기들 제외	
+	AAct_ProjectileWeaponBase* Weapon = Cast<AAct_ProjectileWeaponBase>(GetOwner());
+	if(IsValid(Weapon))
+	{
+		if(IsValid(Weapon->GetWeaponControlSystem()))
+		{
+			for(FWeaponData WeaponData :Weapon->GetWeaponControlSystem()->WeaponDataArray)
+			{
+				if(IsValid(WeaponData.Weapon))
+				{
+					if(WeaponData.Weapon!=GetOwner())
+					{
+						BulletCollision->MoveIgnoreActors.Add(WeaponData.Weapon);
+					}
+				}
+				else
+				{
+					UE_LOG(Proto,Warning,TEXT("%s / %s : otherWeapon is not Valid"),*LINE_INFO,*GetNameSafe(this));
+				}
+			}
+			//캐릭터로부터 플레이어컨트롤러를 받아온다.
+			APawn* WeaponOwner = Cast<APawn>(Weapon->GetWeaponControlSystem()->GetOwner());
+			if(IsValid(WeaponOwner))
+			{
+				//캐릭터 제외
+				BulletCollision->MoveIgnoreActors.Add(WeaponOwner);
+			}
+			else
+			{
+				UE_LOG(Proto,Warning,TEXT("%s / %s : WeaponOwner is not Valid"),*LINE_INFO,*GetNameSafe(this));
+			}
+		}
+		else
+		{
+			UE_LOG(Proto,Warning,TEXT("%s / %s : Fail to Get WeaponControlSystem"),*LINE_INFO,*GetNameSafe(this));
+		}
+		
+	}
+
 	if(!TracerColor.Equals(NewTracerColor, 0.000001f))
 	{
 		TracerColor = NewTracerColor;
 	}
+
 	UMaterialInstanceDynamic* MaterialInstance = TracerFX->CreateDynamicMaterialInstance(0);
 	MaterialInstance->SetVectorParameterValue(FName(TEXT("TracerBaseColor")), TracerColor);
 	TracerFX->SetMaterial(0, MaterialInstance);
 	TracerFX->Activate();
 	ProjectileMovement->Activate();
+	BulletCollision->Activate();
 }
 
 void AAct_Bullet::HitCheck(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit) {
@@ -182,10 +192,11 @@ void AAct_Bullet::StopFX_Implementation(UParticleSystemComponent* PSystem) {
 }
 
 void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
-
-	if (OtherActor != nullptr && OtherActor != this && OtherComponent != nullptr) {
+	
+	if (OtherActor != nullptr) {
+		UE_LOG(Proto,Warning,TEXT("%s / %s : OverLAP with (%s)"),*LINE_INFO,*GetNameSafe(this), *GetNameSafe(OtherActor));
 		GEngine->AddOnScreenDebugMessage(10, 5.0f, FColor::Red, FString::Printf(TEXT("Hit Component : %s"), *OtherActor->GetName()));
-
+		ProjectileMovement->SetVelocityInLocalSpace(FVector::ZeroVector);
 		ProjectileMovement->StopMovementImmediately();
 		if (GetLocalRole() >= ROLE_Authority)
 		{
@@ -195,8 +206,11 @@ void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 		//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, DamageDirection, SweepResult, DamageInstigatorPlayer, GetOwner(), UDamageType::StaticClass());
 		
 		ExplodeFX->Activate(true);
+		TracerFX->DeactivateSystem();
 		BulletCollision->SetHiddenInGame(true, true);
 		SetActorEnableCollision(false);
+		BulletMesh->SetVisibility(false);
+		ProjectileMovement->Deactivate();
 
 		ExplodeFX->OnSystemFinished.AddDynamic(this, &AAct_Bullet::StopFX);
 	}

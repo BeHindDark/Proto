@@ -40,7 +40,7 @@ void AAct_ProjectileWeaponBase::Tick(float DeltaTime)
 void AAct_ProjectileWeaponBase::TurnTowardProjectileAim(float DeltaTime)
 {
 	//WCS 연결 확인
-	if(!WeaponControlSystem_Ref.IsValid())
+	if(!IsValid(WeaponControlSystem_Ref))
 	{
 		//매 틱마다 호출되는 함수이기에 로그가 너무 많아지므로 따로 로그는 넣지 않습니다.
 		return;
@@ -54,7 +54,7 @@ void AAct_ProjectileWeaponBase::TurnTowardProjectileAim(float DeltaTime)
 	}
 
 	//WCS으로 부터 목표지점을 받아 저장
-	TargetLocation = WeaponControlSystem_Ref.Get()->TargetWorldLocation;
+	TargetLocation = WeaponControlSystem_Ref->TargetWorldLocation;
 
 	//ArrowComponent를 이용해 소켓 중심 좌표계를 구합니다.
 	FTransform SocketTransform = SocketArrow_Ref.Get()->GetComponentTransform();
@@ -176,8 +176,3 @@ void AAct_ProjectileWeaponBase::MulticastFireFX_Implementation(UArrowComponent* 
 	}
 }
 
-
-float  AAct_ProjectileWeaponBase::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
-{
-	return DamageAmount;
-}
