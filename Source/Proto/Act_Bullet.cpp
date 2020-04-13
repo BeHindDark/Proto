@@ -88,9 +88,7 @@ AAct_Bullet::AAct_Bullet()
 void AAct_Bullet::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ProjectileMovement->Velocity = ProjectileVelocity;
-
+	
 	//총알액터 수명설정
 	SetLifeSpan(SpanTime);
 }
@@ -102,31 +100,36 @@ void AAct_Bullet::Tick(float DeltaTime)
 
 }
 
-bool AAct_Bullet::InitializeBullet_Validate( AAct_WeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
+bool AAct_Bullet::InitializeBullet_Validate(AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
 	return true;
 }
 
-void AAct_Bullet::InitializeBullet_Implementation(AAct_WeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
+void AAct_Bullet::InitializeBullet_Implementation(AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
 	ProjectileMovement->SetVelocityInLocalSpace(FVector(InitialSpeed, 0.0f, 0.0f));
 	Damage = WeaponDamage;
 	DamageInstigatorPlayer = InputPlayerController;
 	
 	//본인을 발사한 액터 제외
-	BulletCollision->MoveIgnoreActors.Add(BOwner);
+	//BulletCollision->MoveIgnoreActors.Add(BOwner);
+	BulletCollision->IgnoreActorWhenMoving(BOwner, true);
+	
 
 	//본인을 발사한 무기 외 다른 무기들 제외	
-	AAct_ProjectileWeaponBase* Weapon = Cast<AAct_ProjectileWeaponBase>(GetOwner());
-	if(IsValid(Weapon))
+	AAct_ProjectileWeaponBase* Weapon = Cast<AAct_ProjectileWeaponBase>(BOwner);
+	
+	if(IsValid(BOwner))
 	{
-		if(IsValid(Weapon->GetWeaponControlSystem()))
+		BOwner->WeaponSkeletalMesh->IgnoreActorWhenMoving(this, true);
+		if(IsValid(BOwner->GetWeaponControlSystem()))
 		{
-			for(FWeaponData WeaponData :Weapon->GetWeaponControlSystem()->WeaponDataArray)
+			for(FWeaponData WeaponData :BOwner->GetWeaponControlSystem()->WeaponDataArray)
 			{
 				if(IsValid(WeaponData.Weapon))
 				{
 					if(WeaponData.Weapon!= BOwner)
 					{
-						BulletCollision->MoveIgnoreActors.Add(WeaponData.Weapon);
+						//BulletCollision->MoveIgnoreActors.Add(WeaponData.Weapon);
+						BulletCollision->IgnoreActorWhenMoving(WeaponData.Weapon, true);
 					}
 				}
 				else
@@ -135,11 +138,13 @@ void AAct_Bullet::InitializeBullet_Implementation(AAct_WeaponBase* BOwner, ACont
 				}
 			}
 			//캐릭터로부터 플레이어컨트롤러를 받아온다.
-			APawn* WeaponOwner = Cast<APawn>(Weapon->GetWeaponControlSystem()->GetOwner());
+			APawn* WeaponOwner = Cast<APawn>(BOwner->GetWeaponControlSystem()->GetOwner());
 			if(IsValid(WeaponOwner))
 			{
 				//캐릭터 제외
-				BulletCollision->MoveIgnoreActors.Add(WeaponOwner);
+				//BulletCollision->MoveIgnoreActors.Add(WeaponOwner);
+				BulletCollision->IgnoreActorWhenMoving(WeaponOwner, true);
+				
 			}
 			else
 			{
@@ -151,6 +156,10 @@ void AAct_Bullet::InitializeBullet_Implementation(AAct_WeaponBase* BOwner, ACont
 			UE_LOG(Proto,Warning,TEXT("%s / %s : Fail to Get WeaponControlSystem"),*LINE_INFO,*GetNameSafe(this));
 		}
 		
+	}
+	else
+	{
+		UE_LOG(Proto,Warning,TEXT("%s / %s : Fail to Get Owner"),*LINE_INFO,*GetNameSafe(this));
 	}
 
 	if(!TracerColor.Equals(NewTracerColor, 0.000001f))

@@ -47,9 +47,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Bullet")
 	float Damage;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bullet")
-	FVector ProjectileVelocity;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Explode")
 	USoundCue* ExplodeAudio;
 
@@ -74,9 +71,9 @@ public:
 	float SpanTime;
 
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation)
-	void InitializeBullet(class AAct_WeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f,0.03f,0.0f,0.5f));
-	bool InitializeBullet_Validate(class AAct_WeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
-	void InitializeBullet_Implementation(class AAct_WeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
+	void InitializeBullet(class AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f,0.03f,0.0f,0.5f));
+	bool InitializeBullet_Validate(class AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
+	void InitializeBullet_Implementation(class AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
 
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
 	void StopFX(UParticleSystemComponent* PSystem);

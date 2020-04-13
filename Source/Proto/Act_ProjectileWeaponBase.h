@@ -44,12 +44,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Weapon|Projectile|FX")
 	FLinearColor TracerColor = FLinearColor(0.87f, 0.3f, 0.0f, 0.5f);
 
-protected:
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite,Category = "Weapon|Projectile")
 	/** 투사체 무기의 스켈레탈 메쉬
 	*/
 	USkeletalMeshComponent* WeaponSkeletalMesh;
-	
+
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Projectile|FX")
 	/** 총구화염 이펙트를 저장해줄 파티클 시스템입니다.
 	*/
