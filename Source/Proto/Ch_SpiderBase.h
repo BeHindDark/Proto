@@ -63,10 +63,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "Spider|Camera")
 	float CameraYawSpeed  = 120.0f;;
-
-
-
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spider|Movement")
 	float BodyYawSpeed = 0.3;
 
@@ -90,16 +87,14 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HP")
 	float MaxHP = 100;
+	
+	class UWG_InGame_Information* WG_InGame;
 
-	class AAct_ProjectileWeaponBase* BWeapon;
+public:
 
-	UFUNCTION(BlueprintCallable)
-	void SetWeapon(class AAct_ProjectileWeaponBase* weapon);
-
+	UFUNCTION()
 	void OnWeaponTakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) ;
 
-	class UWG_InGame_Information* WG_InGame;
-public:
 	UFUNCTION(Server,Reliable,WithValidation)
 	void ServerNetTick(FVector CameraAim,float Deltatime);
 	void ServerNetTick_Implementation(FVector CameraAim,float Deltatime);

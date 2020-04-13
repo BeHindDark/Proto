@@ -25,6 +25,58 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnJoinSessionReportDelegate, bool, FString
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDestroySessionReportDelegate, bool);
 
+USTRUCT(BlueprintType)
+struct FUserFreeSet
+{
+	GENERATED_USTRUCT_BODY()
+
+	FUserFreeSet()
+	{
+		MainClassIndex = -1;
+		Weapon1 = {-1, -1, -1};
+		Weapon2 = {-1, -1, -1};
+		Weapon3 = {-1, -1, -1};
+		WeaponArray = {&Weapon1, &Weapon2, &Weapon3};
+	};
+	
+	FUserFreeSet(int InitMainIndex, TArray<int> Weapon1Data, TArray<int> Weapon2Data, TArray<int> Weapon3Data):
+		MainClassIndex(InitMainIndex),
+		Weapon1(Weapon1Data),
+		Weapon2(Weapon2Data),
+		Weapon3(Weapon3Data)
+	{WeaponArray ={&Weapon1, &Weapon2, &Weapon3};};
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Custom|UserFreeSet")
+	int MainClassIndex;
+
+	TArray<TArray<int>*> WeaponArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Custom|UserFreeSet")
+	/**	무기 데이터1
+	*	[0]	무기 클래스 Index
+	*	[1]	소켓 Index
+	*	[2]	무기 그룹 Index
+	*/
+	TArray<int> Weapon1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Custom|UserFreeSet")
+	/**	무기 데이터2
+	*	[0]	무기 클래스 Index
+	*	[1]	소켓 Index
+	*	[2]	무기 그룹 Index
+	*/
+	TArray<int> Weapon2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Custom|UserFreeSet")
+	/**	무기 데이터3
+	*	[0]	무기 클래스 Index
+	*	[1]	소켓 Index
+	*	[2]	무기 그룹 Index
+	*/
+	TArray<int> Weapon3;
+};
+
+
 /**
  *
  */
@@ -60,6 +112,8 @@ public:
 
 	/**세션 로비의 맵 이름*/
 	FName SessionLobyName;
+
+	TArray<FUserFreeSet> UserFreeSetArray;
 
 public:
 

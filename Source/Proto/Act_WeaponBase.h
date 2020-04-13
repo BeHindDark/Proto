@@ -6,6 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "Act_WeaponBase.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FWeaponTakeDamageDelegate, float, DamageAmount, struct FDamageEvent const&, DamageEvent, class AController*, EventInstigator, AActor*, DamageCouser);
+
+
+
 UCLASS()
 class PROTO_API AAct_WeaponBase : public AActor
 {
@@ -19,11 +24,16 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual float TakeDamage(float DamageAmount,struct FDamageEvent const& DamageEvent,class AController* EventInstigator,AActor* DamageCauser) override;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
 public:
+
+	FWeaponTakeDamageDelegate OnWeaponTakeDamage;
+
 	UPROPERTY(Replicated, VisibleAnywhere, Category = "Weapon")
 	//매틱마다 WeaponControlSystem으로부터 전달받은 조준위치를 저장해두는 변수입니다.
 	FVector TargetLocation;
@@ -105,7 +115,7 @@ protected:
 	/**	이 무기를 관리하는 WeaponControlSystem에 대한 약포인터입니다.
 	*	조준목표지점을 받아올 때 쓰입니다.
 	*/
-	TWeakObjectPtr<class UWeaponControlSystem> WeaponControlSystem_Ref;
+	class UWeaponControlSystem* WeaponControlSystem_Ref;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess =  true))
 	//포탑이 타겟에 락온되거나, 최대각도게 걸려 안움직이는 상황이면 true
@@ -131,7 +141,9 @@ public:
 	*	이 함수를 실행하기 전에 WCS에서 Socket설정을 먼저 했어야 합니다.
 	*	정상적인 경우 설정된 ArrowComponent에  Attach됩니다.
 	*/
+	UFUNCTION(NetMulticast,Reliable)
 	void ConnectWeaponControlSystem(class UWeaponControlSystem* NewWeaponControlSystem, int NewWeaponIndex);
+	void ConnectWeaponControlSystem_Implementation(class UWeaponControlSystem* NewWeaponControlSystem,int NewWeaponIndex);
 
 	UFUNCTION(BlueprintCallable, Category = "Custom|Weapon")
 	/**	이펙트 및 탄환등을 스폰시킬 총구ArrowComponent를 등록합니다.
