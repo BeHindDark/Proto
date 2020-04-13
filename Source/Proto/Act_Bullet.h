@@ -74,9 +74,9 @@ public:
 	float SpanTime;
 
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation)
-	void InitializeBullet(AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f,0.03f,0.0f,0.5f));
-	bool InitializeBullet_Validate(AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
-	void InitializeBullet_Implementation(AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
+	void InitializeBullet(class AAct_WeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f,0.03f,0.0f,0.5f));
+	bool InitializeBullet_Validate(class AAct_WeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
+	void InitializeBullet_Implementation(class AAct_WeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
 
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
 	void StopFX(UParticleSystemComponent* PSystem);

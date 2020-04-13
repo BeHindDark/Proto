@@ -102,17 +102,17 @@ void AAct_Bullet::Tick(float DeltaTime)
 
 }
 
-bool AAct_Bullet::InitializeBullet_Validate(AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
+bool AAct_Bullet::InitializeBullet_Validate( AAct_WeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
 	return true;
 }
 
-void AAct_Bullet::InitializeBullet_Implementation(AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
+void AAct_Bullet::InitializeBullet_Implementation(AAct_WeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
 	ProjectileMovement->SetVelocityInLocalSpace(FVector(InitialSpeed, 0.0f, 0.0f));
 	Damage = WeaponDamage;
 	DamageInstigatorPlayer = InputPlayerController;
 	
 	//본인을 발사한 액터 제외
-	BulletCollision->MoveIgnoreActors.Add(GetOwner());
+	BulletCollision->MoveIgnoreActors.Add(BOwner);
 
 	//본인을 발사한 무기 외 다른 무기들 제외	
 	AAct_ProjectileWeaponBase* Weapon = Cast<AAct_ProjectileWeaponBase>(GetOwner());
@@ -124,7 +124,7 @@ void AAct_Bullet::InitializeBullet_Implementation(AController* InputPlayerContro
 			{
 				if(IsValid(WeaponData.Weapon))
 				{
-					if(WeaponData.Weapon!=GetOwner())
+					if(WeaponData.Weapon!= BOwner)
 					{
 						BulletCollision->MoveIgnoreActors.Add(WeaponData.Weapon);
 					}
