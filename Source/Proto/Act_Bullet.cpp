@@ -187,8 +187,11 @@ void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 		GEngine->AddOnScreenDebugMessage(10, 5.0f, FColor::Red, FString::Printf(TEXT("Hit Component : %s"), *OtherActor->GetName()));
 
 		ProjectileMovement->StopMovementImmediately();
-		UGameplayStatics::ApplyDamage(OtherActor, Damage, DamageInstigatorPlayer, this, UDamageType::StaticClass());
-		FVector DamageDirection = SweepResult.ImpactPoint - GetActorLocation();
+		if (GetLocalRole() >= ROLE_Authority)
+		{
+			UGameplayStatics::ApplyDamage(OtherActor, Damage, DamageInstigatorPlayer, this, UDamageType::StaticClass());
+		}
+		//FVector DamageDirection = SweepResult.ImpactPoint - GetActorLocation();
 		//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, DamageDirection, SweepResult, DamageInstigatorPlayer, GetOwner(), UDamageType::StaticClass());
 		
 		ExplodeFX->Activate(true);
