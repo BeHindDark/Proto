@@ -42,8 +42,7 @@ public:
 	bool IsTriggerOn = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Weapon|Projectile|FX")
-	FLinearColor TracerColor = FLinearColor(0.87f, 0.3f, 0.0f, 0.5f);
-
+	FLinearColor TracerColor = FLinearColor(0.87f, 0.3f, 0.0f, 1.0f);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite,Category = "Weapon|Projectile")
 	/** 투사체 무기의 스켈레탈 메쉬

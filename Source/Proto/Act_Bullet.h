@@ -15,6 +15,8 @@ public:
 	// Sets default values for this actor's properties
 	AAct_Bullet();
 
+	virtual void PostInitializeComponents() override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -53,16 +55,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Explode")
 	UParticleSystemComponent* ExplodeFX;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BUllet|Collision")
-	TArray<AActor*> IgnoresArray;
-
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bullet|Tracer", meta = (AllowPrivateAccess = true))
-	FLinearColor TracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f);
+	FLinearColor TracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 1.0f);
 	
-	UFUNCTION()
-	void HitCheck(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
-
 public:
 	/**	총알의 속도, 데미지, 색 등을 초기화 하고 발동시킵니다.
 	*	총알은 Spawn될 때 AActor* FActorSpawnParameters.Owner를 통해 자신을 발사한 무기의 정보를 얻습니다.
