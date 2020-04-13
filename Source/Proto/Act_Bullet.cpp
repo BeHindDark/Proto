@@ -33,7 +33,7 @@ AAct_Bullet::AAct_Bullet()
 	
 	RootComponent = DefaultSceneRoot;
 
-	SpanTime = 10;
+	SpanTime = 100000;
 
 	//static ConstructorHelpers::FObjectFinder<USoundCue> EXPLODE_FX(TEXT(""));
 
@@ -45,6 +45,7 @@ AAct_Bullet::AAct_Bullet()
 		BulletMesh->SetStaticMesh(SM_Bullet.Object);
 	}
 	BulletMesh->SetRelativeLocationAndRotation(FVector(-10.0f, 0.0f, 0.0f), FRotator(0.0f,-90.0f,0.0f));
+	BulletMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	//충돌 설정
 	BulletCollision->SetupAttachment(RootComponent);
@@ -56,7 +57,7 @@ AAct_Bullet::AAct_Bullet()
 	BulletCollision->SetGenerateOverlapEvents(true);
 	BulletCollision->OnComponentBeginOverlap.AddDynamic(this,&AAct_Bullet::BeginOverlap);
 	BulletCollision->bAutoActivate = false;
-	BulletCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	BulletCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	
 	//폭발이펙트 설정
 
@@ -88,9 +89,7 @@ AAct_Bullet::AAct_Bullet()
 void AAct_Bullet::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ProjectileMovement->Velocity = ProjectileVelocity;
-
+	
 	//총알액터 수명설정
 	SetLifeSpan(SpanTime);
 }
@@ -102,31 +101,38 @@ void AAct_Bullet::Tick(float DeltaTime)
 
 }
 
-bool AAct_Bullet::InitializeBullet_Validate( AAct_WeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
+bool AAct_Bullet::InitializeBullet_Validate(AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
 	return true;
 }
 
-void AAct_Bullet::InitializeBullet_Implementation(AAct_WeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
+void AAct_Bullet::InitializeBullet_Implementation(AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor) {
 	ProjectileMovement->SetVelocityInLocalSpace(FVector(InitialSpeed, 0.0f, 0.0f));
 	Damage = WeaponDamage;
 	DamageInstigatorPlayer = InputPlayerController;
 	
 	//본인을 발사한 액터 제외
-	BulletCollision->MoveIgnoreActors.Add(BOwner);
+	//BulletCollision->MoveIgnoreActors.Add(BOwner);
+	BulletCollision->IgnoreActorWhenMoving(BOwner, true);
+	
 
 	//본인을 발사한 무기 외 다른 무기들 제외	
-	AAct_ProjectileWeaponBase* Weapon = Cast<AAct_ProjectileWeaponBase>(GetOwner());
-	if(IsValid(Weapon))
+	AAct_ProjectileWeaponBase* Weapon = Cast<AAct_ProjectileWeaponBase>(BOwner);
+	
+	if(IsValid(BOwner))
 	{
-		if(IsValid(Weapon->GetWeaponControlSystem()))
+		IgnoresArray.AddUnique(BOwner);
+		BOwner->WeaponSkeletalMesh->IgnoreActorWhenMoving(this, true);
+		if(IsValid(BOwner->GetWeaponControlSystem()))
 		{
-			for(FWeaponData WeaponData :Weapon->GetWeaponControlSystem()->WeaponDataArray)
+			for(FWeaponData WeaponData :BOwner->GetWeaponControlSystem()->WeaponDataArray)
 			{
 				if(IsValid(WeaponData.Weapon))
 				{
+					IgnoresArray.AddUnique(WeaponData.Weapon);
 					if(WeaponData.Weapon!= BOwner)
 					{
-						BulletCollision->MoveIgnoreActors.Add(WeaponData.Weapon);
+						//BulletCollision->MoveIgnoreActors.Add(WeaponData.Weapon);
+						BulletCollision->IgnoreActorWhenMoving(WeaponData.Weapon, true);
 					}
 				}
 				else
@@ -135,11 +141,14 @@ void AAct_Bullet::InitializeBullet_Implementation(AAct_WeaponBase* BOwner, ACont
 				}
 			}
 			//캐릭터로부터 플레이어컨트롤러를 받아온다.
-			APawn* WeaponOwner = Cast<APawn>(Weapon->GetWeaponControlSystem()->GetOwner());
+			APawn* WeaponOwner = Cast<APawn>(BOwner->GetWeaponControlSystem()->GetOwner());
 			if(IsValid(WeaponOwner))
 			{
+				IgnoresArray.AddUnique(WeaponOwner);
 				//캐릭터 제외
-				BulletCollision->MoveIgnoreActors.Add(WeaponOwner);
+				//BulletCollision->MoveIgnoreActors.Add(WeaponOwner);
+				BulletCollision->IgnoreActorWhenMoving(WeaponOwner, true);
+				
 			}
 			else
 			{
@@ -151,6 +160,10 @@ void AAct_Bullet::InitializeBullet_Implementation(AAct_WeaponBase* BOwner, ACont
 			UE_LOG(Proto,Warning,TEXT("%s / %s : Fail to Get WeaponControlSystem"),*LINE_INFO,*GetNameSafe(this));
 		}
 		
+	}
+	else
+	{
+		UE_LOG(Proto,Warning,TEXT("%s / %s : Fail to Get Owner"),*LINE_INFO,*GetNameSafe(this));
 	}
 
 	if(!TracerColor.Equals(NewTracerColor, 0.000001f))
@@ -188,14 +201,19 @@ bool AAct_Bullet::StopFX_Validate(UParticleSystemComponent* PSystem) {
 }
 
 void AAct_Bullet::StopFX_Implementation(UParticleSystemComponent* PSystem) {
-	Destroy();
+	//Destroy();
 }
 
 void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	
-	if (OtherActor != nullptr) {
+	if (OtherActor != nullptr)
+	{
+		if(IgnoresArray.Find(OtherActor)!=INDEX_NONE)
+		{
+			return;
+		}
 		UE_LOG(Proto,Warning,TEXT("%s / %s : OverLAP with (%s)"),*LINE_INFO,*GetNameSafe(this), *GetNameSafe(OtherActor));
-		GEngine->AddOnScreenDebugMessage(10, 5.0f, FColor::Red, FString::Printf(TEXT("Hit Component : %s"), *OtherActor->GetName()));
+		GEngine->AddOnScreenDebugMessage(10, 5.0f, FColor::Red, FString::Printf(TEXT("overlap Component : %s"), *OtherActor->GetName()));
 		ProjectileMovement->SetVelocityInLocalSpace(FVector::ZeroVector);
 		ProjectileMovement->StopMovementImmediately();
 		if (GetLocalRole() >= ROLE_Authority)

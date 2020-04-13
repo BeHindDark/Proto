@@ -149,6 +149,7 @@ void AAct_ProjectileWeaponBase::SpawnBulletInServer(FVector MuzzleLocation, FRot
 		SpawnParams.Owner = this;
 		//SpawnParams.Instigator = this->Instigator;
 		AAct_Bullet* Bullet = GetWorld()->SpawnActor<AAct_Bullet>(AAct_Bullet::StaticClass(), MuzzleLocation, LaunchRotation, SpawnParams);
+		
 		if(IsValid(InstigatorController))
 		{
 			Bullet->InitializeBullet(this,InstigatorController,LaunchSpeed,Damage*DamageMultiplier,TracerColor);
