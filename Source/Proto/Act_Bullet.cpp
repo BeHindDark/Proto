@@ -33,7 +33,7 @@ AAct_Bullet::AAct_Bullet()
 	
 	RootComponent = DefaultSceneRoot;
 
-	SpanTime = 10;
+	SpanTime = 100000;
 
 	//static ConstructorHelpers::FObjectFinder<USoundCue> EXPLODE_FX(TEXT(""));
 
@@ -45,6 +45,7 @@ AAct_Bullet::AAct_Bullet()
 		BulletMesh->SetStaticMesh(SM_Bullet.Object);
 	}
 	BulletMesh->SetRelativeLocationAndRotation(FVector(-10.0f, 0.0f, 0.0f), FRotator(0.0f,-90.0f,0.0f));
+	BulletMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	//충돌 설정
 	BulletCollision->SetupAttachment(RootComponent);
@@ -56,7 +57,7 @@ AAct_Bullet::AAct_Bullet()
 	BulletCollision->SetGenerateOverlapEvents(true);
 	BulletCollision->OnComponentBeginOverlap.AddDynamic(this,&AAct_Bullet::BeginOverlap);
 	BulletCollision->bAutoActivate = false;
-	BulletCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	BulletCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	
 	//폭발이펙트 설정
 
@@ -119,6 +120,7 @@ void AAct_Bullet::InitializeBullet_Implementation(AAct_ProjectileWeaponBase* BOw
 	
 	if(IsValid(BOwner))
 	{
+		IgnoresArray.AddUnique(BOwner);
 		BOwner->WeaponSkeletalMesh->IgnoreActorWhenMoving(this, true);
 		if(IsValid(BOwner->GetWeaponControlSystem()))
 		{
@@ -126,6 +128,7 @@ void AAct_Bullet::InitializeBullet_Implementation(AAct_ProjectileWeaponBase* BOw
 			{
 				if(IsValid(WeaponData.Weapon))
 				{
+					IgnoresArray.AddUnique(WeaponData.Weapon);
 					if(WeaponData.Weapon!= BOwner)
 					{
 						//BulletCollision->MoveIgnoreActors.Add(WeaponData.Weapon);
@@ -141,6 +144,7 @@ void AAct_Bullet::InitializeBullet_Implementation(AAct_ProjectileWeaponBase* BOw
 			APawn* WeaponOwner = Cast<APawn>(BOwner->GetWeaponControlSystem()->GetOwner());
 			if(IsValid(WeaponOwner))
 			{
+				IgnoresArray.AddUnique(WeaponOwner);
 				//캐릭터 제외
 				//BulletCollision->MoveIgnoreActors.Add(WeaponOwner);
 				BulletCollision->IgnoreActorWhenMoving(WeaponOwner, true);
@@ -197,14 +201,19 @@ bool AAct_Bullet::StopFX_Validate(UParticleSystemComponent* PSystem) {
 }
 
 void AAct_Bullet::StopFX_Implementation(UParticleSystemComponent* PSystem) {
-	Destroy();
+	//Destroy();
 }
 
 void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	
-	if (OtherActor != nullptr) {
+	if (OtherActor != nullptr)
+	{
+		if(IgnoresArray.Find(OtherActor)!=INDEX_NONE)
+		{
+			return;
+		}
 		UE_LOG(Proto,Warning,TEXT("%s / %s : OverLAP with (%s)"),*LINE_INFO,*GetNameSafe(this), *GetNameSafe(OtherActor));
-		GEngine->AddOnScreenDebugMessage(10, 5.0f, FColor::Red, FString::Printf(TEXT("Hit Component : %s"), *OtherActor->GetName()));
+		GEngine->AddOnScreenDebugMessage(10, 5.0f, FColor::Red, FString::Printf(TEXT("overlap Component : %s"), *OtherActor->GetName()));
 		ProjectileMovement->SetVelocityInLocalSpace(FVector::ZeroVector);
 		ProjectileMovement->StopMovementImmediately();
 		if (GetLocalRole() >= ROLE_Authority)

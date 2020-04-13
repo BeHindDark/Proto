@@ -53,6 +53,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Explode")
 	UParticleSystemComponent* ExplodeFX;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BUllet|Collision")
+	TArray<AActor*> IgnoresArray;
+
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bullet|Tracer", meta = (AllowPrivateAccess = true))
 	FLinearColor TracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f);
