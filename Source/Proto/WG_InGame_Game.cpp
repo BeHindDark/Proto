@@ -24,15 +24,27 @@ void UWG_InGame_Game::NativeConstruct()
 		
 }
 
-void UWG_InGame_Game::SetScore(UTextBlock* txtTMP, int score)
+void UWG_InGame_Game::SetScore(ScoreType team, int score)
 {
+	FText textScore;
+
+	// int형 hp를 FText형으로 변환
 	if (score >= 100) {
-		txtTMP->SetText(FText::FromString(FString::FromInt(score)));
+		textScore = (FText::FromString(FString::FromInt(score)));
 	}
 	else if (score <= 0) {
-		txtTMP->SetText(FText::FromString("000"));
+		textScore = (FText::FromString("000"));
 	}
 	else {
-		txtTMP->SetText(FText::FromString("0" + FString::FromInt(score)));
+		textScore = (FText::FromString("0" + FString::FromInt(score)));
+	}
+
+	switch (team) {
+	case ScoreType::Red:
+		txtScoreRed->SetText(textScore);
+		break;
+	case ScoreType::Blue:
+		txtScoreBlue->SetText(textScore);
+		break;	
 	}
 }
