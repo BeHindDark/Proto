@@ -88,7 +88,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HP")
 	float MaxHP = 100;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Widget")
 	class UWG_InGame_Information* WG_InGame;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Spider|Animation")
+	UAnimationAsset* DeathAnimAsset;
 
 public:
 
@@ -129,12 +133,13 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void SetWaistSceneComponent(USceneComponent* BlueprintWaistSceneComponent);
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Death();
-	void Death_Implementation();
-	bool Death_Validate();
+	UFUNCTION(NetMulticast, Reliable)
+	void DeathAnim();
+	void DeathAnim_Implementation();
 
 private:
 	void TurnUpperBody(USceneComponent* WaistComponent, float DeltaTime);
+
+	UFUNCTION(BlueprintCallable)
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 };

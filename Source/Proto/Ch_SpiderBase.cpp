@@ -349,7 +349,7 @@ float ACh_SpiderBase::TakeDamage(float Damage, struct FDamageEvent const& Damage
 		}		
 		if (CurrentHP <= 0.0f) {
 			//여기에 캐릭터 사망함수 혹은 패배관련 함수가 들어가야됩니다
-			Death();
+			DeathAnim();
 		}
 	}
 	return ActualDamage;
@@ -358,31 +358,21 @@ float ACh_SpiderBase::TakeDamage(float Damage, struct FDamageEvent const& Damage
 
 void ACh_SpiderBase::OnWeaponTakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-
-	if (ActualDamage >= 0.0f) {
+	
+	if (Damage >= 0.0f) {
 		CurrentHP -= Damage;
 		if (CurrentHP <= 0.0f) {
 			//여기에 캐릭터 사망함수 들어가야됩니다
 			CurrentHP = 0.0f;
-			Death();
+			DeathAnim();
 		}
 	}
 }
 
-void ACh_SpiderBase::Death_Implementation() {
-	UAnimationAsset* DeathAnim;
-	DeathAnim = LoadObject<UAnimationAsset>(nullptr, TEXT("/Game/Mech_Constructor_Spiders/Animations/Legs_Spider_Hvy/Legs_Spider_Hvy_Death.Legs_Spider_Hvy_Death"));
-	if (DeathAnim != nullptr) {
-		GetMesh()->PlayAnimation(DeathAnim, false);
-	}
-}
-
-bool ACh_SpiderBase::Death_Validate() {
-	if (CurrentHP <= 0) {
-		return true;
-	}
-	else {
-		return false;
+void ACh_SpiderBase::DeathAnim_Implementation()
+{
+	if(IsValid(DeathAnimAsset))
+	{
+		GetMesh()->PlayAnimation(DeathAnimAsset, false);
 	}
 }

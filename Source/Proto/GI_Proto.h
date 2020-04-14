@@ -36,7 +36,7 @@ struct FUserFreeSet
 		Weapon1 = {-1, -1, -1};
 		Weapon2 = {-1, -1, -1};
 		Weapon3 = {-1, -1, -1};
-		WeaponArray = {&Weapon1, &Weapon2, &Weapon3};
+		//WeaponArray = {&Weapon1, &Weapon2, &Weapon3};
 	};
 	
 	FUserFreeSet(int InitMainIndex, TArray<int> Weapon1Data, TArray<int> Weapon2Data, TArray<int> Weapon3Data):
@@ -44,12 +44,14 @@ struct FUserFreeSet
 		Weapon1(Weapon1Data),
 		Weapon2(Weapon2Data),
 		Weapon3(Weapon3Data)
-	{WeaponArray ={&Weapon1, &Weapon2, &Weapon3};};
+	{//WeaponArray ={&Weapon1, &Weapon2, &Weapon3};
+	};
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Custom|UserFreeSet")
 	int MainClassIndex;
 
-	TArray<TArray<int>*> WeaponArray;
+	//UPROPERTY(BlueprintReadOnly,Category = "Custom|UserFreeSet")
+	//TArray<TArray<int>*> WeaponArray;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Custom|UserFreeSet")
 	/**	무기 데이터1
@@ -113,6 +115,7 @@ public:
 	/**세션 로비의 맵 이름*/
 	FName SessionLobyName;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "UserFreeSet")
 	TArray<FUserFreeSet> UserFreeSetArray;
 
 public:
