@@ -348,6 +348,7 @@ float ACh_SpiderBase::TakeDamage(float Damage, struct FDamageEvent const& Damage
 			WG_InGame->SetHP(HPType::BODY,(int)CurrentHP);
 		}		
 		if (CurrentHP <= 0.0f) {
+			OnDeath.Broadcast(EventInstigator);
 			//여기에 캐릭터 사망함수 혹은 패배관련 함수가 들어가야됩니다
 			DeathAnim();
 		}
@@ -361,7 +362,13 @@ void ACh_SpiderBase::OnWeaponTakeDamage(float Damage, FDamageEvent const& Damage
 	
 	if (Damage >= 0.0f) {
 		CurrentHP -= Damage;
+		if(IsValid(WG_InGame))
+		{
+			WG_InGame->SetHP(HPType::BODY,(int)CurrentHP);
+		}
 		if (CurrentHP <= 0.0f) {
+
+			OnDeath.Broadcast(EventInstigator);
 			//여기에 캐릭터 사망함수 들어가야됩니다
 			CurrentHP = 0.0f;
 			DeathAnim();

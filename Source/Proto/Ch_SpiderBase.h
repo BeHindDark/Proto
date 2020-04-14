@@ -6,6 +6,11 @@
 #include "GameFramework/Character.h"
 #include "Ch_SpiderBase.generated.h"
 
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpiderOnDeath,AController*,EventInstigator);
+
+
 UCLASS()
 class PROTO_API ACh_SpiderBase : public ACharacter
 {
@@ -38,6 +43,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Spider|Movement")
 	float MoveInput = 0.0f;
 
+	UPROPERTY(BlueprintAssignable,VisibleAnywhere,BlueprintCallable,Category = "Event")
+	FSpiderOnDeath OnDeath;
 protected:
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category = "Spider|WeaponControlSystem")
@@ -136,6 +143,7 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void DeathAnim();
 	void DeathAnim_Implementation();
+
 
 private:
 	void TurnUpperBody(USceneComponent* WaistComponent, float DeltaTime);
