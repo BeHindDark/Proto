@@ -243,6 +243,9 @@ void AAct_Bullet::CollisionMulticast_Implementation()
 	BulletMesh->SetVisibility(false);
 	ProjectileMovement->Deactivate();
 	ExplodeFX->OnSystemFinished.AddDynamic(this,&AAct_Bullet::StopFX);
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),ExplodeFX->Template,GetActorTransform(),true,EPSCPoolMethod::None,true);
+	Destroy();
+
 }
 
 
