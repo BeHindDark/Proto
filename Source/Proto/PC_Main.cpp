@@ -180,7 +180,7 @@ void APC_Main::OnGetCreateSessionReport(bool bWasSuccessful)
 		}
 
 
-		UGameplayStatics::OpenLevel(GetWorld(),FName("WidgetTestMap"),true,"listen");
+		UGameplayStatics::OpenLevel(GetWorld(),FName("RespawnTest_Map"),true,"listen");
 	}
 	else
 	{
