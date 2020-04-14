@@ -15,6 +15,8 @@ public:
 	// Sets default values for this actor's properties
 	AAct_Bullet();
 
+	virtual void PostInitializeComponents() override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -61,28 +63,11 @@ private:
 	FLinearColor TracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f);
 	
 	UFUNCTION()
-	void HitCheck(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
-
-public:
-	/**	총알의 속도, 데미지, 색 등을 초기화 하고 발동시킵니다.
-	*	총알은 Spawn될 때 AActor* FActorSpawnParameters.Owner를 통해 자신을 발사한 무기의 정보를 얻습니다.
-	*	그리고 이 Initiallize에서 무기를 통해 WCS와 무기가 장착된 Actor, 그 무기의 Controller를 구합니다.
-	*	여기서 
-	*/
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bullet")
-	float SpanTime;
-
-	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation)
-	void InitializeBullet(class AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f,0.03f,0.0f,0.5f));
-	bool InitializeBullet_Validate(class AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
-	void InitializeBullet_Implementation(class AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
-
-	UFUNCTION(NetMulticast, Reliable, WithValidation)
-	void StopFX(UParticleSystemComponent* PSystem);
-	bool StopFX_Validate(UParticleSystemComponent* PSystem);
-	void StopFX_Implementation(UParticleSystemComponent* PSystem);
-
+	void HitCheck(UPrimitiveComponent* HitComponent,
+				  AActor* OtherActor,
+				  UPrimitiveComponent* OtherComponent,
+				  FVector NormalImpulse,
+				  const FHitResult& Hit);
 
 	UFUNCTION( )
     void BeginOverlap(UPrimitiveComponent* OverlappedComponent, 
@@ -90,5 +75,32 @@ public:
                       UPrimitiveComponent* OtherComponent, 
                       int32 OtherBodyIndex, 
                       bool bFromSweep, 
-                      const FHitResult &SweepResult );
+                      const FHitResult &SweepResult);
+
+public:
+	
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Bullet")
+	float SpanTime;
+	
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, WithValidation)
+	/**	총알의 속도, 데미지, 색 등을 초기화 하고 발동시킵니다.
+	*	총알은 Spawn될 때 AActor* FActorSpawnParameters.Owner를 통해 자신을 발사한 무기의 정보를 얻습니다.
+	*	그리고 이 Initiallize에서 무기를 통해 WCS와 무기가 장착된 Actor, 그 무기의 Controller를 구합니다.
+	*	여기서
+	*/
+	void InitializeBullet(class AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f,0.03f,0.0f,0.5f));
+	bool InitializeBullet_Validate(class AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
+	void InitializeBullet_Implementation(class AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor = FLinearColor(0.87f, 0.03f, 0.0f, 0.5f));
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void StopFX(UParticleSystemComponent* PSystem);
+	bool StopFX_Validate(UParticleSystemComponent* PSystem);
+	void StopFX_Implementation(UParticleSystemComponent* PSystem);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void CollisionMulticast();
+	void CollisionMulticast_Implementation();
+
+	
 };
