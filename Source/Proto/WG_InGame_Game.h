@@ -9,6 +9,13 @@
 /**
  * 
  */
+
+UENUM(BlueprintType)
+enum class ScoreType : uint8 {
+	Red UMETA(DisplayName = "Read"),
+	Blue UMETA(DisplayName = "Blue"),
+};
+
 UCLASS()
 class PROTO_API UWG_InGame_Game : public UUserWidget
 {
@@ -29,5 +36,5 @@ protected:
 
 public:
 	UFUNCTION()
-	void SetScore(UTextBlock* txtTMP, int score);
+	void SetScore(ScoreType team, int score);
 };

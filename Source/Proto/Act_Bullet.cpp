@@ -15,7 +15,7 @@
 // Sets default values
 AAct_Bullet::AAct_Bullet()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	//리플리케이션 설정
@@ -30,10 +30,10 @@ AAct_Bullet::AAct_Bullet()
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ExplodeAudio = CreateDefaultSubobject<USoundCue>(TEXT("ExplodeAudio"));
 	ExplodeFX = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ExplodeFX"));
-	
+
 	RootComponent = DefaultSceneRoot;
 
-	SpanTime = 100000;
+	SpanTime = 1000000;
 
 	//static ConstructorHelpers::FObjectFinder<USoundCue> EXPLODE_FX(TEXT(""));
 
@@ -44,22 +44,22 @@ AAct_Bullet::AAct_Bullet()
 	{
 		BulletMesh->SetStaticMesh(SM_Bullet.Object);
 	}
-	BulletMesh->SetRelativeLocationAndRotation(FVector(-10.0f, 0.0f, 0.0f), FRotator(0.0f,-90.0f,0.0f));
-	
+	BulletMesh->SetRelativeLocationAndRotation(FVector(-10.0f,0.0f,0.0f),FRotator(0.0f,-90.0f,0.0f));
+
 
 	//충돌 설정
 	BulletCollision->SetupAttachment(RootComponent);
-	BulletCollision->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
-	BulletCollision->SetCapsuleSize(7.0f, 30.0f);
-	BulletCollision->SetGenerateOverlapEvents(true);
+	BulletCollision->SetRelativeRotation(FRotator(-90.0f,0.0f,0.0f));
+	BulletCollision->SetCapsuleSize(7.0f,30.0f);
 	BulletCollision->bAutoActivate = false;
-	//BulletCollision->SetIsReplicated(true);
-	
+	BulletCollision->SetIsReplicated(true);
+
+	BulletCollision->SetGenerateOverlapEvents(true);
 	//폭발이펙트 설정
 
 	ExplodeFX->SetupAttachment(RootComponent);
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> EXPLODE_EFFECT(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
-	if (EXPLODE_EFFECT.Succeeded()) {
+	if(EXPLODE_EFFECT.Succeeded()) {
 		ExplodeFX->SetTemplate(EXPLODE_EFFECT.Object);
 		ExplodeFX->SetAutoActivate(false);
 	}
@@ -81,24 +81,18 @@ AAct_Bullet::AAct_Bullet()
 	ProjectileMovement->MaxSpeed = 30000.0f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bAutoActivate = false;
-	//ProjectileMovement->SetIsReplicated(true);
-		
+	ProjectileMovement->SetIsReplicated(true);
+
 }
 
 void AAct_Bullet::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	BulletMesh->SetCollisionProfileName(TEXT("NoCollision"));
-
-	if(GetLocalRole()<ROLE_Authority)
-	{
-		//BulletCollision->SetCollisionProfileName(TEXT("NoCollision"));
-		//return;
-	}
-
 	BulletCollision->SetCollisionProfileName(TEXT("Projectile"));
 	BulletCollision->OnComponentBeginOverlap.AddDynamic(this,&AAct_Bullet::BeginOverlap);
-	BulletCollision->IgnoreActorWhenMoving(GetOwner(), true);
+	BulletCollision->OnComponentHit.AddDynamic(this,&AAct_Bullet::HitCheck);
+	BulletCollision->IgnoreActorWhenMoving(GetOwner(),true);
 	AAct_ProjectileWeaponBase* Weapon = Cast<AAct_ProjectileWeaponBase>(GetOwner());
 
 	if(IsValid(Weapon))
@@ -110,7 +104,7 @@ void AAct_Bullet::PostInitializeComponents()
 			{
 				if(IsValid(WeaponData.Weapon))
 				{
-					
+
 					if(WeaponData.Weapon!= Weapon)
 					{
 						//BulletCollision->MoveIgnoreActors.Add(WeaponData.Weapon);
@@ -128,7 +122,7 @@ void AAct_Bullet::PostInitializeComponents()
 			{
 				//캐릭터 제외
 				BulletCollision->IgnoreActorWhenMoving(WeaponOwner,true);
-
+				DamageInstigatorPlayer = WeaponOwner->GetController();
 			}
 			else
 			{
@@ -139,7 +133,6 @@ void AAct_Bullet::PostInitializeComponents()
 		{
 			UE_LOG(Proto,Warning,TEXT("%s / %s : Fail to Get WeaponControlSystem"),*LINE_INFO,*GetNameSafe(this));
 		}
-
 	}
 	else
 	{
@@ -151,7 +144,7 @@ void AAct_Bullet::PostInitializeComponents()
 void AAct_Bullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	//총알액터 수명설정
 	SetLifeSpan(SpanTime);
 }
@@ -163,28 +156,72 @@ void AAct_Bullet::Tick(float DeltaTime)
 
 }
 
-bool AAct_Bullet::InitializeBullet_Validate(AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor)
+bool AAct_Bullet::InitializeBullet_Validate(AAct_ProjectileWeaponBase* BOwner,AController* InputPlayerController,float InitialSpeed,float WeaponDamage,FLinearColor NewTracerColor)
 {
 	return true;
 }
 
-void AAct_Bullet::InitializeBullet_Implementation(AAct_ProjectileWeaponBase* BOwner, AController* InputPlayerController, float InitialSpeed, float WeaponDamage, FLinearColor NewTracerColor)
+void AAct_Bullet::InitializeBullet_Implementation(AAct_ProjectileWeaponBase* BOwner,AController* InputPlayerController,float InitialSpeed,float WeaponDamage,FLinearColor NewTracerColor)
 {
-	ProjectileMovement->SetVelocityInLocalSpace(FVector(InitialSpeed, 0.0f, 0.0f));
+	ProjectileMovement->SetVelocityInLocalSpace(FVector(InitialSpeed,0.0f,0.0f));
 	Damage = WeaponDamage;
 	DamageInstigatorPlayer = InputPlayerController;
-	
-	if(!TracerColor.Equals(NewTracerColor, 0.000001f))
+
+	if(!TracerColor.Equals(NewTracerColor,0.000001f))
 	{
 		TracerColor = NewTracerColor;
 	}
 
 	UMaterialInstanceDynamic* MaterialInstance = TracerFX->CreateDynamicMaterialInstance(0);
-	MaterialInstance->SetVectorParameterValue(FName(TEXT("TracerBaseColor")), TracerColor);
-	TracerFX->SetMaterial(0, MaterialInstance);
-	TracerFX->Activate();
-	ProjectileMovement->Activate();
+	MaterialInstance->SetVectorParameterValue(FName(TEXT("TracerBaseColor")),TracerColor);
+	TracerFX->SetMaterial(0,MaterialInstance);
+	TracerFX->Activate();	
 	BulletCollision->Activate();
+	ProjectileMovement->Activate();
+}
+
+void AAct_Bullet::HitCheck(UPrimitiveComponent* HitComponent,AActor* OtherActor,UPrimitiveComponent* OtherComponent,FVector NormalImpulse,const FHitResult& Hit)
+{
+	if(GetLocalRole()<ROLE_Authority)
+	{
+		UE_LOG(Proto,Warning,TEXT("%s / %s : localhit with (%s)"),*LINE_INFO,*GetNameSafe(this),*GetNameSafe(OtherActor));
+		return;
+	}
+
+	UE_LOG(Proto,Warning,TEXT("%s / %s : server hit with (%s)"),*LINE_INFO,*GetNameSafe(this),*GetNameSafe(OtherActor));
+	ProjectileMovement->StopMovementImmediately();
+	UGameplayStatics::ApplyDamage(OtherActor,Damage,DamageInstigatorPlayer,this,UDamageType::StaticClass());
+
+	CollisionMulticast();
+
+	
+}
+
+void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent,AActor* OtherActor,UPrimitiveComponent* OtherComponent,int32 OtherBodyIndex,bool bFromSweep,const FHitResult& SweepResult)
+{
+	
+	if(GetLocalRole()<ROLE_Authority)
+	{
+		UE_LOG(Proto,Warning,TEXT("%s / %s : localOverLAP with (%s)"),*LINE_INFO,*GetNameSafe(this),*GetNameSafe(OtherActor));
+		return;
+	}
+
+
+	UE_LOG(Proto,Warning,TEXT("%s / %s : serverOverLAP with (%s)"),*LINE_INFO,*GetNameSafe(this),*GetNameSafe(OtherActor));
+	ProjectileMovement->SetVelocityInLocalSpace(FVector::ZeroVector);
+	ProjectileMovement->StopMovementImmediately();
+
+	UGameplayStatics::ApplyDamage(OtherActor,Damage,DamageInstigatorPlayer,this,UDamageType::StaticClass());
+	
+
+
+	//FVector DamageDirection = SweepResult.ImpactPoint - GetActorLocation();
+	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, DamageDirection, SweepResult, DamageInstigatorPlayer, GetOwner(), UDamageType::StaticClass());
+
+	CollisionMulticast();
+
+	//ExplodeFX->OnSystemFinished.AddDynamic(this,&AAct_Bullet::StopFX);
+
 }
 
 bool AAct_Bullet::StopFX_Validate(UParticleSystemComponent* PSystem)
@@ -197,31 +234,19 @@ void AAct_Bullet::StopFX_Implementation(UParticleSystemComponent* PSystem)
 	Destroy();
 }
 
-void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AAct_Bullet::CollisionMulticast_Implementation()
 {
-	
-	UE_LOG(Proto,Warning,TEXT("%s / %s : OverLAP with (%s)"),*LINE_INFO,*GetNameSafe(this), *GetNameSafe(OtherActor));
-	GEngine->AddOnScreenDebugMessage(10, 5.0f, FColor::Red, FString::Printf(TEXT("overlap Component : %s"), *OtherActor->GetName()));
-	ProjectileMovement->SetVelocityInLocalSpace(FVector::ZeroVector);
-	ProjectileMovement->StopMovementImmediately();
-
-	if(GetLocalRole()>=ROLE_Authority)
-	{
-		UGameplayStatics::ApplyDamage(OtherActor,Damage,DamageInstigatorPlayer,this,UDamageType::StaticClass());
-	}
-		
-		
-	//FVector DamageDirection = SweepResult.ImpactPoint - GetActorLocation();
-	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, DamageDirection, SweepResult, DamageInstigatorPlayer, GetOwner(), UDamageType::StaticClass());
-		
 	ExplodeFX->Activate(true);
 	TracerFX->DeactivateSystem();
-	BulletCollision->SetHiddenInGame(true, true);
+	BulletCollision->SetHiddenInGame(true,true);
 	SetActorEnableCollision(false);
 	BulletMesh->SetVisibility(false);
 	ProjectileMovement->Deactivate();
+	ExplodeFX->OnSystemFinished.AddDynamic(this,&AAct_Bullet::StopFX);
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),ExplodeFX->Template,GetActorTransform(),true,EPSCPoolMethod::None,true);
+	Destroy();
 
-	ExplodeFX->OnSystemFinished.AddDynamic(this, &AAct_Bullet::StopFX);
-	
 }
+
+
 
