@@ -118,7 +118,7 @@ protected:
 	class UWeaponControlSystem* WeaponControlSystem_Ref;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess =  true))
-	//포탑이 타겟에 락온되거나, 최대각도게 걸려 안움직이는 상황이면 true
+	//포탑이 타겟에 락온되거나, 최대각도에 걸려 안움직이는 상황이면 true
 	bool bLocked;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess =  true))

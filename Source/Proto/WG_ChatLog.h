@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "WG_TextBox.generated.h"
+#include "WG_ChatLog.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROTO_API UWG_TextBox : public UUserWidget
+class PROTO_API UWG_ChatLog : public UUserWidget
 {
 	GENERATED_BODY()
 

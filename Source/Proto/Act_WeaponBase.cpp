@@ -20,7 +20,7 @@ AAct_WeaponBase::AAct_WeaponBase()
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 
 	RootComponent = DefaultSceneRoot;
-		
+	
 }
 
 void AAct_WeaponBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -37,7 +37,7 @@ void AAct_WeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	FActorSpawnParameters spawnparam;
+	//FActorSpawnParameters spawnparam;
 	
 	//GetWorld()->SpawnActor<AAct_Bullet>()
 	//GetWorld()->SpawnActorDiffed<>
@@ -54,12 +54,6 @@ float AAct_WeaponBase::TakeDamage(float DamageAmount,FDamageEvent const & Damage
 void AAct_WeaponBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	/*
-	if(GetLocalRole()>=ROLE_Authority)
-	{
-		TurnTowardDirectAim(DeltaTime);
-	}
-	*/
 
 }
 
@@ -86,12 +80,13 @@ void AAct_WeaponBase::ServerOnCeaseFireOrder()
 
 void AAct_WeaponBase::ConnectWeaponControlSystem_Implementation(UWeaponControlSystem * NewWeaponControlSystem,int NewWeaponIndex)
 {
-	WeaponControlSystem_Ref = NewWeaponControlSystem;
-	if(!IsValid(WeaponControlSystem_Ref))
+	if(!IsValid(NewWeaponControlSystem))
 	{
-		UE_LOG(Proto,Warning,TEXT("%s / %s : fuckfuckfuck"),*LINE_INFO,*GetNameSafe(this));
+		UE_LOG(Proto,Warning,TEXT("%s / %s : Fail to Connect WeaponControlSystem(Target is inValid)"),*LINE_INFO,*GetNameSafe(this));
+		return;
 	}
-
+	WeaponControlSystem_Ref = NewWeaponControlSystem;
+	
 	SocketArrow_Ref = NewWeaponControlSystem->WeaponDataArray[NewWeaponIndex].SocketArrow_Ref;
 
 	WeaponIndex = NewWeaponIndex;
@@ -201,12 +196,8 @@ void AAct_WeaponBase::TurnTowardDirectAim(float DeltaTime)
 	FRotator TargetAngleDiff;
 	(RelativeTargetDirection - NewRelativeRotation).GetWindingAndRemainder(Dummyrot,RotationDiff);
 
-	if(TargetAngleDiff.IsNearlyZero(0.001f))
+	if(bIsOnTarget!=TargetAngleDiff.IsNearlyZero(0.001f))
 	{
-		bIsOnTarget = true;
-	}
-	else
-	{
-		bIsOnTarget = false;
+		bIsOnTarget=(!bIsOnTarget);
 	}
 }

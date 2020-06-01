@@ -23,25 +23,32 @@ public:
 	/** 위에 포대 노티파이 델리게이트
 	*/
 	FUpFireCheckDelegate UpFireCheck;
+
 	/** 아래 포대 노티파이 델리게이트
 	*/
 	FDownFireCheckDelegate DownFireCheck;
+
 	/** 애니메이션 종료 델리게이트
 	*/
 	FAnimationEndDelegate AnimationEnd;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	//애니메이션 대상
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	class AAct_ProjectileWeaponBase* Weapon;
 
+	//Weapon 레퍼런스를 받으면 true로 바뀝니다.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bWeaponConnected;
+
 private:
-	UFUNCTION()
-	/** 위에 포대 애니메이션 노티파이
+	/** 상부총열발사 애니메이션 노티파이
 	*/
+	UFUNCTION()
 	void AnimNotify_UpFireCheck();
 	
-	UFUNCTION()
-	/** 아래 포대 애니메이션 노티파이
+	/** 하부총열발사 애니메이션 노티파이
 	*/
+	UFUNCTION()
 	void AnimNotify_DownFireCheck();
 
 	UFUNCTION()

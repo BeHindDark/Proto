@@ -21,11 +21,13 @@ UGI_Proto::UGI_Proto(const FObjectInitializer& ObjectInitializer) {
 	//기본 freeset초기화. 나중에 ini로 이동
 	UserFreeSetArray.SetNum(5);
 	UserFreeSetArray.Reserve(5);
-	UserFreeSetArray[0] = FUserFreeSet(0, {0,0,0}, {0,0,0}, {0,0,0});
-	UserFreeSetArray[1] = FUserFreeSet(0, {0,0,0}, {0,0,0}, {0,0,0});
-	UserFreeSetArray[2] = FUserFreeSet(0, {0,0,0}, {0,0,0}, {0,0,0});
-	UserFreeSetArray[3] = FUserFreeSet(0, {0,0,0}, {0,0,0}, {0,0,0});
-	UserFreeSetArray[4] = FUserFreeSet(0, {0,0,0}, {0,0,0}, {0,0,0});
+	UserFreeSetArray[0] = FUserFreeSet(0, {0,0,0}, {0,1,1}, {-1,-1,-1});
+	UserFreeSetArray[1] = FUserFreeSet(0, {0,0,0}, {0,1,1}, {-1,-1,-1});
+	UserFreeSetArray[2] = FUserFreeSet(0, {0,0,0}, {0,1,1}, {-1,-1,-1});
+	UserFreeSetArray[3] = FUserFreeSet(0, {0,0,0}, {0,1,1}, {-1,-1,-1});
+	UserFreeSetArray[4] = FUserFreeSet(0, {0,0,0}, {0,1,1}, {-1,-1,-1});
+
+	UserFreeSetSelector = 0;
 }
 
 void UGI_Proto::Init()

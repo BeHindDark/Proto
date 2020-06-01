@@ -21,6 +21,11 @@ void AAct_DB_ProjectileWeaponBase::PostInitializeComponents()
 		Anim->UpFireCheck.AddDynamic(this,&AAct_DB_ProjectileWeaponBase::UpFire);
 		Anim->DownFireCheck.AddDynamic(this,&AAct_DB_ProjectileWeaponBase::DownFire);
 		Anim->Weapon = this;
+		Anim->bWeaponConnected = true;
+	}
+	else
+	{
+		UE_LOG(Proto,Warning,TEXT("%s / %s : Fail to get AnimInstance from skeletalmesh."),*LINE_INFO,*GetNameSafe(this));
 	}
 	
 }

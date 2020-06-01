@@ -20,13 +20,15 @@ ACh_SpiderBase* UBPF_SpawnFactory::SpawnSpider( int32 CharacterClassIndex, FVect
 	{
 		Initialize();
 	}
+	/*
 	FActorSpawnParameters SpawnParam;
 	SpawnParam.Owner = Owner;
 	auto Class = UBPF_SpawnFactory::CharacterArray[CharacterClassIndex];
 	ACh_SpiderBase* NewActor =	Owner->GetWorld()->SpawnActor<ACh_SpiderBase>(Class, Location, Rotation,SpawnParam);
 	UE_LOG(LogTemp, Warning, TEXT("SpawnSpiderExecute"));
 	return NewActor;
-
+	*/
+	return nullptr;
 }
 
 AAct_WeaponBase* UBPF_SpawnFactory::SpawnWeapon(int32 WeaponClassIndex, FVector Location, FRotator Rotation, AActor* Owner)
@@ -45,12 +47,14 @@ AAct_WeaponBase* UBPF_SpawnFactory::SpawnWeapon(int32 WeaponClassIndex, FVector 
 void UBPF_SpawnFactory::Initialize()
 {
 	CharacterArray.SetNum(1);
+	/*
 	static ConstructorHelpers::FClassFinder<ACh_SpiderBase>Character_Spider(TEXT("/Game/Blueprints/TestSpider.TestSpider_C"));
 	if (Character_Spider.Succeeded())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SpiderSourceExecute"));
 		CharacterArray[0] = Character_Spider.Class;
 	}
+	*/
 	WeaponArray.SetNum(2);
 	static ConstructorHelpers::FClassFinder<AAct_WeaponBase>Actor_Weapon(TEXT("/Game/Blueprints/BP_Act_DB_ProjectileWeaponBase.BP_Act_DB_ProjectileWeaponBase_C"));
 	if (Actor_Weapon.Succeeded())

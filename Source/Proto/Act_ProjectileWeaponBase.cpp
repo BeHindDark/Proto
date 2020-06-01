@@ -39,7 +39,7 @@ void AAct_ProjectileWeaponBase::Tick(float DeltaTime)
 
 void AAct_ProjectileWeaponBase::TurnTowardProjectileAim(float DeltaTime)
 {
-	//WCS 연결 확인
+	//WeaponControlSystem 연결 확인
 	if(!IsValid(WeaponControlSystem_Ref))
 	{
 		//매 틱마다 호출되는 함수이기에 로그가 너무 많아지므로 따로 로그는 넣지 않습니다.
@@ -93,6 +93,8 @@ void AAct_ProjectileWeaponBase::TurnTowardProjectileAim(float DeltaTime)
 	//두 각도의 차이를 구한 뒤 -180 ~ 180의 값으로 변환하여 RotationDiff에 준다.
 	(TargetRelativeRotation - CurRelativeRotation).GetWindingAndRemainder(Dummyrot,RotationDiff);
 
+	FRotator NewRelativeRotation = CurRelativeRotation;
+
 	//만약 거의 값이 같아서 돌릴필요가 없으면 돌리지 않는다.
 	if(RotationDiff.IsNearlyZero(0.001f))
 	{
@@ -129,11 +131,19 @@ void AAct_ProjectileWeaponBase::TurnTowardProjectileAim(float DeltaTime)
 		//현재상대회전 + 돌릴각도 = 새 상대회전
 		//굳이 이렇게 한단계 거치는 이유는 본체나 포탑이 너무 빠르게 회전할 경우 Roll값이 조금씩 돌아가는 문제가 있기 때문입니다.
 		//부동소수점 연산에서 생기는 찌꺼기 값이 계속 누적되서 일지도...
-		FRotator NewRelativeRotation = CurRelativeRotation + DeltaRotation;
+		NewRelativeRotation = CurRelativeRotation + DeltaRotation;
 		NewRelativeRotation.Pitch = FMath::ClampAngle(NewRelativeRotation.Pitch,PitchRotationLimit[0],PitchRotationLimit[1]);
 		NewRelativeRotation.Yaw = FMath::ClampAngle(NewRelativeRotation.Yaw,YawRotationLimit[0],YawRotationLimit[1]);
 		NewRelativeRotation.Roll = 0.0f;
 		SetActorRelativeRotation(NewRelativeRotation);
+	}
+
+	FRotator TargetAngleDiff;
+	(RelativeLaunchDirection - NewRelativeRotation).GetWindingAndRemainder(Dummyrot,RotationDiff);
+
+	if(bIsOnTarget!=TargetAngleDiff.IsNearlyZero(0.001f))
+	{
+		bIsOnTarget=(!bIsOnTarget);
 	}
 }
 

@@ -4,6 +4,5 @@
 /Build
 /Plugins
 /Binaries
-/Content/Map_Esset
 *.sln
 *_BuiltData.uasset

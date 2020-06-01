@@ -193,7 +193,6 @@ void AAct_Bullet::HitCheck(UPrimitiveComponent* HitComponent,AActor* OtherActor,
 	UGameplayStatics::ApplyDamage(OtherActor,Damage,DamageInstigatorPlayer,this,UDamageType::StaticClass());
 
 	CollisionMulticast();
-
 	
 }
 

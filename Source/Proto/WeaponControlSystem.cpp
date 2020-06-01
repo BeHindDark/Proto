@@ -26,6 +26,19 @@ void UWeaponControlSystem::BeginPlay()
 	
 }
 
+void UWeaponControlSystem::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	//UPROPERTY(replicated,VisibleAnywhere,BlueprintReadWrite,Category = "Spider|WeaponControlSystem")
+	//FVector AimLocation = FVector::ZeroVector;
+	DOREPLIFETIME(UWeaponControlSystem, WeaponDataArray);
+	DOREPLIFETIME(UWeaponControlSystem, IsTriggerOn);
+	DOREPLIFETIME(UWeaponControlSystem, WeaponGroupSelector);
+	DOREPLIFETIME(UWeaponControlSystem, WeaponGroupArray);
+}
+
 
 // Called every frame
 void UWeaponControlSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -40,7 +53,7 @@ void UWeaponControlSystem::ActivateWeaponGroup_Implementation(int WeaponGroupInd
 {
 	if((WeaponGroupIndex>=0)&&(WeaponGroupArray.Num()>WeaponGroupIndex))
 	{
-		if(WeaponGroupArray[WeaponGroupIndex].Num()>0)
+		if(WeaponGroupArray[WeaponGroupIndex].Array.Num()>0)
 		{
 			WeaponGroupSelector = WeaponGroupIndex;
 			return;
@@ -59,14 +72,13 @@ void UWeaponControlSystem::ActivateWeaponGroup_Implementation(int WeaponGroupInd
 	}
 }
 
-bool UWeaponControlSystem::ActivateWeaponGroup_Validate(int WeaponGroupIndex)
-{
-	return true;
-}
-
 
 bool UWeaponControlSystem::SyncNewWeapon(AAct_WeaponBase * NewWeapon,int WeaponIndex,int WeaponGroupIndex)
 {
+	if(GetOwnerRole()<ROLE_Authority)
+	{
+		return false;
+	}
 	//오류 처리
 	if(!IsValid(NewWeapon))
 	{
@@ -82,7 +94,7 @@ bool UWeaponControlSystem::SyncNewWeapon(AAct_WeaponBase * NewWeapon,int WeaponI
 
 	//Attach 시도
 	NewWeapon->AttachToComponent(WeaponDataArray[WeaponIndex].SocketArrow_Ref.Get(), FAttachmentTransformRules::SnapToTargetIncludingScale);
-
+	
 	//Attach 실패 처리
 	if(!NewWeapon->IsAttachedTo(GetOwner()))
 	{
@@ -95,25 +107,26 @@ bool UWeaponControlSystem::SyncNewWeapon(AAct_WeaponBase * NewWeapon,int WeaponI
 	}
 
 	//내부작업
-
 	WeaponDataArray[WeaponIndex].Weapon = NewWeapon;
 	WeaponDataArray[WeaponIndex].GroupIndex = WeaponGroupIndex;
 
-	NewWeapon->ConnectWeaponControlSystem(this, WeaponIndex);
-
 	//기존 WeaponIndex 제거
-	for(TArray<int> WeaponIndexArray :WeaponGroupArray)
+	for(FIndexArray WeaponIndexArray :WeaponGroupArray)
 	{
-		WeaponIndexArray.Remove(WeaponIndex);
+		WeaponIndexArray.Array.Remove(WeaponIndex);
 	}
 
 	//다시 WeaponIndex 추가
-	WeaponGroupArray[WeaponGroupIndex].AddUnique(WeaponIndex);
+	WeaponGroupArray[WeaponGroupIndex].Array.AddUnique(WeaponIndex);
+
+	NewWeapon->ConnectWeaponControlSystem(this,WeaponIndex);
+
+	//spider의 함수를 weapon의 델리게이트와 바로 묶는 것이 아니라, weapon control system을 거치도록 바꿔야 한다.
 	ACh_SpiderBase* spider = Cast<ACh_SpiderBase>(GetOwner());
 	if(IsValid(spider))
 	{
 		NewWeapon->OnWeaponTakeDamage.AddDynamic(spider, &ACh_SpiderBase::OnWeaponTakeDamage);
-	}	
+	}
 	return true;
 }
 
@@ -127,7 +140,7 @@ void UWeaponControlSystem::InitializeWeaponNumber(int32 NewWeaponNum)
 	}
 	WeaponDataArray.Init(FWeaponData(), NewWeaponNum);
 	WeaponDataArray.Reserve(NewWeaponNum);
-	WeaponGroupArray.Init(TArray<int>(), NewWeaponNum);
+	WeaponGroupArray.Init(FIndexArray(), NewWeaponNum);
 	WeaponGroupArray.Reserve(NewWeaponNum);
 }
 
@@ -173,7 +186,7 @@ bool UWeaponControlSystem::SetWeaponSocket(class UArrowComponent* NewSocketArrow
 
 void UWeaponControlSystem::SendFireOrder()
 {
-	for(int WeaponIndex:WeaponGroupArray[WeaponGroupSelector])
+	for(int WeaponIndex:WeaponGroupArray[WeaponGroupSelector].Array)
 	{
 		WeaponDataArray[WeaponIndex].Weapon->ServerOnFireOrder();
 	}
@@ -181,8 +194,9 @@ void UWeaponControlSystem::SendFireOrder()
 
 void UWeaponControlSystem::SendCeaseFireOrder()
 {
-	for(int WeaponIndex:WeaponGroupArray[WeaponGroupSelector])
+	for(int WeaponIndex:WeaponGroupArray[WeaponGroupSelector].Array)
 	{
 		WeaponDataArray[WeaponIndex].Weapon->ServerOnCeaseFireOrder();
 	}
 }
+

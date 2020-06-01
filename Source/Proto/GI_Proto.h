@@ -5,25 +5,27 @@
 #include "Proto.h"
 #include "Engine/GameInstance.h"
 #include "OJ_Webconnect.h"
-
 #include "Http.h"
 #include "Interfaces/IHttpResponse.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Loginhttp.h"
-
 #include "GI_Proto.generated.h"
 
+//d
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCreateSessionReportDelegate, bool);
 
+//d
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnFindSessionReportDelegate, bool);
 
 /**	세션 참가시도가 끝나고 ClientTravel을 하기 전 호출되는 델리게이트
 *	@param	bool	bWasSuccessful	세션 참가 성공 여부
 *	@param	FString	TravelURL		참가할 세션의 URL
 */
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnJoinSessionReportDelegate, bool, FString);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnJoinSessionReportDelegate, bool,FString);
 
+//d
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDestroySessionReportDelegate, bool);
+
 
 USTRUCT(BlueprintType)
 struct FUserFreeSet
@@ -54,26 +56,26 @@ struct FUserFreeSet
 	//TArray<TArray<int>*> WeaponArray;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Custom|UserFreeSet")
-	/**	무기 데이터1
-	*	[0]	무기 클래스 Index
-	*	[1]	소켓 Index
-	*	[2]	무기 그룹 Index
+	/**	WeaponData1
+	*	[0]	Weapon Class Index
+	*	[1]	Socket Index
+	*	[2]	Weapon Group Index
 	*/
 	TArray<int> Weapon1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Custom|UserFreeSet")
-	/**	무기 데이터2
-	*	[0]	무기 클래스 Index
-	*	[1]	소켓 Index
-	*	[2]	무기 그룹 Index
+	/**	WeaponData1
+	*	[0]	Weapon Class Index
+	*	[1]	Socket Index
+	*	[2]	Weapon Group Index
 	*/
 	TArray<int> Weapon2;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Custom|UserFreeSet")
-	/**	무기 데이터3
-	*	[0]	무기 클래스 Index
-	*	[1]	소켓 Index
-	*	[2]	무기 그룹 Index
+	/**	WeaponData1
+	*	[0]	Weapon Class Index
+	*	[1]	Socket Index
+	*	[2]	Weapon Group Index
 	*/
 	TArray<int> Weapon3;
 };
@@ -116,7 +118,17 @@ public:
 	FName SessionLobyName;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "UserFreeSet")
+	/**	유저 프리셋이 저장되는 Array
+	*	본체와 무기에 대한 각종 Index가 저장됨
+	*/
 	TArray<FUserFreeSet> UserFreeSetArray;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "UserFreeSet")
+	/**	어떤 유저프리셋을 사용할지 정하는 Index
+	*	@ value	0<=valid<=4
+	*	@ value -1 == non initialized
+	*/
+	int UserFreeSetSelector = -1;
 
 public:
 
@@ -171,8 +183,11 @@ public:
 	/** Handle to registered delegate for destroying a session */
 	FDelegateHandle OnDestroySessionCompleteDelegateHandle;
 
-	FOnCreateSessionReportDelegate OnCreateSessionReport;
+	//블루프린트 및 외부 클래스에서 접근하기 위한 델리게이트(설명추가필요)
 
+	//UPROPERTY(BlueprintAssignable)
+	FOnCreateSessionReportDelegate OnCreateSessionReport;
+	
 	FOnFindSessionReportDelegate OnFindSessionReport;
 
 	FOnJoinSessionReportDelegate OnJoinSessionReport;

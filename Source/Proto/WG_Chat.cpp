@@ -3,7 +3,7 @@
 
 #include "WG_Chat.h"
 #include "PC_Lobby.h"
-#include "WG_TextBox.h"
+#include "WG_ChatLog.h"
 #include "Components/TextBlock.h"
 #include "Components/EditableTextBox.h"
 #include "Components/ScrollBox.h"

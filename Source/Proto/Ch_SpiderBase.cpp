@@ -10,21 +10,20 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "WeaponControlSystem.h"
-#include "Act_ProjectileWeaponBase.h"
-#include "WG_InGame_Information.h"
+#include "DamageControlSystem.h"
+#include "Act_WeaponBase.h"
 
 // Sets default values
 ACh_SpiderBase::ACh_SpiderBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	bReplicates = true;
 	
 	//기본값(컴포넌트 등록, 좌표, 기타 기본 값) 정렬
-	//WaistSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("WaistSceneComponent"));
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	WCS = CreateDefaultSubobject<UWeaponControlSystem>(TEXT("WCS"));
+	WeaponControlSystem = CreateDefaultSubobject<UWeaponControlSystem>(TEXT("WCS"));
+	DamageControlSystem = CreateDefaultSubobject<UDamageControlSystem>(TEXT("DCS"));
 		
 	SpringArm->TargetArmLength = 800.0f;
 	SpringArm->SocketOffset = FVector(0.0f, 0.0f, 300.0f);
@@ -38,52 +37,59 @@ ACh_SpiderBase::ACh_SpiderBase()
 	Camera->bUsePawnControlRotation = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 30.0f, 0.0f);
 
-	if(GetLocalRole()>=ROLE_Authority)
-	{
-		AimLocation = GetActorLocation() + 100.0f*GetActorForwardVector();
-	}
-	
-	WCS->SetIsReplicated(true);
+	WeaponControlSystem->SetIsReplicated(true);
+	DamageControlSystem->SetIsReplicated(true);
 
-	
 }
 
 /**	변수 리플리케이션을 할 때 항상 삽입해야 하는 함수입니다.
 *	선언은 없이 정의부분만 넣어주면 됩니다.
+*	빨간줄은 무시하세요
 */
 void ACh_SpiderBase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ACh_SpiderBase,AimLocation);
+		
+	//UPROPERTY(replicated,VisibleAnywhere,BlueprintReadWrite,Category = "Spider|WeaponControlSystem")
+	//FVector AimLocation = FVector::ZeroVector;
+	//DOREPLIFETIME(ACh_SpiderBase,AimLocation);
+	
+	DOREPLIFETIME(ACh_SpiderBase,bIsPlayerControlling);
+	DOREPLIFETIME(ACh_SpiderBase,PlayerController);
 }
 
 // Called when the game starts or when spawned
 void ACh_SpiderBase::BeginPlay()
 {
 	Super::BeginPlay();	
-
-	CurrentHP = MaxHP;
+	DamageControlSystem->StartSystem();
 }
 
 void ACh_SpiderBase::PossessedBy(AController* NewController) {
 	Super::PossessedBy(NewController);
-	
+	/*
 	if(IsPlayerControlled())
 	{
-		PlayerController = Cast<APlayerController>(NewController);
-		if(PlayerController != nullptr)
+		PlayerController = TWeakObjectPtr<APlayerController>(Cast<APlayerController>(NewController));
+		if(PlayerController.IsValid())
 		{
 			bIsPlayerControlling = true;
 		}
 	}
+	*/
 }
 
 void ACh_SpiderBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	WCS->InitializeWeaponNumber(WeaponSlotNum);
-
+	AimLocation = GetActorLocation() + 100.0f*GetActorForwardVector();
+	
+	WeaponControlSystem->InitializeWeaponNumber(WeaponSlotNum);
+	DamageControlSystem->InitializeSystem(MaxHP);
+	DamageControlSystem->OnHPIsZero.AddUObject(this, &ACh_SpiderBase::OnHPIsZero);
+	
+	//DeathAnimAssset이 재생 끝나는걸 알리는 notify에 웨폰 및 본체를 파괴시키는 로직을 추가하자.
 }
 
 // Called every frame
@@ -91,31 +97,40 @@ void ACh_SpiderBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if(IsPlayerControlled())
+	if(!bIsLocalPlayerControlled)
 	{
-		if(IsValid(GetController()))
+		if(IsPlayerControlled())
 		{
-			if(GetController()->IsLocalController())
+			if(IsLocallyControlled())
 			{
-				if(Camera != nullptr)
-				{
-					Camera->AddRelativeRotation(FRotator(CameraPitchMovement * DeltaTime,0.0f,0.0f));
-				}
-				if(SpringArm != nullptr)
-				{
-					SpringArm->AddRelativeRotation(FRotator(0.0f,CameraYawMovement * DeltaTime,0.0f));
-				}
-				FVector NewLocalAim = CameraAimLocation(Camera);
-				AimLocation = NewLocalAim;
-				WCS->TargetWorldLocation = NewLocalAim;
-				ServerNetTick(NewLocalAim,DeltaTime);
+				bIsLocalPlayerControlled = true;
 			}
-			
 		}
 	}
+	else
+	{
+		if(IsValid(Camera)&&IsValid(SpringArm))
+		{
+			//카메라 회전
+			Camera->AddRelativeRotation(FRotator(CameraPitchMovement * DeltaTime,0.0f,0.0f));
+			SpringArm->AddRelativeRotation(FRotator(0.0f,CameraYawMovement * DeltaTime,0.0f));
+		}
+	}
+
 	if(IsValid(WaistSceneComponent))
 	{
 		TurnUpperBody(WaistSceneComponent,DeltaTime);
+	}
+
+	//DeltaTime은 약 0.003~0.005입니다.
+	TickTimeStack += DeltaTime;
+
+	if(TickTimeStack>=NetworkTickInterval)
+	{
+		//네트워크 함수 실행
+		NetworkTick(TickTimeStack);
+
+		TickTimeStack = 0.0f;
 	}
 }
 
@@ -123,7 +138,7 @@ void ACh_SpiderBase::Tick(float DeltaTime)
 void ACh_SpiderBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAxis(TEXT("Turn"),this,&ACh_SpiderBase::Turn);
+	PlayerInputComponent->BindAxis(TEXT("Turn"),this,&ACh_SpiderBase::TurnCamera);
 	PlayerInputComponent->BindAxis(TEXT("LookUp"),this,&ACh_SpiderBase::LookUp);
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"),this,&ACh_SpiderBase::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"),this,&ACh_SpiderBase::MoveRight);
@@ -153,47 +168,59 @@ void ACh_SpiderBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction(FName(TEXT("Fire")),IE_Pressed,this,&ACh_SpiderBase::OnTriggerDown);
 	PlayerInputComponent->BindAction(FName(TEXT("Fire")),IE_Released,this,&ACh_SpiderBase::OnTriggerUp);
-	//OnTakePointDamage.AddDynamic()
 }
 
-FVector ACh_SpiderBase::CameraAimLocation(UCameraComponent* CurrentCamera) {
-	FVector AimPoint = Camera->GetComponentLocation() + (Camera->GetForwardVector() * 10000.0f);
+FVector ACh_SpiderBase::GetCameraAimLocation(UCameraComponent* CurrentCamera)
+{
+	FVector AimEnd = Camera->GetComponentLocation() + (Camera->GetForwardVector() * 10000.0f);
 	FCollisionQueryParams AimParams;
 	FHitResult AimResult;
+	//Actors to ignore을 spider의 변수로 만들고, 리플리케이트 되게 한다.
+	//또한 Weapon을 attach시킬 때 ignore에 추가시키는 로직을 만든다.(WCS에서)
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
-	for(FWeaponData WeaponData:WCS->WeaponDataArray) {
+	for(FWeaponData WeaponData:WeaponControlSystem->WeaponDataArray)
+	{
 		ActorsToIgnore.Add(WeaponData.Weapon);
 	}
+
 	AimParams.AddIgnoredActors(ActorsToIgnore);
-	bool IsHit = GetWorld()->LineTraceSingleByChannel(AimResult,Camera->GetComponentLocation(),AimPoint,ECC_Visibility,AimParams);
-	if(IsHit) {
-		if(AimResult.bBlockingHit) {
+	bool IsHit = GetWorld()->LineTraceSingleByChannel(AimResult,Camera->GetComponentLocation(),AimEnd,ECC_Visibility,AimParams);
+	if(IsHit)
+	{
+		if(AimResult.bBlockingHit)
+		{
 			return FVector(AimResult.ImpactPoint);
 		}
-		else {
-			return AimPoint;
+		else
+		{
+			return AimEnd;
 		}
 	}
-	else {
-		return AimPoint;
+	else
+	{
+		return AimEnd;
 	}
 }
 
-void ACh_SpiderBase::Turn(float NewAxisValue) {
+void ACh_SpiderBase::TurnCamera(float NewAxisValue)
+{
 	CameraYawMovement = CameraYawSpeed * NewAxisValue;
 }
 
-void ACh_SpiderBase::LookUp(float NewAxisValue) {
+void ACh_SpiderBase::LookUp(float NewAxisValue)
+{
 	CameraPitchMovement = CameraPitchSpeed * -NewAxisValue;
 }
 
-void ACh_SpiderBase::MoveForward(float NewAxisValue) {
+void ACh_SpiderBase::MoveForward(float NewAxisValue)
+{
 	MoveInput = NewAxisValue;
 	AddMovementInput(GetActorForwardVector(),NewAxisValue);
 }
 
-void ACh_SpiderBase::MoveRight(float NewAxisValue) {
+void ACh_SpiderBase::MoveRight(float NewAxisValue)
+{
 	if(FMath::IsNearlyEqual(MoveInput,0.0f,0.01f))
 	{
 		AddMovementInput(GetActorRightVector(),NewAxisValue);
@@ -218,19 +245,18 @@ void ACh_SpiderBase::TurnBody(float NewAxisValue)
 
 void ACh_SpiderBase::ChangeWeaponGroup(int NewGroup)
 {
-	//IsLocallyControlled()
-
+	
 	if(NewGroup>=WeaponSlotNum)
 	{
 		UE_LOG(Proto,Warning,TEXT("%s / %s : The Index is out of range. Fail to change active weapon group."),*LINE_INFO,*GetNameSafe(this));
 		return;
 	}
-	if(!IsValid(WCS))
+	if(!IsValid(WeaponControlSystem))
 	{
 		return;
 	}
-
-	WCS->ActivateWeaponGroup(NewGroup);
+	
+	WeaponControlSystem->ActivateWeaponGroup(NewGroup);
 }
 
 void ACh_SpiderBase::OnTriggerDown_Implementation()
@@ -240,7 +266,7 @@ void ACh_SpiderBase::OnTriggerDown_Implementation()
 		return;
 	}
 
-	WCS->SendFireOrder();
+	WeaponControlSystem->SendFireOrder();
 }
 
 bool ACh_SpiderBase::OnTriggerDown_Validate()
@@ -255,33 +281,20 @@ void ACh_SpiderBase::OnTriggerUp_Implementation()
 		return;
 	}
 
-	WCS->SendCeaseFireOrder();
+	WeaponControlSystem->SendCeaseFireOrder();
 }
 
 bool ACh_SpiderBase::OnTriggerUp_Validate()
 {
 	return true;
 }
+
 void ACh_SpiderBase::SetWaistSceneComponent(USceneComponent * BlueprintWaistSceneComponent)
 {
-	WaistSceneComponent = BlueprintWaistSceneComponent;
-}
-
-
-void ACh_SpiderBase::ServerNetTick_Implementation(FVector CameraAim,float Deltatime)
-{
-	if(GetLocalRole()<ROLE_Authority)
+	if(IsValid(BlueprintWaistSceneComponent))
 	{
-		return;
+		WaistSceneComponent = BlueprintWaistSceneComponent;
 	}
-	AimLocation = CameraAim;
-	WCS->TargetWorldLocation = AimLocation;
-	
-}
-
-bool ACh_SpiderBase::ServerNetTick_Validate(FVector CameraAim,float Deltatime)
-{
-	return true;
 }
 
 void ACh_SpiderBase::TurnUpperBody(USceneComponent* WaistComponent,float DeltaTime)
@@ -329,12 +342,22 @@ void ACh_SpiderBase::TurnUpperBody(USceneComponent* WaistComponent,float DeltaTi
 			DeltaRotation.Yaw = FMath::Sign(RotationDiff.Yaw) * UpperBodyRotationSpeed * DeltaTime;
 		}
 
+		//새로운 로테이션의 최종값, 찌꺼기값이 쌓이는 걸 방지하기 위해 pich와 roll은 0으로 고정된다.
 		FRotator NewUpperBodyRotation = CurrentUpperBodyRotation + DeltaRotation;
-		NewUpperBodyRotation.Pitch = 0.0f;
-		NewUpperBodyRotation.Roll = 0.0f;
-		WaistComponent->SetRelativeRotation(NewUpperBodyRotation);
+		
+		//적용
+		WaistSceneComponent->SetRelativeRotation(FRotator(0.0f, NewUpperBodyRotation.Yaw, 0.0f));
 	}
 }
+
+void ACh_SpiderBase::Multicast_SetUpperBodyYaw_Implementation(float NewYaw)
+{
+	if(IsValid(WaistSceneComponent))
+	{
+		WaistSceneComponent->SetRelativeRotation(FRotator(0.0f,NewYaw,0.0f));
+	}	
+}
+
 float ACh_SpiderBase::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) {
 	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	
@@ -343,10 +366,12 @@ float ACh_SpiderBase::TakeDamage(float Damage, struct FDamageEvent const& Damage
 		CurrentHP -= Damage;
 		//위젯에 체력 넘겨주는 부분
 		//열거형 사용해서 어떤 부위의 HP인지 매개변수로 넘겨줌
+		/*
 		if(IsValid(WG_InGame))
 		{
 			WG_InGame->SetHP(HPType::BODY,(int)CurrentHP);
-		}		
+		}
+		*/
 		if (CurrentHP <= 0.0f) {
 			OnDeath.Broadcast(EventInstigator);
 			//여기에 캐릭터 사망함수 혹은 패배관련 함수가 들어가야됩니다
@@ -359,13 +384,14 @@ float ACh_SpiderBase::TakeDamage(float Damage, struct FDamageEvent const& Damage
 
 void ACh_SpiderBase::OnWeaponTakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	
 	if (Damage >= 0.0f) {
 		CurrentHP -= Damage;
+		/*
 		if(IsValid(WG_InGame))
 		{
 			WG_InGame->SetHP(HPType::BODY,(int)CurrentHP);
 		}
+		*/
 		if (CurrentHP <= 0.0f) {
 
 			OnDeath.Broadcast(EventInstigator);
@@ -376,10 +402,53 @@ void ACh_SpiderBase::OnWeaponTakeDamage(float Damage, FDamageEvent const& Damage
 	}
 }
 
+void ACh_SpiderBase::OnHPIsZero(AController* DamageInstigator,AActor* DamageCauser,AActor* DamageReciever)
+{
+	if(GetLocalRole()>=ROLE_Authority)
+	{
+		OnDeath.Broadcast(DamageInstigator);
+	}	
+}
+
 void ACh_SpiderBase::DeathAnim_Implementation()
 {
 	if(IsValid(DeathAnimAsset))
 	{
 		GetMesh()->PlayAnimation(DeathAnimAsset, false);
 	}
+}
+
+void ACh_SpiderBase::NetworkTick(float NetworkDeltaTime)
+{
+	if(bIsLocalPlayerControlled)
+	{
+		if(IsValid(Camera))
+		{
+			FVector NewLocalAim = GetCameraAimLocation(Camera);
+			ServerNetTick(NewLocalAim);
+		}
+	}
+
+	if(GetLocalRole()>=ROLE_Authority)
+	{
+		MulticastNetTick(AimLocation);
+	}
+}
+
+void ACh_SpiderBase::ServerNetTick_Implementation(FVector LocalAim)
+{
+	if(GetLocalRole()<ROLE_Authority)
+	{
+		return;
+	}
+	AimLocation = LocalAim;
+}
+
+void ACh_SpiderBase::MulticastNetTick_Implementation(FVector ServerAim)
+{
+	if(GetLocalRole()<ROLE_Authority)
+	{
+		AimLocation = ServerAim;
+	}
+	WeaponControlSystem->TargetWorldLocation = ServerAim;
 }
