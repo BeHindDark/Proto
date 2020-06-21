@@ -112,7 +112,7 @@ public:
 	*/
 
 	/**유저의 ID*/
-	FName LocalUserID;
+	FName LocalUserID = "DefaultID";
 
 	/**세션 로비의 맵 이름*/
 	FName SessionLobyName;
@@ -129,6 +129,9 @@ public:
 	*	@ value -1 == non initialized
 	*/
 	int UserFreeSetSelector = -1;
+
+	//에디터 플레이시, 자동으로 생성된 listen server에서 나가기 위한 임시 변수
+	bool bIsInitialSessionDestroyed = false;
 
 public:
 

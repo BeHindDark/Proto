@@ -189,10 +189,11 @@ void AAct_Bullet::HitCheck(UPrimitiveComponent* HitComponent,AActor* OtherActor,
 	}
 
 	UE_LOG(Proto,Warning,TEXT("%s / %s : server hit with (%s)"),*LINE_INFO,*GetNameSafe(this),*GetNameSafe(OtherActor));
+	
 	ProjectileMovement->StopMovementImmediately();
 	UGameplayStatics::ApplyDamage(OtherActor,Damage,DamageInstigatorPlayer,this,UDamageType::StaticClass());
 
-	CollisionMulticast();
+	CollisionMulticast(Hit.ImpactPoint);
 	
 }
 
@@ -207,17 +208,15 @@ void AAct_Bullet::BeginOverlap(UPrimitiveComponent* OverlappedComponent,AActor* 
 
 
 	UE_LOG(Proto,Warning,TEXT("%s / %s : serverOverLAP with (%s)"),*LINE_INFO,*GetNameSafe(this),*GetNameSafe(OtherActor));
-	ProjectileMovement->SetVelocityInLocalSpace(FVector::ZeroVector);
 	ProjectileMovement->StopMovementImmediately();
 
 	UGameplayStatics::ApplyDamage(OtherActor,Damage,DamageInstigatorPlayer,this,UDamageType::StaticClass());
 	
 
-
 	//FVector DamageDirection = SweepResult.ImpactPoint - GetActorLocation();
 	//UGameplayStatics::ApplyPointDamage(OtherActor, Damage, DamageDirection, SweepResult, DamageInstigatorPlayer, GetOwner(), UDamageType::StaticClass());
 
-	CollisionMulticast();
+	CollisionMulticast(SweepResult.ImpactPoint);
 
 	//ExplodeFX->OnSystemFinished.AddDynamic(this,&AAct_Bullet::StopFX);
 
@@ -233,18 +232,15 @@ void AAct_Bullet::StopFX_Implementation(UParticleSystemComponent* PSystem)
 	Destroy();
 }
 
-void AAct_Bullet::CollisionMulticast_Implementation()
+void AAct_Bullet::CollisionMulticast_Implementation(FVector CollisionLocation)
 {
-	ExplodeFX->Activate(true);
 	TracerFX->DeactivateSystem();
-	BulletCollision->SetHiddenInGame(true,true);
 	SetActorEnableCollision(false);
-	BulletMesh->SetVisibility(false);
-	ProjectileMovement->Deactivate();
-	ExplodeFX->OnSystemFinished.AddDynamic(this,&AAct_Bullet::StopFX);
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),ExplodeFX->Template,GetActorTransform(),true,EPSCPoolMethod::None,true);
+	if(IsValid(ExplodeFX->Template))
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),ExplodeFX->Template,FTransform(FRotator::ZeroRotator,CollisionLocation),true,EPSCPoolMethod::None,true);
+	}	
 	Destroy();
-
 }
 
 

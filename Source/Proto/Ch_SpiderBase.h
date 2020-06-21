@@ -43,6 +43,8 @@ public:
 	FSpiderOnDeath OnDeath;
 
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Spider")
+	FName ClassName = "SpiderBase";
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category = "Spider|WeaponControl")
 	class UWeaponControlSystem* WeaponControlSystem;
@@ -101,6 +103,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Network")
 	bool bIsLocalPlayerControlled = false;
+	
 
 private:
 	//매 틱마다 누적된 시간을 저장하는 변수
@@ -156,7 +159,11 @@ protected:
 	*	주기적으로 반복실행되어야하는 Reliable RPC함수를 실행시키는데 쓰입니다.
 	*/
 	virtual void NetworkTick(float NetworkDeltaTime);
-
+	
+	/**	DamageControlSystem의 OnGPIsZero Delegate에 의해 호출됩니다.
+	*	HP가 0이 되었을 떄의 행동을 결정합니다.
+	*	예를들어 바로 사망처리를 할 수도 있지만, 팀원에 의한 부활 대기시간을 가지거나, 아이템등을 써서 바로 부활할 수 있습니다.(예정)
+	*/
 	void OnHPIsZero(AController* DamageInstigator, AActor* DamageCauser, AActor* DamageReciever);
 
 private:

@@ -77,7 +77,7 @@ public:
 	AController* InstigatorController = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon|WeaponControlSystem")
-	APawn* OwningPawn = nullptr;
+	AActor* OwningActor = nullptr;
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon", meta = (AllowPrivateAccess = true))

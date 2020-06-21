@@ -57,6 +57,9 @@ public:
 	*/
 	FOnHPIsChangedDelegate OnHPIsChanged;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HP")
+	bool bIsAlive = true;
+
 private:
 	//HP 초기화를 위한 기본 HP값입니다.
 	UPROPERTY(EditDefaultsOnly, Category = "HP")

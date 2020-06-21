@@ -8,7 +8,7 @@
 UGI_Proto::UGI_Proto(const FObjectInitializer& ObjectInitializer) {
 	// 초기화
 
-	SessionLobyName = TEXT("SessionLobyMap");
+	SessionLobyName = TEXT("DebugMap");
 
 	/** 세션에 관련된 함수와 델리게이트를 바인딩한다. */
 	OnCreateSessionCompleteDelegate = FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Proto::OnCreateSessionComplete);
@@ -394,7 +394,7 @@ void UGI_Proto::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
 			// If it was successful, we just load another level (could be a MainMenu!)
 			if (bWasSuccessful)
 			{
-				UGameplayStatics::OpenLevel(GetWorld(), "mainmenumap", true);
+				UGameplayStatics::OpenLevel(GetWorld(), TEXT("MainMap"), true);
 			}
 			//Sessions->UnregisterPlayer();
 			//Sessions->DestroySession();

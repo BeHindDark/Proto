@@ -361,52 +361,24 @@ void ACh_SpiderBase::Multicast_SetUpperBodyYaw_Implementation(float NewYaw)
 float ACh_SpiderBase::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) {
 	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	
-	if (ActualDamage >= 0.0f) {
-		//정말로 간단한 체력계산식
-		CurrentHP -= Damage;
-		//위젯에 체력 넘겨주는 부분
-		//열거형 사용해서 어떤 부위의 HP인지 매개변수로 넘겨줌
-		/*
-		if(IsValid(WG_InGame))
-		{
-			WG_InGame->SetHP(HPType::BODY,(int)CurrentHP);
-		}
-		*/
-		if (CurrentHP <= 0.0f) {
-			OnDeath.Broadcast(EventInstigator);
-			//여기에 캐릭터 사망함수 혹은 패배관련 함수가 들어가야됩니다
-			DeathAnim();
-		}
-	}
-	return ActualDamage;
+	return DamageControlSystem->OnTakeDamage(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
+	
 }
 
 
 void ACh_SpiderBase::OnWeaponTakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (Damage >= 0.0f) {
-		CurrentHP -= Damage;
-		/*
-		if(IsValid(WG_InGame))
-		{
-			WG_InGame->SetHP(HPType::BODY,(int)CurrentHP);
-		}
-		*/
-		if (CurrentHP <= 0.0f) {
-
-			OnDeath.Broadcast(EventInstigator);
-			//여기에 캐릭터 사망함수 들어가야됩니다
-			CurrentHP = 0.0f;
-			DeathAnim();
-		}
-	}
+	DamageControlSystem->OnTakeDamage(Damage,DamageEvent,EventInstigator,DamageCauser);
+	
 }
 
 void ACh_SpiderBase::OnHPIsZero(AController* DamageInstigator,AActor* DamageCauser,AActor* DamageReciever)
 {
 	if(GetLocalRole()>=ROLE_Authority)
 	{
+		DamageControlSystem->bIsAlive = false;
 		OnDeath.Broadcast(DamageInstigator);
+		DeathAnim();
 	}	
 }
 

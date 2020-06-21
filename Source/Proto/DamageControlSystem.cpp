@@ -75,6 +75,10 @@ float UDamageControlSystem::OnTakeDamage(float Damage,FDamageEvent const & Damag
 	{
 		return 0.0f;
 	}
+	if(!bIsAlive)
+	{
+		return 0.0f;
+	}
 	EDamageInstigatorType InstigatorType = EDamageInstigatorType::DamageInstigator_None;
 	FString InstigatorName = TEXT("None");
 

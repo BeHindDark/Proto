@@ -99,8 +99,8 @@ public:
 	void StopFX_Implementation(UParticleSystemComponent* PSystem);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void CollisionMulticast();
-	void CollisionMulticast_Implementation();
+	void CollisionMulticast(FVector CollisionLocation);
+	void CollisionMulticast_Implementation(FVector CollisionLocation);
 
 	
 };

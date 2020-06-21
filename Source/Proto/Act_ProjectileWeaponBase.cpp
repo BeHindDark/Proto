@@ -166,7 +166,25 @@ void AAct_ProjectileWeaponBase::SpawnBulletInServer(FVector MuzzleLocation, FRot
 		}
 		else
 		{
-			Bullet->InitializeBullet(this,nullptr, LaunchSpeed, Damage*DamageMultiplier, TracerColor);
+			if(IsValid(OwningActor))
+			{
+				APawn* OwningPawn =  Cast<APawn>(OwningActor);
+				if(IsValid(OwningPawn))
+				{
+					InstigatorController = OwningPawn->GetController();
+					Bullet->InitializeBullet(this,InstigatorController,LaunchSpeed,Damage*DamageMultiplier,TracerColor);
+					
+				}
+				else
+				{
+					Bullet->InitializeBullet(this,nullptr,LaunchSpeed,Damage*DamageMultiplier,TracerColor);
+				}
+			}
+			else
+			{
+				Bullet->InitializeBullet(this,nullptr,LaunchSpeed,Damage*DamageMultiplier,TracerColor);
+			}
+			
 		}
 	}
 }

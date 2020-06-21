@@ -21,8 +21,23 @@ void APC_Main::BeginPlay()
 	SetInputMode(UIMode);
 
 	UGI_Proto* GI_Proto = Cast<UGI_Proto>(GetGameInstance());
-
-	GI_Proto->DestroySessionAndLeaveGame();
+	if(IsValid(GI_Proto))
+	{
+		if(!GI_Proto->bIsInitialSessionDestroyed)
+		{
+			GI_Proto->bIsInitialSessionDestroyed = true;
+			GI_Proto->DestroySessionAndLeaveGame();
+			UE_LOG(Proto,Warning,TEXT("%s / %s : Destroying Initial Session"),*LINE_INFO,*GetNameSafe(this));
+		}
+		else
+		{
+			UE_LOG(Proto,Warning,TEXT("%s / %s : Initial Session already destroyed"),*LINE_INFO,*GetNameSafe(this));
+		}
+	}
+	else
+	{
+		UE_LOG(Proto,Warning,TEXT("%s / %s : GameInstance is not valid"),*LINE_INFO,*GetNameSafe(this));
+	}
 
 }
 
@@ -47,7 +62,7 @@ void APC_Main::ShowMainWG(int Zorder)
 	{
 		WG_Main->AddToViewport(Zorder);
 	}
-	
+	 
 	
 	bShowMouseCursor = true;
 }
@@ -178,9 +193,10 @@ void APC_Main::OnGetCreateSessionReport(bool bWasSuccessful)
 		{
 			WG_Main->RemoveFromParent();
 		}
+		
+		UE_LOG(Proto,Warning,TEXT("%s / %s : Succeed to Create Session"),*LINE_INFO,*GetNameSafe(this));
 
-
-		UGameplayStatics::OpenLevel(GetWorld(),FName("RespawnTest_Map"),true,"listen");
+		UGameplayStatics::OpenLevel(this,"DebugMap",true,"listen");
 	}
 	else
 	{

@@ -86,6 +86,17 @@ void AAct_WeaponBase::ConnectWeaponControlSystem_Implementation(UWeaponControlSy
 		return;
 	}
 	WeaponControlSystem_Ref = NewWeaponControlSystem;
+
+	OwningActor = NewWeaponControlSystem->GetOwner();
+
+	if(IsValid(OwningActor))
+	{
+		APawn* OwningPawn =  Cast<APawn>(OwningActor);
+		if(IsValid(OwningPawn))
+		{
+			InstigatorController = OwningPawn->GetController();
+		}
+	}	
 	
 	SocketArrow_Ref = NewWeaponControlSystem->WeaponDataArray[NewWeaponIndex].SocketArrow_Ref;
 
